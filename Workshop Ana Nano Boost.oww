@@ -1,0 +1,148 @@
+settings
+{
+	main
+	{
+		Mode Name: "Ana Nano Boost - 5Q9R1"
+	}
+
+	modes
+	{
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	extensions
+	{
+		Buff Status Effects
+		Buff and Debuff Sounds
+	}
+}
+
+variables
+{
+	player:
+		0: ID_Array
+		1: Target
+}
+
+rule("Use Nano Boost")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Disallow Button(Event Player, Button(Ultimate));
+		Set Melee Enabled(Event Player, False);
+		Set Reload Enabled(Event Player, False);
+		Cancel Primary Action(Event Player);
+		Event Player.Target = First Of(Sorted Array(Filtered Array(Remove From Array(All Living Players(Team Of(Event Player)),
+			Event Player), Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS)
+			&& Distance Between(Eye Position(Event Player) + Facing Direction Of(Event Player) * Distance Between(Eye Position(
+			Event Player), Eye Position(Current Array Element)), Eye Position(Current Array Element)) <= 2 && Distance Between(
+			Event Player, Current Array Element) <= 40), Distance Between(Eye Position(Event Player) + Facing Direction Of(Event Player)
+			* Distance Between(Eye Position(Event Player), Eye Position(Current Array Element)), Eye Position(Current Array Element))));
+		Skip If(Entity Exists(Event Player.Target), 1);
+		Event Player.Target = Event Player;
+		Wait(0.128, Ignore Condition);
+		Heal(Event Player.Target, Event Player, 250);
+		Wait(0.600, Ignore Condition);
+		Set Primary Fire Enabled(Event Player, True);
+		Set Secondary Fire Enabled(Event Player, True);
+		Set Ability 1 Enabled(Event Player, True);
+		Set Ability 2 Enabled(Event Player, True);
+		Allow Button(Event Player, Button(Ultimate));
+		Set Melee Enabled(Event Player, True);
+		Set Reload Enabled(Event Player, True);
+		Wait(7.272, Restart When True);
+		Event Player.Target = Null;
+	}
+}
+
+rule("Nano Boost Effect")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Players(Team Of(Event Player)), Current Array Element.Target == Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.128, Ignore Condition);
+		Destroy Effect(Event Player.ID_Array[0]);
+		Destroy Effect(Event Player.ID_Array[1]);
+		Create Effect(All Players(All Teams), Ana Nano Boosted Effect, Team Of(Event Player) == Team 1 ? Color(Team 1) : Color(Team 2),
+			Event Player, 1, Visible To);
+		Event Player.ID_Array[0] = Last Created Entity;
+		Create Effect(All Players(All Teams), Ana Nano Boosted Sound, Color(White), Event Player, 100, Visible To);
+		Event Player.ID_Array[1] = Last Created Entity;
+		Set Damage Dealt(Event Player, 150);
+		Set Damage Received(Event Player, 50);
+		Wait Until(Is True For All(All Players(Team Of(Event Player)), Current Array Element.Target != Event Player), 99999);
+		Destroy Effect(Event Player.ID_Array[0]);
+		Destroy Effect(Event Player.ID_Array[1]);
+		Set Damage Dealt(Event Player, 100);
+		Set Damage Received(Event Player, 100);
+	}
+}
+
+rule("Nano Assist")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Players(Team Of(Event Player)), Current Array Element.Target == Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Assist(Event Player.ID_Array[2]);
+		Start Assist(Filtered Array(All Players(Team Of(Event Player)), Current Array Element.Target == Event Player), Victim, None);
+		Event Player.ID_Array[2] = Last Assist ID;
+		Wait(1, Restart When True);
+		Stop Assist(Event Player.ID_Array[2]);
+	}
+}
