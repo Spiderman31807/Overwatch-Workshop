@@ -1,0 +1,931 @@
+settings
+{
+	main
+	{
+		Description: "\"https://discord.gg/JVU3dQ743U\" To Download\nMap Layouts, Just Open The File, Copy The\nText And You Can Paste It Into The Workshop.\n\nImport A Pathfinder With \"3CZ1R\"\n\nGray - Path\nYellow - Undefined Healthkit\nAqua - Small Healthkit\nGreen - Large Medkit\nPurple - ObjectiveA / ObjectiveB\nBlack - Chokepoint\nTurquoise - Staircase Bottom\nLime - Staircase Middle\nViolet - Staircase Top\nAqua - JumpStart / JumpEnd"
+		Mode Name: "Pathfind Node Maker - 9005G"
+	}
+
+	lobby
+	{
+		Map Rotation: Paused
+		Max Spectators: 0
+		Max Team 1 Players: 0
+		Max Team 2 Players: 1
+		Return To Lobby: Never
+		Swap Teams After Match: No
+	}
+
+	modes
+	{
+		Assault
+		{
+			enabled maps
+			{
+				Hanamura 972777519512068154
+			}
+		}
+
+		Control
+		{
+			enabled maps
+			{
+			}
+		}
+
+		Escort
+		{
+			enabled maps
+			{
+			}
+		}
+
+		Hybrid
+		{
+			enabled maps
+			{
+			}
+		}
+
+		General
+		{
+			Allow Hero Switching: Off
+			Game Mode Start: Manual
+			Hero Limit: Off
+			Respawn As Random Hero: On
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			enabled heroes
+			{
+				Soldier: 76
+			}
+		}
+	}
+
+	extensions
+	{
+		Beam Effects
+		Buff Status Effects
+		Debuff Status Effects
+		Buff and Debuff Sounds
+		Energy Explosion Effects
+		Kinetic Explosion Effects
+		Explosion Sounds
+		Play More Effects
+	}
+}
+
+variables
+{
+	global:
+		0: Path_Nodes
+		1: Healthkits
+		5: ObjectiveA_Nodes
+		6: ObjectiveB_Nodes
+		8: Chokepoint
+		9: Staircase_Top
+		10: Staircase_Bottom
+		11: Healthkits_Small
+		12: Healthkits_Large
+		13: Staircase_Middle
+		14: Jump_Start
+		15: Jump_End
+
+	player:
+		0: Staircase_Bottom
+		1: Staircase_Middle
+		2: Staircase_Top
+		3: Staircase_Phase
+		4: Targeted_Node
+		5: Targeted_Node_Type
+		6: Facing
+		7: Effects
+		8: Node_Index
+		9: Node_Types
+		10: Log_Index
+		11: Making_Staircase
+		12: Closest_Staircase_Index
+		13: Closest_Staircase
+		14: Jump_Start
+		15: Jump_End
+		16: Jump_Phase
+		17: Making_Jump
+		18: Closest_Jump_Index
+		19: Closest_Jump
+}
+
+subroutines
+{
+	0: Make_Staircase_Bottom
+	1: Make_Staircase_Middle
+	2: Make_Staircase_Top
+	3: Finish_Staircase
+	4: Make_Jump_Start
+	5: Make_Jump_End
+	6: Finish_Jump
+}
+
+rule("----------- Copy Map Layout Here -----------")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+}
+
+rule("Global Variables")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Destroy All Effects;
+		Destroy All Icons;
+		Destroy All HUD Text;
+		Host Player.Node_Types = Array(Custom String("Path"), Custom String("Healthkit"), Custom String("Healthkit Small"), Custom String(
+			"Healthkit Large"), Custom String("Objective A"), Custom String("Objective B"), Custom String("Chokepoint"), Custom String(
+			"Staircase"), Custom String("Jump"));
+		Create Icon(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), First Of(
+			Sorted Array(Filtered Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(
+			Append To Array(Append To Array(Append To Array(Global.Path_Nodes, Global.Healthkits), Global.Healthkits_Small),
+			Global.Healthkits_Large), Global.ObjectiveA_Nodes), Global.ObjectiveB_Nodes), Append To Array(Global.Chokepoint,
+			Append To Array(Global.Jump_Start, Global.Jump_End))), Global.Staircase_Bottom), Global.Staircase_Middle),
+			Global.Staircase_Top), Current Array Element != Null), Distance Between(Host Player.Facing, Current Array Element))),
+			Arrow: Down, Visible To and Position, Color(Red), False);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Host Player.Making_Jump && !Host Player.Making_Staircase),
+			Orisa Halt Tendril Beam, Host Player.Jump_Start, Event Player.Jump_End, Color(Team 2), Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+			Turquoise), Global.Staircase_Bottom[Host Player.Closest_Staircase_Index], 0.500, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+			Lime Green), Global.Staircase_Middle[Host Player.Closest_Staircase_Index], 0.500, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Host Player.Making_Jump && !Host Player.Making_Staircase), Sphere, Color(
+			Aqua), Host Player.Jump_Start, 0.500, Visible To Position and Radius);
+		Create Beam Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump),
+			Orisa Halt Tendril Beam, Global.Jump_Start[Host Player.Closest_Jump_Index], Global.Jump_End[Host Player.Closest_Jump_Index],
+			Color(Team 2), Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Host Player.Making_Jump && !Host Player.Making_Staircase), Sphere, Color(
+			Aqua), Host Player.Jump_End, 0.500, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+			Violet), Global.Staircase_Top[Host Player.Closest_Staircase_Index], 0.500, Visible To Position and Radius);
+		Create Beam Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump),
+			Orisa Halt Tendril Beam, Global.Staircase_Bottom[Host Player.Closest_Staircase_Index],
+			Global.Staircase_Middle[Host Player.Closest_Staircase_Index] == Null ? Global.Staircase_Top[Host Player.Closest_Staircase_Index] : Global.Staircase_Middle[Host Player.Closest_Staircase_Index],
+			Color(Team 2), Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+			Aqua), Global.Jump_Start[Host Player.Closest_Jump_Index], 0.500, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+			Aqua), Global.Jump_End[Host Player.Closest_Jump_Index], 0.500, Visible To Position and Radius);
+		Create Beam Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump),
+			Orisa Halt Tendril Beam, Global.Staircase_Top[Host Player.Closest_Staircase_Index],
+			Global.Staircase_Middle[Host Player.Closest_Staircase_Index] == Null ? Global.Staircase_Bottom[Host Player.Closest_Staircase_Index] : Global.Staircase_Middle[Host Player.Closest_Staircase_Index],
+			Color(Team 2), Visible To Position and Radius);
+		Create HUD Text(Filtered Array(All Players(All Teams), Event Player.Making_Staircase || Event Player.Making_Jump), Custom String(
+			"No Progress Was Lost, Nodes Are Invisible\n             During Build Mode"), Null, Null, Top, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(All Players(All Teams), Event Player.Making_Staircase || Event Player.Making_Jump), Custom String(
+			"Cancel Building Stage {0}\nConfirm Stage {1} {2}", Input Binding String(Button(Secondary Fire)),
+			Host Player.Making_Staircase ? Host Player.Staircase_Phase : Host Player.Jump_Phase, Custom String("{0}\nUndo Stage {2}{1}",
+			Input Binding String(Button(Primary Fire)), Host Player.Staircase_Phase == Custom String("Middle") ? Custom String(
+			"\nSkip Stage {0}", Input Binding String(Button(Interact))) : Custom String(""), Input Binding String(Button(Ultimate)))),
+			Null, Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create Effect(Filtered Array(All Players(All Teams), Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+			Turquoise), Host Player.Staircase_Bottom, 0.500, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+			Lime Green), Host Player.Staircase_Middle, 0.500, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+			Violet), Host Player.Staircase_Top, 0.500, Visible To Position and Radius);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Host Player.Making_Staircase && !Host Player.Making_Jump),
+			Orisa Halt Tendril Beam, Host Player.Staircase_Bottom,
+			Host Player.Staircase_Middle == Null ? Host Player.Staircase_Top : Host Player.Staircase_Middle, Color(Team 2),
+			Visible To Position and Radius);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Host Player.Making_Staircase && !Host Player.Making_Jump),
+			Orisa Halt Tendril Beam, Host Player.Staircase_Top,
+			Host Player.Staircase_Middle == Null ? Host Player.Staircase_Bottom : Host Player.Staircase_Middle, Color(Team 2),
+			Visible To Position and Radius);
+		Create HUD Text(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Custom String(
+			"Only Considers Your POV\nBlue = Both Ways\nOrange = Only Down\nRed = No Ways"), Null, Null, Left, 0, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Custom String(
+			"{0} To Teleport Forward\nReset ALL Nodes {1} While Crouching\nLog All Nodes {2}", Input Binding String(Button(Interact)),
+			Input Binding String(Button(Melee)), Custom String("{0} While Crouching\nDelete Targeted Node (Red Arrow) {1}",
+			Input Binding String(Button(Reload)), Input Binding String(Button(Ultimate)))), Null, Null, Right, 6, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Custom String(
+			"{0} To Place {1} Node\nTargeted Node {2}", Input Binding String(Button(Reload)),
+			Host Player.Node_Types[Host Player.Node_Index], Host Player.Targeted_Node_Type), Null, Null, Top, 5, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Custom String(
+			"{0} Previous Node\n{1} Next Node\n\nObjective Index {2}", Input Binding String(Button(Secondary Fire)), Input Binding String(
+			Button(Primary Fire)), Objective Index), Null, Null, Left, 1, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Create Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere,
+			Array Contains(Global.Healthkits_Small, First Of(Sorted Array(Append To Array(Append To Array(Global.Healthkits,
+			Global.Healthkits_Small), Global.Healthkits_Large), Distance Between(Host Player, Current Array Element)))) ? Color(Blue) : (
+			Array Contains(Global.Healthkits_Large, First Of(Sorted Array(Append To Array(Append To Array(Global.Healthkits,
+			Global.Healthkits_Small), Global.Healthkits_Large), Distance Between(Host Player, Current Array Element)))) ? Color(Green)
+			: Color(Yellow)), First Of(Sorted Array(Append To Array(Append To Array(Global.Healthkits, Global.Healthkits_Small),
+			Global.Healthkits_Large), Distance Between(Host Player, Current Array Element))), 0.500, Visible To Position Radius and Color);
+		Create Beam Effect(Filtered Array(Host Player, !Host Player.Making_Staircase && !Host Player.Making_Jump), Bad Beam, First Of(
+			Sorted Array(Global.Path_Nodes, Distance Between(Host Player.Facing, Current Array Element))), Position Of(Host Player),
+			Y Component Of(World Vector Of(Vector(0, 2.550, 0), Host Player, Rotation And Translation)) > Y Component Of(First Of(
+			Sorted Array(Global.Path_Nodes, Distance Between(Host Player.Facing, Current Array Element)))) && Y Component Of(
+			World Vector Of(Vector(0, 0.550, 0), Host Player, Rotation And Translation)) < Y Component Of(First Of(Sorted Array(
+			Global.Path_Nodes, Distance Between(Host Player.Facing, Current Array Element)))) ? Color(Aqua) : (Y Component Of(
+			World Vector Of(Vector(0, 2.550, 0), Host Player, Rotation And Translation)) > Y Component Of(First Of(Sorted Array(
+			Global.Path_Nodes, Distance Between(Host Player.Facing, Current Array Element)))) ? Color(Orange) : Color(Red)),
+			Visible To Position Radius and Color);
+		Create Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+			Black), First Of(Sorted Array(Global.Chokepoint, Distance Between(Host Player, Current Array Element))), 0.500,
+			Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+			Purple), First Of(Sorted Array(Append To Array(Global.ObjectiveA_Nodes, Global.ObjectiveB_Nodes), Distance Between(Host Player,
+			Current Array Element))), 0.500, Visible To Position and Radius);
+		For Player Variable(Host Player, Effects, 0, 10, 1);
+			Create Effect(Filtered Array(All Players(All Teams), !Host Player.Making_Staircase && !Host Player.Making_Jump), Sphere, Color(
+				Gray), Sorted Array(Global.Path_Nodes, Distance Between(Host Player, Current Array Element))[Evaluate Once(Host Player.Effects)
+				], 0.500, Visible To Position and Radius);
+			Wait(0.100, Ignore Condition);
+		End;
+		Create Beam Effect(Filtered Array(Host Player, !Host Player.Making_Staircase && !Host Player.Making_Jump), Bad Beam, Last Of(
+			Global.Path_Nodes), Position Of(Host Player), Y Component Of(World Vector Of(Vector(0, 2.550, 0), Host Player,
+			Rotation And Translation)) > Y Component Of(Last Of(Global.Path_Nodes)) && Y Component Of(World Vector Of(Vector(0, 0.550, 0),
+			Host Player, Rotation And Translation)) < Y Component Of(Last Of(Global.Path_Nodes)) ? Color(Aqua) : (Y Component Of(
+			World Vector Of(Vector(0, 2.550, 0), Host Player, Rotation And Translation)) > Y Component Of(Last Of(Global.Path_Nodes))
+			? Color(Orange) : Color(Red)), Visible To Position Radius and Color);
+	}
+}
+
+rule("Update Variables")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Host Player.Making_Staircase != True;
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Host Player.Facing = Ray Cast Hit Position(Eye Position(Host Player), Eye Position(Host Player) + Facing Direction Of(Host Player)
+			* 15, Null, All Players(All Teams), False);
+		Host Player.Closest_Jump = First Of(Sorted Array(Filtered Array(Append To Array(Global.Jump_Start, Global.Jump_End),
+			Current Array Element != Null), Distance Between(Host Player, Current Array Element)));
+		If(Array Contains(Global.Jump_Start, Host Player.Closest_Jump));
+			Host Player.Closest_Jump_Index = Index Of Array Value(Global.Jump_Start, Host Player.Closest_Jump);
+		Else If(Array Contains(Global.Jump_End, Host Player.Closest_Jump));
+			Host Player.Closest_Jump_Index = Index Of Array Value(Global.Jump_End, Host Player.Closest_Jump);
+		End;
+		Host Player.Closest_Staircase = First Of(Sorted Array(Filtered Array(Append To Array(Append To Array(Global.Staircase_Bottom,
+			Global.Staircase_Middle), Global.Staircase_Top), Current Array Element != Null), Distance Between(Host Player,
+			Current Array Element)));
+		If(Array Contains(Global.Staircase_Bottom, Host Player.Closest_Staircase));
+			Host Player.Closest_Staircase_Index = Index Of Array Value(Global.Staircase_Bottom, Host Player.Closest_Staircase);
+		Else If(Array Contains(Global.Staircase_Middle, Host Player.Closest_Staircase));
+			Host Player.Closest_Staircase_Index = Index Of Array Value(Global.Staircase_Middle, Host Player.Closest_Staircase);
+		Else If(Array Contains(Global.Staircase_Top, Host Player.Closest_Staircase));
+			Host Player.Closest_Staircase_Index = Index Of Array Value(Global.Staircase_Top, Host Player.Closest_Staircase);
+		End;
+		Host Player.Targeted_Node = First Of(Sorted Array(Filtered Array(Append To Array(Append To Array(Append To Array(Append To Array(
+			Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Global.Path_Nodes, Global.Healthkits),
+			Global.Healthkits_Small), Global.Healthkits_Large), Global.ObjectiveA_Nodes), Global.ObjectiveB_Nodes), Append To Array(
+			Append To Array(Global.Chokepoint, Global.Jump_Start), Global.Jump_End)), Global.Staircase_Bottom), Global.Staircase_Middle),
+			Global.Staircase_Top), Current Array Element != Null), Distance Between(Host Player.Facing, Current Array Element)));
+		If(Host Player.Targeted_Node != Null);
+			If(Array Contains(Global.Path_Nodes, Host Player.Targeted_Node));
+				Host Player.Targeted_Node_Type = Custom String("Path");
+			Else If(Array Contains(Global.Healthkits, Host Player.Targeted_Node));
+				Host Player.Targeted_Node_Type = Custom String("Undefined Medkit");
+			Else If(Array Contains(Global.Healthkits_Small, Host Player.Targeted_Node));
+				Host Player.Targeted_Node_Type = Custom String("Small Healthkit");
+			Else If(Array Contains(Global.Healthkits_Large, Host Player.Targeted_Node));
+				Host Player.Targeted_Node_Type = Custom String("Large Healthkit");
+			Else If(Array Contains(Global.ObjectiveA_Nodes, Host Player.Targeted_Node));
+				Host Player.Targeted_Node_Type = Custom String("ObjectiveA");
+			Else If(Array Contains(Global.ObjectiveB_Nodes, Host Player.Targeted_Node));
+				Host Player.Targeted_Node_Type = Custom String("ObjectiveB");
+			Else If(Array Contains(Global.Chokepoint, Host Player.Targeted_Node));
+				Host Player.Targeted_Node_Type = Custom String("Chokepoint");
+			Else If(Array Contains(Global.Jump_Start, Host Player.Targeted_Node) || Array Contains(Global.Jump_End,
+					Host Player.Targeted_Node));
+				Host Player.Targeted_Node_Type = Custom String("Jump");
+			Else;
+				Host Player.Targeted_Node_Type = Custom String("Staircase");
+			End;
+		Else;
+			Host Player.Targeted_Node_Type = Custom String("None");
+		End;
+		Loop If Condition Is True;
+	}
+}
+
+rule("Remove Targeted Node")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Event Player.Making_Staircase != True;
+		Event Player.Making_Jump != True;
+	}
+
+	actions
+	{
+		Host Player.Targeted_Node = First Of(Sorted Array(Filtered Array(Append To Array(Append To Array(Append To Array(Append To Array(
+			Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Global.Path_Nodes, Global.Healthkits),
+			Global.Healthkits_Small), Global.Healthkits_Large), Global.ObjectiveA_Nodes), Global.ObjectiveB_Nodes), Append To Array(
+			Append To Array(Global.Chokepoint, Global.Jump_Start), Global.Jump_End)), Global.Staircase_Bottom), Global.Staircase_Middle),
+			Global.Staircase_Top), Current Array Element != Null), Distance Between(Host Player.Facing, Current Array Element)));
+		Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+		If(Array Contains(Global.Path_Nodes, Event Player.Targeted_Node));
+			Modify Global Variable(Path_Nodes, Remove From Array By Value, Event Player.Targeted_Node);
+		Else If(Array Contains(Global.Healthkits, Event Player.Targeted_Node));
+			Modify Global Variable(Healthkits, Remove From Array By Value, Event Player.Targeted_Node);
+		Else If(Array Contains(Global.Healthkits_Small, Event Player.Targeted_Node));
+			Modify Global Variable(Healthkits_Small, Remove From Array By Value, Event Player.Targeted_Node);
+		Else If(Array Contains(Global.Healthkits_Large, Event Player.Targeted_Node));
+			Modify Global Variable(Healthkits_Large, Remove From Array By Value, Event Player.Targeted_Node);
+		Else If(Array Contains(Global.ObjectiveA_Nodes, Event Player.Targeted_Node));
+			Modify Global Variable(ObjectiveA_Nodes, Remove From Array By Value, Event Player.Targeted_Node);
+		Else If(Array Contains(Global.ObjectiveB_Nodes, Event Player.Targeted_Node));
+			Modify Global Variable(ObjectiveB_Nodes, Remove From Array By Value, Event Player.Targeted_Node);
+		Else If(Array Contains(Global.Chokepoint, Event Player.Targeted_Node));
+			Modify Global Variable(Chokepoint, Remove From Array By Value, Event Player.Targeted_Node);
+		Else If(Array Contains(Global.Staircase_Bottom, Event Player.Targeted_Node));
+			Modify Global Variable(Staircase_Middle, Remove From Array By Index, Index Of Array Value(Global.Staircase_Bottom,
+				Event Player.Targeted_Node));
+			Modify Global Variable(Staircase_Top, Remove From Array By Index, Index Of Array Value(Global.Staircase_Bottom,
+				Event Player.Targeted_Node));
+			Modify Global Variable(Staircase_Bottom, Remove From Array By Value, Event Player.Targeted_Node);
+		Else If(Array Contains(Global.Staircase_Middle, Event Player.Targeted_Node));
+			Modify Global Variable(Staircase_Bottom, Remove From Array By Index, Index Of Array Value(Global.Staircase_Middle,
+				Event Player.Targeted_Node));
+			Modify Global Variable(Staircase_Top, Remove From Array By Index, Index Of Array Value(Global.Staircase_Middle,
+				Event Player.Targeted_Node));
+			Modify Global Variable(Staircase_Middle, Remove From Array By Value, Event Player.Targeted_Node);
+		Else If(Array Contains(Global.Staircase_Top, Event Player.Targeted_Node));
+			Modify Global Variable(Staircase_Middle, Remove From Array By Index, Index Of Array Value(Global.Staircase_Top,
+				Event Player.Targeted_Node));
+			Modify Global Variable(Staircase_Bottom, Remove From Array By Index, Index Of Array Value(Global.Staircase_Top,
+				Event Player.Targeted_Node));
+			Modify Global Variable(Staircase_Top, Remove From Array By Value, Event Player.Targeted_Node);
+		Else If(Array Contains(Global.Jump_Start, Event Player.Targeted_Node));
+			Modify Global Variable(Jump_End, Remove From Array By Index, Index Of Array Value(Global.Jump_Start, Event Player.Targeted_Node));
+			Modify Global Variable(Jump_Start, Remove From Array By Index, Index Of Array Value(Global.Jump_Start,
+				Event Player.Targeted_Node));
+		Else If(Array Contains(Global.Jump_End, Event Player.Targeted_Node));
+			Modify Global Variable(Jump_Start, Remove From Array By Index, Index Of Array Value(Global.Jump_End, Event Player.Targeted_Node));
+			Modify Global Variable(Jump_End, Remove From Array By Index, Index Of Array Value(Global.Jump_End, Event Player.Targeted_Node));
+		End;
+		Wait(0.250, Ignore Condition);
+	}
+}
+
+rule("Reset All Nodes")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Empty Array;
+		Global.Healthkits = Empty Array;
+		Global.ObjectiveA_Nodes = Empty Array;
+		Global.ObjectiveB_Nodes = Empty Array;
+		Global.Chokepoint = Empty Array;
+		Global.Staircase_Top = Empty Array;
+		Global.Staircase_Bottom = Empty Array;
+		Global.Healthkits_Small = Empty Array;
+		Global.Healthkits_Large = Empty Array;
+		Global.Staircase_Middle = Empty Array;
+		Global.Jump_Start = Empty Array;
+		Global.Jump_End = Empty Array;
+		Wait(!Is Button Held(Host Player, Button(Melee)), Ignore Condition);
+		Wait Until(!Host Player.Making_Staircase && Is Crouching(Host Player) && Is Button Held(Host Player, Button(Melee)), 99999);
+		Loop;
+	}
+}
+
+rule("Next Node Type")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Primary Fire)) == True;
+		Event Player.Making_Staircase != True;
+		Event Player.Making_Jump != True;
+	}
+
+	actions
+	{
+		If(Host Player.Node_Index < Count Of(Host Player.Node_Types) - 1);
+			Host Player.Node_Index += 1;
+		Else;
+			Host Player.Node_Index = 0;
+		End;
+		Play Effect(All Players(All Teams), Buff Impact Sound, Color(White), Event Player, 20);
+		Wait(0.100, Ignore Condition);
+	}
+}
+
+rule("Previous Node Type")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Secondary Fire)) == True;
+		Event Player.Making_Staircase != True;
+		Event Player.Making_Jump != True;
+	}
+
+	actions
+	{
+		If(Host Player.Node_Index > 0);
+			Host Player.Node_Index -= 1;
+		Else;
+			Host Player.Node_Index = Count Of(Host Player.Node_Types) - 1;
+		End;
+		Play Effect(All Players(All Teams), Buff Impact Sound, Color(White), Event Player, 20);
+		Wait(0.100, Ignore Condition);
+	}
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Ultimate Ability Enabled(Event Player, False);
+		Disallow Button(Event Player, Button(Interact));
+		Set Reload Enabled(Event Player, False);
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Disable Game Mode HUD(Event Player);
+		Set Status(Event Player, Null, Phased Out, 9999);
+	}
+}
+
+rule("Teleport Forward")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		(Is Button Held(Event Player, Button(Crouch)) || !Event Player.Making_Staircase) == True;
+		(Is Button Held(Event Player, Button(Crouch)) || !Event Player.Making_Jump) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Position Of(Event Player) + Facing Direction Of(Event Player) * 5);
+		Wait(0.200, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Place Node")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Reload)) == True;
+		Is Crouching(Event Player) != True;
+		Event Player.Making_Staircase != True;
+		Event Player.Making_Jump != True;
+	}
+
+	actions
+	{
+		Play Effect(All Players(All Teams), Buff Impact Sound, Color(White), Event Player, 25);
+		If(Host Player.Node_Index == 0);
+			Modify Global Variable(Path_Nodes, Append To Array, World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation));
+		Else If(Host Player.Node_Index == 1);
+			Modify Global Variable(Healthkits, Append To Array, World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation));
+		Else If(Host Player.Node_Index == 2);
+			Modify Global Variable(Healthkits, Append To Array, World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation));
+			Modify Global Variable(Healthkits_Small, Append To Array, World Vector Of(Vector(0, 1.550, 0), Event Player,
+				Rotation And Translation));
+		Else If(Host Player.Node_Index == 3);
+			Modify Global Variable(Healthkits, Append To Array, World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation));
+			Modify Global Variable(Healthkits_Large, Append To Array, World Vector Of(Vector(0, 1.550, 0), Event Player,
+				Rotation And Translation));
+		Else If(Host Player.Node_Index == 4);
+			Modify Global Variable(ObjectiveA_Nodes, Append To Array, World Vector Of(Vector(0, 1.550, 0), Event Player,
+				Rotation And Translation));
+		Else If(Host Player.Node_Index == 5);
+			Modify Global Variable(ObjectiveB_Nodes, Append To Array, World Vector Of(Vector(0, 1.550, 0), Event Player,
+				Rotation And Translation));
+		Else If(Host Player.Node_Index == 6);
+			Modify Global Variable(Chokepoint, Append To Array, World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation));
+		Else If(Host Player.Node_Index == 7);
+			Event Player.Making_Staircase = True;
+			Event Player.Staircase_Bottom = Null;
+			Event Player.Staircase_Middle = Null;
+			Event Player.Staircase_Top = Null;
+			Call Subroutine(Make_Staircase_Bottom);
+		Else If(Host Player.Node_Index == 8);
+			Event Player.Making_Jump = True;
+			Event Player.Jump_Start = Null;
+			Event Player.Jump_End = Null;
+			Call Subroutine(Make_Jump_Start);
+		End;
+		Wait(0.100, Ignore Condition);
+	}
+}
+
+rule("Staircase Bottom")
+{
+	event
+	{
+		Subroutine;
+		Make_Staircase_Bottom;
+	}
+
+	actions
+	{
+		Event Player.Staircase_Bottom = Null;
+		Event Player.Staircase_Phase = Custom String("Bottom");
+		Wait Until(!(Is Button Held(Event Player, Button(Primary Fire)) || Is Button Held(Event Player, Button(Ultimate))), 99999);
+		Wait Until(Is True For Any(Array(!Event Player.Making_Staircase, Is Button Held(Event Player, Button(Secondary Fire)),
+			Is Button Held(Event Player, Button(Primary Fire)), Is Button Held(Event Player, Button(Ultimate))), Current Array Element),
+			99999);
+		Abort If(!Event Player.Making_Staircase);
+		If(Is Button Held(Event Player, Button(Secondary Fire)));
+			Wait Until(!Is Button Held(Event Player, Button(Secondary Fire)), 99999);
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+			Event Player.Making_Staircase = False;
+			Abort;
+		Else If(Is Button Held(Event Player, Button(Ultimate)));
+			Wait Until(!Is Button Held(Event Player, Button(Ultimate)), 99999);
+			Small Message(All Players(All Teams), Custom String("Cant Undo Nothing"));
+			Call Subroutine(Make_Staircase_Bottom);
+		End;
+		Play Effect(All Players(All Teams), Brigitte Repair Pack Armor Sound, Color(White), Event Player, 75);
+		Event Player.Staircase_Bottom = World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation);
+		Call Subroutine(Make_Staircase_Middle);
+	}
+}
+
+rule("Staircase Middle")
+{
+	event
+	{
+		Subroutine;
+		Make_Staircase_Middle;
+	}
+
+	actions
+	{
+		Event Player.Staircase_Middle = Null;
+		Event Player.Staircase_Phase = Custom String("Middle");
+		Wait Until(!(Is Button Held(Event Player, Button(Primary Fire)) || Is Button Held(Event Player, Button(Ultimate))), 99999);
+		Wait Until(Is True For Any(Array(!Event Player.Making_Staircase, Is Button Held(Event Player, Button(Secondary Fire)),
+			Is Button Held(Event Player, Button(Primary Fire)), Is Button Held(Event Player, Button(Ultimate)), Is Button Held(
+			Event Player, Button(Interact))), Current Array Element), 99999);
+		Abort If(!Event Player.Making_Staircase);
+		If(Is Button Held(Event Player, Button(Secondary Fire)));
+			Wait Until(!Is Button Held(Event Player, Button(Secondary Fire)), 99999);
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+			Event Player.Making_Staircase = False;
+			Abort;
+		Else If(Is Button Held(Event Player, Button(Ultimate)));
+			Wait Until(!Is Button Held(Event Player, Button(Ultimate)), 99999);
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+			Event Player.Staircase_Bottom = Null;
+			Call Subroutine(Make_Staircase_Bottom);
+		Else If(Is Button Held(Event Player, Button(Primary Fire)));
+			Event Player.Staircase_Middle = World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation);
+			Play Effect(All Players(All Teams), Brigitte Repair Pack Armor Sound, Color(White), Event Player, 75);
+		Else If(Is Button Held(Event Player, Button(Interact)));
+			Event Player.Staircase_Middle = Null;
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+		End;
+		Call Subroutine(Make_Staircase_Top);
+	}
+}
+
+rule("Staircase Top")
+{
+	event
+	{
+		Subroutine;
+		Make_Staircase_Top;
+	}
+
+	actions
+	{
+		Event Player.Staircase_Top = Null;
+		Event Player.Staircase_Phase = Custom String("Top");
+		Wait Until(!(Is Button Held(Event Player, Button(Primary Fire)) || Is Button Held(Event Player, Button(Ultimate))), 99999);
+		Wait Until(Is True For Any(Array(!Event Player.Making_Staircase, Is Button Held(Event Player, Button(Secondary Fire)),
+			Is Button Held(Event Player, Button(Primary Fire)), Is Button Held(Event Player, Button(Ultimate))), Current Array Element),
+			99999);
+		Abort If(!Event Player.Making_Staircase);
+		If(Is Button Held(Event Player, Button(Secondary Fire)));
+			Wait Until(!Is Button Held(Event Player, Button(Secondary Fire)), 99999);
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+			Event Player.Making_Staircase = False;
+			Abort;
+		Else If(Is Button Held(Event Player, Button(Ultimate)));
+			Wait Until(!Is Button Held(Event Player, Button(Ultimate)), 99999);
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+			Event Player.Staircase_Middle = Null;
+			Call Subroutine(Make_Staircase_Middle);
+		End;
+		Event Player.Staircase_Top = World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation);
+		Event Player.Staircase_Phase = Custom String("");
+		Play Effect(All Players(All Teams), Brigitte Repair Pack Armor Sound, Color(White), Event Player, 75);
+		Call Subroutine(Finish_Staircase);
+	}
+}
+
+rule("Finish Staircase")
+{
+	event
+	{
+		Subroutine;
+		Finish_Staircase;
+	}
+
+	actions
+	{
+		Wait Until(!Is Button Held(Event Player, Button(Primary Fire)), 99999);
+		Wait Until(Is True For Any(Array(!Event Player.Making_Staircase, Is Button Held(Event Player, Button(Secondary Fire)),
+			Is Button Held(Event Player, Button(Primary Fire)), Is Button Held(Event Player, Button(Ultimate))), Current Array Element),
+			99999);
+		Abort If(!Event Player.Making_Staircase);
+		Skip If(!Is Button Held(Event Player, Button(Ultimate)), 3);
+		Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+		Event Player.Staircase_Top = Null;
+		Call Subroutine(Make_Staircase_Top);
+		Wait Until(!Is Button Held(Event Player, Button(Primary Fire)), 99999);
+		If(Is True For All(Array(Is In Line of Sight(Event Player.Staircase_Bottom,
+			Event Player.Staircase_Middle == Null ? Event Player.Staircase_Top : Event Player.Staircase_Middle, Barriers Do Not Block LOS),
+			Is In Line of Sight(Event Player.Staircase_Top,
+			Event Player.Staircase_Middle == Null ? Event Player.Staircase_Bottom : Event Player.Staircase_Middle,
+			Barriers Do Not Block LOS)), Current Array Element));
+			Modify Global Variable(Staircase_Bottom, Append To Array, Event Player.Staircase_Bottom);
+			Modify Global Variable(Staircase_Top, Append To Array, Event Player.Staircase_Top);
+			Modify Global Variable(Staircase_Middle, Append To Array, Event Player.Staircase_Middle);
+			Event Player.Making_Staircase = False;
+			Play Effect(All Players(All Teams), Brigitte Repair Pack Armor Sound, Color(White), Event Player, 100);
+		Else;
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+			Small Message(All Players(All Teams), Custom String("Missing Line Of Sight, Please Undo And FIx"));
+			Call Subroutine(Finish_Staircase);
+		End;
+	}
+}
+
+rule("Jump Start")
+{
+	event
+	{
+		Subroutine;
+		Make_Jump_Start;
+	}
+
+	actions
+	{
+		Event Player.Jump_Start = Null;
+		Event Player.Jump_Phase = Custom String("Start");
+		Wait Until(!(Is Button Held(Event Player, Button(Primary Fire)) || Is Button Held(Event Player, Button(Ultimate))), 99999);
+		Wait Until(Is True For Any(Array(!Event Player.Making_Jump, Is Button Held(Event Player, Button(Secondary Fire)), Is Button Held(
+			Event Player, Button(Primary Fire)), Is Button Held(Event Player, Button(Ultimate))), Current Array Element), 99999);
+		Abort If(!Event Player.Making_Jump);
+		If(Is Button Held(Event Player, Button(Secondary Fire)));
+			Wait Until(!Is Button Held(Event Player, Button(Secondary Fire)), 99999);
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+			Event Player.Making_Jump = False;
+			Abort;
+		Else If(Is Button Held(Event Player, Button(Ultimate)));
+			Wait Until(!Is Button Held(Event Player, Button(Ultimate)), 99999);
+			Small Message(All Players(All Teams), Custom String("Cant Undo Nothing"));
+			Call Subroutine(Make_Jump_Start);
+		End;
+		Play Effect(All Players(All Teams), Brigitte Repair Pack Armor Sound, Color(White), Event Player, 75);
+		Event Player.Jump_Start = World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation);
+		Call Subroutine(Make_Jump_End);
+	}
+}
+
+rule("Jump End")
+{
+	event
+	{
+		Subroutine;
+		Make_Jump_End;
+	}
+
+	actions
+	{
+		Event Player.Jump_End = Null;
+		Event Player.Jump_Phase = Custom String("End");
+		Wait Until(!(Is Button Held(Event Player, Button(Primary Fire)) || Is Button Held(Event Player, Button(Ultimate))), 99999);
+		Wait Until(Is True For Any(Array(!Event Player.Making_Jump, Is Button Held(Event Player, Button(Secondary Fire)), Is Button Held(
+			Event Player, Button(Primary Fire)), Is Button Held(Event Player, Button(Ultimate))), Current Array Element), 99999);
+		Abort If(!Event Player.Making_Jump);
+		If(Is Button Held(Event Player, Button(Secondary Fire)));
+			Wait Until(!Is Button Held(Event Player, Button(Secondary Fire)), 99999);
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+			Event Player.Making_Jump = False;
+			Abort;
+		Else If(Is Button Held(Event Player, Button(Ultimate)));
+			Wait Until(!Is Button Held(Event Player, Button(Ultimate)), 99999);
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+			Event Player.Jump_Start = Null;
+			Call Subroutine(Make_Jump_Start);
+		End;
+		Event Player.Jump_End = World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation);
+		Event Player.Jump_Phase = Custom String("");
+		Play Effect(All Players(All Teams), Brigitte Repair Pack Armor Sound, Color(White), Event Player, 75);
+		Call Subroutine(Finish_Jump);
+	}
+}
+
+rule("Finish Jump")
+{
+	event
+	{
+		Subroutine;
+		Finish_Jump;
+	}
+
+	actions
+	{
+		Wait Until(!Is Button Held(Event Player, Button(Primary Fire)), 99999);
+		Wait Until(Is True For Any(Array(!Event Player.Making_Jump, Is Button Held(Event Player, Button(Secondary Fire)), Is Button Held(
+			Event Player, Button(Primary Fire)), Is Button Held(Event Player, Button(Ultimate))), Current Array Element), 99999);
+		Abort If(!Event Player.Making_Jump);
+		Skip If(!Is Button Held(Event Player, Button(Ultimate)), 3);
+		Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+		Event Player.Jump_End = Null;
+		Call Subroutine(Make_Jump_End);
+		Wait Until(!Is Button Held(Event Player, Button(Primary Fire)), 99999);
+		If(Is In Line of Sight(Event Player.Jump_Start, Event Player.Jump_End, Barriers Do Not Block LOS) == True);
+			Modify Global Variable(Jump_Start, Append To Array, Event Player.Jump_Start);
+			Modify Global Variable(Jump_End, Append To Array, Event Player.Jump_End);
+			Event Player.Making_Jump = False;
+			Play Effect(All Players(All Teams), Brigitte Repair Pack Armor Sound, Color(White), Event Player, 100);
+		Else;
+			Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+			Small Message(All Players(All Teams), Custom String("Missing Line Of Sight, Please Undo And FIx"));
+			Call Subroutine(Finish_Jump);
+		End;
+	}
+}
+
+rule("Log All Nodes")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Reload)) == True;
+		Is Crouching(Event Player) == True;
+		Event Player.Making_Staircase != True;
+		Event Player.Making_Jump != True;
+	}
+
+	actions
+	{
+		Play Effect(All Players(All Teams), Moira Fade Disappear Sound, Color(White), Event Player, 25);
+		Log To Inspector(Custom String("-------------Path------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.Path_Nodes), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.Path_Nodes[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Path------------------"));
+		Log To Inspector(Custom String("-------------Healthkit------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.Healthkits), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.Healthkits[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Healthkit------------------"));
+		Log To Inspector(Custom String("-------------Healthkit (Small)------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.Healthkits_Small), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.Healthkits_Small[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Healthkit (Small)------------------"));
+		Log To Inspector(Custom String("-------------Healthkit (Large)------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.Healthkits_Large), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.Healthkits_Large[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Healthkit (Large)------------------"));
+		Log To Inspector(Custom String("-------------Objective A------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.ObjectiveA_Nodes), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.ObjectiveA_Nodes[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Objective A------------------"));
+		Log To Inspector(Custom String("-------------Objective B------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.ObjectiveB_Nodes), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.ObjectiveB_Nodes[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Objective B------------------"));
+		Log To Inspector(Custom String("-------------Chokepoints------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.Chokepoint), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.Chokepoint[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Chokepoints------------------"));
+		Log To Inspector(Custom String("-------------Staircase Bottom------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.Staircase_Bottom), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.Staircase_Bottom[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Staircase Bottom------------------"));
+		Log To Inspector(Custom String("-------------Staircase Middle------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.Staircase_Middle), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.Staircase_Middle[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Staircase Middle------------------"));
+		Log To Inspector(Custom String("-------------Staircase Top------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.Staircase_Top), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.Staircase_Top[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Staircase Top------------------"));
+		Log To Inspector(Custom String("-------------Jump Start------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.Jump_Start), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.Jump_Start[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Jump Start------------------"));
+		Log To Inspector(Custom String("-------------Jump End------------------"));
+		For Player Variable(Host Player, Log_Index, 0, Count Of(Global.Jump_End), 1);
+			Log To Inspector(Custom String("{0}, Index {1}", Global.Jump_End[Event Player.Log_Index], Event Player.Log_Index));
+			Wait(0.010, Ignore Condition);
+		End;
+		Log To Inspector(Custom String("-------------Jump End------------------"));
+		Wait(1, Ignore Condition);
+		Play Effect(All Players(All Teams), Moira Fade Reappear Sound, Color(White), Event Player, 25);
+	}
+}
