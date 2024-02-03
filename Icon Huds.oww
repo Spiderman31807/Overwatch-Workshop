@@ -1,0 +1,128 @@
+settings
+{
+	main
+	{
+		Description: "It Wouldn't Let Me Have Enough Huds For Every\nWorkshop Icon And Current Hero Icons So I\nSeperated The 2 With A Workshop Setting To\nSwap Between Them Both.\n\n\nIt Does Change Based On If Your Duplicating.\nIt Will Show \"{Echo Ultimate Icon}-\" Before Any\nIcon While Duplicating Any Hero."
+		Mode Name: "Icon Huds"
+	}
+
+	modes
+	{
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Flashpoint
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+}
+
+rule("Huds")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		If(Workshop Setting Combo(Custom String("Icon Hud"), Custom String("Show"), 0, Array(Custom String("Hero Icon And Abilities"),
+			Custom String("Workshop Icons")), 0) == 0);
+			Create HUD Text(Event Player, Null, Custom String("Hero: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Hero Icon String(Hero Being Duplicated(Event Player))) : Hero Icon String(
+				Hero Of(Event Player))), Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Ultimate: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Ability Icon String(Hero Being Duplicated(Event Player), Button(Ultimate)))
+				: Ability Icon String(Hero Of(Event Player), Button(Ultimate))), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("\nPrimary: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Ability Icon String(Hero Being Duplicated(Event Player), Button(
+				Primary Fire))) : Ability Icon String(Hero Of(Event Player), Button(Primary Fire))), Null, Left, 0, Color(White), Color(White),
+				Color(White), Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Secondary: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Ability Icon String(Hero Being Duplicated(Event Player), Button(
+				Secondary Fire))) : Ability Icon String(Hero Of(Event Player), Button(Secondary Fire))), Null, Left, 0, Color(White), Color(
+				White), Color(White), Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Ability 1: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Ability Icon String(Hero Being Duplicated(Event Player), Button(Ability 1)))
+				: Ability Icon String(Hero Of(Event Player), Button(Ability 1))), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Ability 2: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Ability Icon String(Hero Being Duplicated(Event Player), Button(Ability 2)))
+				: Ability Icon String(Hero Of(Event Player), Button(Ability 2))), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("\nJump: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Ability Icon String(Hero Being Duplicated(Event Player), Button(Jump)))
+				: Ability Icon String(Hero Of(Event Player), Button(Jump))), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Crouch: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Ability Icon String(Hero Being Duplicated(Event Player), Button(Crouch)))
+				: Ability Icon String(Hero Of(Event Player), Button(Crouch))), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Melee: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Ability Icon String(Hero Being Duplicated(Event Player), Button(Melee)))
+				: Ability Icon String(Hero Of(Event Player), Button(Melee))), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Reload: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Ability Icon String(Hero Being Duplicated(Event Player), Button(Reload)))
+				: Ability Icon String(Hero Of(Event Player), Button(Reload))), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Interact: {0}", Is Duplicating(Event Player) ? Custom String("{0}-{1}",
+				Ability Icon String(Hero(Echo), Button(Ultimate)), Ability Icon String(Hero Being Duplicated(Event Player), Button(Interact)))
+				: Ability Icon String(Hero Of(Event Player), Button(Interact))), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+		Else;
+			Create HUD Text(Event Player, Null, Custom String("Arrow Down: {0}\nArrow Left: {1}\nArrow Left: {2}", Icon String(Arrow: Down),
+				Icon String(Arrow: Left), Icon String(Arrow: Left)), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Arrow Up: {0}\nAsterisk: {1}\nBolt: {2}", Icon String(Arrow: Up), Icon String(
+				Asterisk), Icon String(Bolt)), Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String,
+				Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Checkmark: {0}\nCircle: {1}\nClub: {2}", Icon String(Checkmark), Icon String(
+				Circle), Icon String(Club)), Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String,
+				Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Diamond: {0}\nDizzy: {1}\nExclamation Mark: {2}", Icon String(Diamond),
+				Icon String(Dizzy), Icon String(Exclamation Mark)), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Eye: {0}\nFire: {1}\nFlag: {2}", Icon String(Eye), Icon String(Fire),
+				Icon String(Flag)), Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Halo: {0}\nHappy: {1}\nHeart: {2}", Icon String(Halo), Icon String(Happy),
+				Icon String(Heart)), Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Moon: {0}\nNo: {1}\nPlus: {2}", Icon String(Moon), Icon String(No), Icon String(
+				Plus)), Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Poison: {0}\nPoison 2: {1}\nQuestion Mark: {2}", Icon String(Poison),
+				Icon String(Poison 2), Icon String(Question Mark)), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Radioactive: {0}\nRing Thick: {1}\nRing Thin: {2}", Icon String(Radioactive),
+				Icon String(Ring Thick), Icon String(Ring Thin)), Null, Left, 0, Color(White), Color(White), Color(White),
+				Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Sad: {0}\nSkull: {1}\nSpade: {2}", Icon String(Sad), Icon String(Skull),
+				Icon String(Spade)), Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("Stop: {0}\nTrashcan: {1}\nWarning: {2}", Icon String(Stop), Icon String(
+				Trashcan), Icon String(Warning)), Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String,
+				Default Visibility);
+			Create HUD Text(Event Player, Null, Custom String("X: {0}", Icon String(X)), Null, Left, 0, Color(White), Color(White), Color(
+				White), Visible To and String, Default Visibility);
+		End;
+	}
+}
