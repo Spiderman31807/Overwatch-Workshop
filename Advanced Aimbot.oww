@@ -1,0 +1,467 @@
+settings
+{
+	main
+	{
+		Mode Name: "Advanced Aimbot - G676V"
+	}
+
+	modes
+	{
+		Assault
+
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Flashpoint
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	workshop
+	{
+		Fire When: [1]
+		Instant Tracking: On
+		Require Binding Toggle.: On
+		Toggle Binding: [7]
+		Toggle Binding.: [5]
+	}
+}
+
+variables
+{
+	global:
+		0: All_Heros
+		1: Primary_Speed
+		2: Secondary_Speed
+		3: Aimbot_Triggers
+		4: Ability1_Speed
+		5: Ability2_Speed
+		6: Primary_Arc
+		7: Secondary_Arc
+		8: Ability1_Arc
+		9: Ability2_Arc
+		10: Aimbot_Settings
+
+	player:
+		0: Target
+		1: Targets
+		2: Projectile_Speed
+		3: Projectile_Arc
+		4: Toggled_Aimbot
+		5: Toggled_Autofire
+}
+
+rule("Setup Global")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Aimbot_Settings = Array(Workshop Setting Toggle(Custom String("Aimbot"), Custom String("Require Player In FOV"), True, 0),
+			Workshop Setting Integer(Custom String("Aimbot"), Custom String("Aimbot FOV"), 60, 1, 360, 1), Workshop Setting Toggle(
+			Custom String("Aimbot"), Custom String("Require Player LOS"), True, 2), Workshop Setting Toggle(Custom String("Aimbot"),
+			Custom String("Instant Tracking"), False, 3), Workshop Setting Integer(Custom String("Aimbot"), Custom String("Turn Speed"),
+			225, 1, 1000, 0), Workshop Setting Toggle(Custom String("Aimbot"), Custom String("Require Binding Toggle."), False, 0),
+			Workshop Setting Combo(Custom String("Auto-Fire"), Custom String("Fire When"), 0, Array(Custom String("Disabled"),
+			Custom String("Targets Visable"), Custom String("Scoped")), 0), Workshop Setting Toggle(Custom String("Auto-Fire"),
+			Custom String("Require Binding Toggle"), True, 0), Array(Button(Primary Fire), Button(Secondary Fire), Button(Ability 1),
+			Button(Ability 2), Button(Ultimate), Button(Interact), Button(Jump), Button(Crouch), Button(Melee), Button(Reload))
+			[Workshop Setting Combo(Custom String("Auto-Fire"), Custom String("Toggle Binding"), 0, Array(Custom String("Primary"),
+			Custom String("Secondary"), Custom String("Ability 1"), Custom String("Ability 2"), Custom String("Ultimate"), Custom String(
+			"Interact"), Custom String("Jump"), Custom String("Crouch"), Custom String("Melee"), Custom String("Reload")), 0)], Array(
+			Button(Primary Fire), Button(Secondary Fire), Button(Ability 1), Button(Ability 2), Button(Ultimate), Button(Interact), Button(
+			Jump), Button(Crouch), Button(Melee), Button(Reload))[Workshop Setting Combo(Custom String("Aimbot"), Custom String(
+			"Toggle Binding."), 0, Array(Custom String("Primary"), Custom String("Secondary"), Custom String("Ability 1"), Custom String(
+			"Ability 2"), Custom String("Ultimate"), Custom String("Interact"), Custom String("Jump"), Custom String("Crouch"),
+			Custom String("Melee"), Custom String("Reload")), 0)]);
+		Global.All_Heros = Array(Hero(Ana), Hero(Ashe), Hero(Baptiste), Hero(Bastion), Hero(Brigitte), Hero(Cassidy), Hero(D.Va), Hero(
+			Doomfist), Hero(Echo), Hero(Genji), Hero(Hanzo), Hero(Illari), Hero(Junker Queen), Hero(Junkrat), Hero(Kiriko), Hero(
+			Lifeweaver), Hero(Lúcio), Hero(Mauga), Hero(Mei), Hero(Mercy), Hero(Moira), Hero(Orisa), Hero(Pharah), Hero(Ramattra), Hero(
+			Reaper), Hero(Reinhardt), Hero(Roadhog), Hero(Sigma), Hero(Soldier: 76), Hero(Sombra), Hero(Sojourn), Hero(Symmetra), Hero(
+			Torbjörn), Hero(Tracer), Hero(Widowmaker), Hero(Winston), Hero(Wrecking Ball), Hero(Zarya), Hero(Zenyatta));
+		Global.Aimbot_Triggers = Array(Array(Button(Primary Fire), Button(Secondary Fire), Button(Ability 1), Button(Ability 2)), Array(
+			Button(Primary Fire), Button(Secondary Fire), Button(Ability 1), Button(Ability 2)), Array(Button(Primary Fire)), Array(Button(
+			Primary Fire), Button(Secondary Fire)), Array(Button(Primary Fire), Button(Ability 1)), Array(Button(Primary Fire), Button(
+			Secondary Fire), Button(Ability 2)), Array(Button(Primary Fire), Button(Ability 2)), Array(Button(Primary Fire), Button(
+			Secondary Fire), Button(Ability 1)), Array(Button(Primary Fire), Button(Secondary Fire), Button(Ability 2)), Array(Button(
+			Primary Fire), Button(Secondary Fire), Button(Ability 1), Button(Ability 2)), Array(Button(Primary Fire)), Array(Button(
+			Primary Fire)), Array(Button(Primary Fire), Button(Secondary Fire), Button(Ability 2)), Array(Button(Primary Fire), Button(
+			Ability 1)), Array(Button(Secondary Fire)), Array(Button(Secondary Fire)), Array(Button(Primary Fire), Button(Secondary Fire)),
+			Array(Button(Primary Fire), Button(Secondary Fire)), Array(Button(Primary Fire), Button(Secondary Fire)), Array(Button(
+			Primary Fire)), Array(Button(Secondary Fire)), Array(Button(Primary Fire), Button(Secondary Fire), Button(Ability 2)), Array(
+			Button(Primary Fire), Button(Ability 2)), Array(Button(Primary Fire), Button(Ability 1), Button(Ability 2)), Array(Button(
+			Primary Fire)), Array(Button(Primary Fire), Button(Ability 2)), Array(Button(Primary Fire), Button(Secondary Fire), Button(
+			Ability 1)), Array(Button(Primary Fire), Button(Ability 2)), Array(Button(Primary Fire), Button(Secondary Fire)), Array(Button(
+			Primary Fire), Button(Secondary Fire)), Array(Button(Primary Fire), Button(Secondary Fire), Button(Ability 2)), Array(Button(
+			Primary Fire), Button(Secondary Fire)), Array(Button(Primary Fire), Button(Secondary Fire)), Array(Button(Primary Fire)),
+			Array(Button(Primary Fire), Button(Secondary Fire)), Array(Button(Primary Fire), Button(Secondary Fire)), Array(Button(
+			Primary Fire)), Array(Button(Primary Fire), Button(Secondary Fire)), Array(Button(Primary Fire), Button(Secondary Fire)));
+		Global.Primary_Speed = Array(90, 125, 500, 500, 500, 500, 500, 500, 80, 75, 60, 500, 110, 500, 25, 20, 500, 50, 500, 500, 50, 500,
+			90, 35, 80, 500, 500, 60, 50, 500, 500, 160, 500, 70, 500, 500, 500, 500, 500);
+		Global.Secondary_Speed = Array(0, 0, 60, 40, 0, 0, 0, 44, 50, 60, 110, 0, 30, 25, 90, 70, 0, 115, 500, 50, 0, 25, 35, 80, 0, 0, 80,
+			50, 50, 0, 0, 25, 120, 0, 0, 0, 0, 25, 90);
+		Global.Ability1_Speed = Array(60, 0, 0, 0, 80, 0, 0, 30, 0, 50, 0, 0, 0, 25, 90, 70, 0, 0, 0, 0, 0, 0, 0, 105, 0, 17, 40, 50, 0, 0,
+			160, 0, 70, 0, 0, 30, 0, 0, 0);
+		Global.Ability2_Speed = Array(30, 25, 0, 40, 0, 20, 40, 80, 0, 0, 110, 20, 0, 25, 90, 70, 50, 0, 0, 50, 0, 0, 60, 30, 0, 25, 60,
+			50, 0, 0, 160, 0, 70, 0, 20, 0, 0, 0, 0);
+		Global.Primary_Arc = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.020, 0, 0, -0.400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, -0.050, 0, 0, 0, 0, 0, 0);
+		Global.Secondary_Arc = Array(0, 0, 0, -0.150, 0, 0, 0, 0, 0, 0, 0, 0, -0.150, 0, 0, 0, 0, 0, 0, 0, 0, -0.030, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, -0.300, 0);
+		Global.Ability1_Arc = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0);
+		Global.Ability2_Arc = Array(-0.300, -0.300, 0, 0, 0, -0.450, 0, 0, 0, 0, 0, -0.300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.250, 0, 0,
+			0, -0.250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	}
+}
+
+rule("Targets")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is True For Any(Global.Aimbot_Triggers[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))], Is Button Held(Event Player, Current Array Element))
+			|| Event Player.Toggled_Autofire == True) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Targets = Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))), (Is In Line of Sight(
+			Eye Position(Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS) && (
+			Global.Aimbot_Settings[0] == False || Is In View Angle(Event Player, Eye Position(Current Array Element),
+			Global.Aimbot_Settings[1]))) || (Global.Aimbot_Settings[2] == False));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(Sombra) || !Is Using Ability 1(Current Array Element)
+			|| Is Firing Secondary(Current Array Element));
+		Event Player.Targets = Filtered Array(Event Player.Targets, !(Health(Current Array Element) == 1 && Has Status(
+			Current Array Element, Unkillable)) && !Has Status(Current Array Element, Invincible) && !Has Status(Current Array Element,
+			Phased Out) && !Is In Spawn Room(Current Array Element));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(D.Va) || !Is Firing Secondary(Current Array Element)
+			|| !Is In View Angle(Current Array Element, Eye Position(Event Player), 45));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(Genji) || !Is Using Ability 2(Current Array Element)
+			|| !Is In View Angle(Current Array Element, Eye Position(Event Player), 45));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(Orisa) || !Is Using Ability 2(Current Array Element)
+			|| !Is In View Angle(Current Array Element, Eye Position(Event Player), 45));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(Sigma) || !Is Using Ability 1(Current Array Element)
+			|| !Is In View Angle(Current Array Element, Eye Position(Event Player), 45));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(Doomfist) || !Is Using Ultimate(Current Array Element));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(Mei) || !Is Using Ability 1(Current Array Element));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(Moira) || !Is Using Ability 1(Current Array Element));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(Reaper) || !Is Using Ability 1(Current Array Element));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(Tracer) || !Is Using Ability 2(Current Array Element));
+		Event Player.Targets = Filtered Array(Event Player.Targets, (Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+			Current Array Element) : Hero Of(Current Array Element)) != Hero(Zenyatta) || !Is Using Ultimate(Current Array Element));
+		Event Player.Targets = Sorted Array(Event Player.Targets, Distance Between(Current Array Element, Eye Position(Event Player)
+			+ Facing Direction Of(Event Player) * Distance Between(Event Player, Current Array Element)) * (Is In Line of Sight(
+			Eye Position(Event Player), Eye Position(Current Array Element), Enemy Barriers Block LOS) ? 1 : 10));
+		Event Player.Target = First Of(Event Player.Targets);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Aimbot")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is True For Any(Global.Aimbot_Triggers[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))], Is Button Held(Event Player, Current Array Element)) || (
+			Global.Aimbot_Settings[6] != 0 && Event Player.Toggled_Autofire == True)) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(Event Player.Target) == True;
+		Event Player.Toggled_Aimbot == True;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Update Every Frame(Direction From Angles(Horizontal Angle From Direction(Direction Towards(Eye Position(
+			Event Player), Eye Position(Event Player.Target) + Velocity Of(Event Player.Target) * (Distance Between(Eye Position(
+			Event Player), Eye Position(Event Player.Target)) / Event Player.Projectile_Speed))), Vertical Angle From Direction(
+			Direction Towards(Eye Position(Event Player), Eye Position(Event Player.Target) - Vector(0, 0.100, 0))) + Distance Between(
+			Eye Position(Event Player), Eye Position(Event Player.Target)) * Event Player.Projectile_Arc)),
+			Global.Aimbot_Settings[3] == True ? 9999 : Global.Aimbot_Settings[4], To World, Direction and Turn Rate);
+		Wait Until((Is True For All(Global.Aimbot_Triggers[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))], !Is Button Held(Event Player, Current Array Element)) && (
+			Global.Aimbot_Settings[6] == 0 || Event Player.Toggled_Autofire != True)) || Is True For Any(Array(!Entity Exists(
+			Event Player.Target), Is Dead(Event Player), Event Player.Toggled_Aimbot != True), Current Array Element), 99999);
+		Stop Facing(Event Player);
+	}
+}
+
+rule("Set Projectile Primary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Global.Aimbot_Triggers[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(
+			Event Player) : Hero Of(Event Player))], Button(Primary Fire)) == True;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Button(Primary Fire)) == True;
+		(((Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) != Hero(Ramattra)
+			|| !Is In Alternate Form(Event Player)) && (Is True For All(Array(Hero(Ana), Hero(Ashe), Hero(Widowmaker)), (Is Duplicating(
+			Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) != Current Array Element) || !Is Firing Secondary(
+			Event Player))) == True;
+		(Event Player.Projectile_Speed != Global.Primary_Speed[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))
+			] || Event Player.Projectile_Arc != Global.Primary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))]) == True;
+	}
+
+	actions
+	{
+		Event Player.Projectile_Speed = Global.Primary_Speed[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Event Player.Projectile_Arc = Global.Primary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+	}
+}
+
+rule("Projectile Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Global.Aimbot_Triggers[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(
+			Event Player) : Hero Of(Event Player))], Button(Secondary Fire)) == True;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Button(Secondary Fire)) == True;
+		(Event Player.Projectile_Speed != Global.Secondary_Speed[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))
+			] || Event Player.Projectile_Arc != Global.Secondary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))]) == True;
+	}
+
+	actions
+	{
+		Event Player.Projectile_Speed = Global.Secondary_Speed[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Event Player.Projectile_Arc = Global.Secondary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+	}
+}
+
+rule("Projectile Ability 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Global.Aimbot_Triggers[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(
+			Event Player) : Hero Of(Event Player))], Button(Ability 1)) == True;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Button(Ability 1)) == True;
+		(Event Player.Projectile_Speed != Global.Ability1_Speed[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))
+			] || Event Player.Projectile_Arc != Global.Ability1_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))]) == True;
+	}
+
+	actions
+	{
+		Event Player.Projectile_Speed = Global.Ability1_Speed[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Event Player.Projectile_Arc = Global.Ability1_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+	}
+}
+
+rule("Projectile Ability 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Global.Aimbot_Triggers[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(
+			Event Player) : Hero Of(Event Player))], Button(Ability 2)) == True;
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Button(Ability 2)) == True;
+		(Event Player.Projectile_Speed != Global.Ability2_Speed[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))
+			] || Event Player.Projectile_Arc != Global.Ability2_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))]) == True;
+	}
+
+	actions
+	{
+		Event Player.Projectile_Speed = Global.Ability2_Speed[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Event Player.Projectile_Arc = Global.Ability2_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+	}
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Toggled_Aimbot = Global.Aimbot_Settings[5] ? False : True;
+		Event Player.Toggled_Autofire = Global.Aimbot_Settings[7] ? False : True;
+		While(True);
+			Wait(0.250, Ignore Condition);
+			Wait Until(Is Button Held(Event Player, Global.Aimbot_Settings[8]) || Is Button Held(Event Player, Global.Aimbot_Settings[9]),
+				99999);
+			If(Is Button Held(Event Player, Global.Aimbot_Settings[8]) && Global.Aimbot_Settings[7] == True);
+				If(Event Player.Toggled_Autofire != True);
+					Event Player.Toggled_Autofire = True;
+					Small Message(Event Player, Custom String("Auto-Fire Enabled"));
+				Else;
+					Event Player.Toggled_Autofire = False;
+					Small Message(Event Player, Custom String("Auto-Fire Disabled"));
+				End;
+			End;
+			If(Is Button Held(Event Player, Global.Aimbot_Settings[9]) && Global.Aimbot_Settings[5] == True);
+				If(Event Player.Toggled_Aimbot != True);
+					Event Player.Toggled_Aimbot = True;
+					Small Message(Event Player, Custom String("Aimbot Enabled"));
+				Else;
+					Event Player.Toggled_Aimbot = False;
+					Small Message(Event Player, Custom String("Aimbot Disabled"));
+				End;
+			End;
+			Wait Until(!Is Button Held(Event Player, Global.Aimbot_Settings[8]) && !Is Button Held(Event Player, Global.Aimbot_Settings[9]),
+				99999);
+		End;
+	}
+}
+
+rule("Auto-Fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.Aimbot_Settings[6] != 0;
+		(Global.Aimbot_Settings[6] == 2 ? Is True For Any(Array(Hero(Ana), Hero(Ashe), Hero(Widowmaker)), (Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Current Array Element) && Is Firing Secondary(Event Player)
+			: True) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(Event Player.Target) == True;
+		Event Player.Toggled_Autofire == True;
+		Is Reloading(Event Player) != True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(Event Player.Target), Barriers Do Not Block LOS) == True;
+	}
+
+	actions
+	{
+		If((Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Hanzo)
+			&& !Is Using Ability 2(Event Player));
+			Start Holding Button(Event Player, Button(Primary Fire));
+			Wait(0.732, Ignore Condition);
+			Stop Holding Button(Event Player, Button(Primary Fire));
+			Wait(0.500, Ignore Condition);
+		Else If((Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Ashe));
+			Press Button(Event Player, Button(Primary Fire));
+			Wait(Is Firing Secondary(Event Player) ? 0.650 : 0.277, Ignore Condition);
+		Else If((Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Widowmaker)
+				&& Is Firing Secondary(Event Player));
+			Press Button(Event Player, Button(Primary Fire));
+			Wait(1.500, Ignore Condition);
+		Else;
+			Start Holding Button(Event Player, Button(Primary Fire));
+			Wait Until(Is True For Any(Array((Global.Aimbot_Settings[4] == 2 ? Is True For Any(Array(Hero(Ana), Hero(Ashe), Hero(Widowmaker)),
+				(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Current Array Element)
+				&& Is Firing Secondary(Event Player) : False) == True, Is Dead(Event Player), !Entity Exists(Event Player.Target),
+				Event Player.Toggled_Autofire == False, !Is Firing Primary(Event Player)), Current Array Element), 99999);
+			Stop Holding Button(Event Player, Button(Primary Fire));
+			Wait(0.100, Ignore Condition);
+		End;
+		Loop If Condition Is True;
+	}
+}
+
+rule("Spawn Testing Dummy")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Button Held(Host Player, Button(Jump)) == True;
+		Is Button Held(Host Player, Button(Crouch)) == True;
+		Is Button Held(Host Player, Button(Reload)) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Roadhog), Opposite Team Of(Team Of(Host Player)), 6, Position Of(Host Player), Facing Direction Of(
+			Host Player));
+	}
+}
