@@ -1,0 +1,1561 @@
+settings
+{
+	main
+	{
+		Description: "This Is No Ordinary Infection. This Infection Has\nSupport For Support's!\n\nAll Supports Other Then Moira, Lifeweaver And\nKiriko Can Heal Other Allies.\n\nMercy Can Also Boost Other Mercy's."
+		Mode Name: "Infection - DACGP"
+	}
+
+	lobby
+	{
+		Allow Players Who Are In Queue: Yes
+		Match Voice Chat: Enabled
+		Max FFA Players: 10
+	}
+
+	modes
+	{
+		Deathmatch
+		{
+			disabled maps
+			{
+				Workshop Chamber
+				Workshop Expanse
+				Workshop Expanse Night
+				Workshop Green Screen
+				Workshop Island
+				Workshop Island Night
+			}
+		}
+
+		General
+		{
+			Hero Limit: Off
+			Spawn Health Packs: Disabled
+			Tank Role Passive Health Bonus: Disabled
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			D.Va
+			{
+				Spawn Without Mech: On
+			}
+
+			Symmetra
+			{
+				Sentry Turret: Off
+			}
+
+			Torbjörn
+			{
+				Deploy Turret: Off
+			}
+
+			enabled heroes
+			{
+				Soldier: 76
+			}
+		}
+	}
+
+	workshop
+	{
+		Healing Buff: 0
+		Last Stand: [2]
+	}
+
+	extensions
+	{
+		Beam Effects
+		Beam Sounds
+		Buff Status Effects
+		Buff and Debuff Sounds
+	}
+}
+
+variables
+{
+	global:
+		4: Alive
+		60: Pool
+		61: Ally_Outlines
+		62: Max_Rounds
+		63: Match_Time
+		64: Last_Stand_Stats
+		65: Match_Point
+		66: Round
+
+	player:
+		0: Is_AntiNaded
+		1: Nano_Target
+		2: Nano_ID_Array
+		3: Has_Nano
+		4: Has_Real_Inspire
+		5: Origin
+		6: Inspire_From
+		7: Inspire_Duration
+		8: Center_Mass
+		9: Heal_Beam_Target
+		10: Inital_Spawn
+		11: Orb_Target
+		12: Orb_From
+		13: Has_Orb
+		14: Boost_Beam_Target
+		15: Support_Passive
+		16: Strike
+		62: Convert
+		63: Health
+		65: Infection
+		66: Last_Stand
+}
+
+subroutines
+{
+	1: Start_Round
+}
+
+rule("Settings")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Ally_Outlines = Workshop Setting Toggle(Custom String("Infection"), Custom String("Ally Outlines"), True, 0);
+		Global.Max_Rounds = Workshop Setting Integer(Custom String("Infection"), Custom String("Max Rounds"), 15, 1, 38, 0);
+		Global.Match_Time = Workshop Setting Integer(Custom String("Infection"), Custom String("Max Round Duration"), 300, 60, 900, 0);
+		Global.Match_Point = Workshop Setting Integer(Custom String("Infection"), Custom String("Score To Insta-Win"), 10, 1, 38, 0);
+		Global.Last_Stand_Stats = Array(Workshop Setting Combo(Custom String("Infection"), Custom String("Last Stand"), 0, Array(
+			Custom String("Disabled"), Custom String("Enabled"), Custom String("Cant Activate On Inital Spawn"), Custom String(
+			"Cant Activate On Origin")), 2), Workshop Setting Integer(Custom String("Last Stand"), Custom String("Damage Buff"), 50, 0,
+			100, 0), Workshop Setting Integer(Custom String("Last Stand"), Custom String("Resistance Buff"), 50, 0, 99, 1),
+			Workshop Setting Integer(Custom String("Last Stand"), Custom String("Healing Buff"), 50, 0, 100, 2), Workshop Setting Integer(
+			Custom String("Last Stand"), Custom String("Healing On Activation"), 250, 0, 1000, 3), Workshop Setting Integer(Custom String(
+			"Last Stand"), Custom String("Ultimate Charge On Activation"), 0, 0, 100, 4), Workshop Setting Integer(Custom String(
+			"Last Stand"), Custom String("Deley Before Activation"), 3, 0, 5, 5), Workshop Setting Integer(Custom String("Last Stand"),
+			Custom String("Deley Before Deactivation"), 1, 0, 8, 6), Workshop Setting Toggle(Custom String("Last Stand"), Custom String(
+			"Reveal Player"), True, 6));
+		Global.Round = 1;
+		Disable Built-In Game Mode Completion;
+		Global.Pool = All Heroes;
+		Wait Until(Is Assembling Heroes, 99999);
+		Start Rule(Start_Round, Restart Rule);
+		Disable Built-In Game Mode Scoring;
+	}
+}
+
+rule("Round Start")
+{
+	event
+	{
+		Subroutine;
+		Start_Round;
+	}
+
+	actions
+	{
+		Stop Forcing Player Outlines(All Players(All Teams), All Players(All Teams));
+		Stop Forcing Player To Be Hero(All Players(All Teams));
+		Set Player Allowed Heroes(All Players(All Teams), Global.Pool);
+		Go To Assemble Heroes;
+		Set Match Time(10);
+		Start Forcing Player To Be Hero(All Players(All Teams), Random Value In Array(Global.Pool));
+		Stop Forcing Player To Be Hero(All Players(All Teams));
+		Global.Alive = Global.Pool;
+		Filtered Array(All Players(All Teams), Is Dummy Bot(Current Array Element)).Origin = Random Value In Array(Global.Alive);
+		Filtered Array(All Players(All Teams), !Is Dummy Bot(Current Array Element)).Origin = Null;
+		All Players(All Teams).Convert = Null;
+		All Players(All Teams).Infection = Null;
+		All Players(All Teams).Inital_Spawn = True;
+		Wait(11, Ignore Condition);
+		Set Match Time(Max(Global.Match_Time, 60));
+		Wait(4, Ignore Condition);
+		Global.Alive = Filtered Array(Global.Pool, Number Of Heroes(Current Array Element, All Teams) > 0);
+		Set Player Allowed Heroes(Filtered Array(All Players(All Teams), !Has Spawned(Current Array Element)), Global.Alive);
+	}
+}
+
+rule("Round End")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Global.Alive) == 1;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Big Message(All Players(All Teams), Custom String("{0}{1} Origin Gained A Point", Hero Icon String(First Of(Global.Alive)),
+			First Of(Global.Alive)));
+		Modify Player Score(Filtered Array(All Players(All Teams), Current Array Element.Origin == First Of(Global.Alive)), 1);
+		Modify Global Variable(Pool, Remove From Array By Value, First Of(Global.Alive));
+		Wait(5, Ignore Condition);
+		If(Is True For Any(All Players(All Teams), Score Of(Current Array Element) >= Global.Match_Point));
+			Big Message(All Players(All Teams), Custom String("Score Limit: Winner {0}", Last Of(Sorted Array(All Players(All Teams), Score Of(
+				Current Array Element)))));
+			Wait(3, Ignore Condition);
+			Declare Player Victory(Last Of(Sorted Array(All Players(All Teams), Score Of(Current Array Element))));
+		Else;
+			If(Global.Round < Global.Max_Rounds);
+				Global.Round += 1;
+				Start Rule(Start_Round, Restart Rule);
+			Else;
+				Big Message(All Players(All Teams), Custom String("Round Limit: Winner {0}", Last Of(Sorted Array(All Players(All Teams), Score Of(
+					Current Array Element)))));
+				Wait(3, Ignore Condition);
+				Declare Player Victory(Last Of(Sorted Array(All Players(All Teams), Score Of(Current Array Element))));
+			End;
+		End;
+	}
+}
+
+rule("Round End (Timer)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Match Time == 0;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("Match Time Limit"));
+		Wait(3, Ignore Condition);
+		Big Message(All Players(All Teams), Custom String("{0}{1} Origin Gained A Point", Hero Icon String(Last Of(Sorted Array(
+			Global.Alive, Number Of Heroes(Current Array Element, All Teams)))), Last Of(Sorted Array(Global.Alive, Number Of Heroes(
+			Current Array Element, All Teams)))));
+		Modify Player Score(Filtered Array(All Players(All Teams), Current Array Element.Origin == First Of(Global.Alive)), 1);
+		Modify Global Variable(Pool, Remove From Array By Value, Last Of(Sorted Array(Global.Alive, Number Of Heroes(Current Array Element,
+			All Teams))));
+		Wait(5, Ignore Condition);
+		If(Is True For Any(All Players(All Teams), Score Of(Current Array Element) >= Global.Match_Point));
+			Big Message(All Players(All Teams), Custom String("Score Limit: Winner {0}", Last Of(Sorted Array(All Players(All Teams), Score Of(
+				Current Array Element)))));
+			Wait(3, Ignore Condition);
+			Declare Player Victory(Last Of(Sorted Array(All Players(All Teams), Score Of(Current Array Element))));
+		Else;
+			If(Global.Round < Global.Max_Rounds);
+				Global.Round += 1;
+				Start Rule(Start_Round, Restart Rule);
+			Else;
+				Big Message(All Players(All Teams), Custom String("Round Limit: Winner {0}", Last Of(Sorted Array(All Players(All Teams), Score Of(
+					Current Array Element)))));
+				Wait(3, Ignore Condition);
+				Declare Player Victory(Last Of(Sorted Array(All Players(All Teams), Score Of(Current Array Element))));
+			End;
+		End;
+	}
+}
+
+rule("Player Setup")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Inital_Spawn = True;
+		Set Player Allowed Heroes(Event Player, Global.Pool);
+		Skip If(!Is Game In Progress, 1);
+		Set Player Allowed Heroes(Event Player, Global.Alive);
+		Disable Built-In Game Mode Respawning(Event Player);
+		Start Damage Modification(Remove From Array(Players On Hero(Hero Of(Event Player), All Teams), Event Player), Event Player,
+			Is True For Any(Array(Hero(Ana), Hero(Baptiste)), Hero Of(Event Player) == Current Array Element) ? 1 : 0,
+			Receivers Damagers and Damage Percent);
+		Create In-World Text(Filtered Array(Players On Hero(Hero(Sombra), All Teams), Hero Of(Event Player) == Hero(Sombra)
+			&& Is Using Ability 1(Event Player)), Ability Icon String(Hero(Sombra), Button(Ability 1)), World Vector Of(Vector(0, 2.550,
+			0), Event Player, Rotation And Translation), 2, Do Not Clip, Visible To, Color(Blue), Default Visibility);
+		Create Progress Bar In-World Text(Players On Hero(Hero Of(Event Player), All Teams), Update Every Frame(Event Player.Health),
+			Custom String(""), Event Player, 0.001, Clip Against Surfaces, Event Player.Health <= 25 ? Color(Red) : (
+			Event Player.Health <= 75 ? Color(Orange) : Color(Green)), Color(White), Visible To Position Values and Color,
+			Default Visibility);
+		Chase Player Variable At Rate(Event Player, Health, Update Every Frame(Normalized Health(Event Player) * 100), 99999,
+			Destination and Rate);
+		Create HUD Text(Event Player, Custom String("Origin: {0}{1}\nStatus: {2}", Hero Icon String(Event Player.Origin),
+			Event Player.Origin, Custom String("{0}\n\n{2}\nStatus: {1}", Array Contains(Global.Alive, Event Player.Origin) ? Count Of(
+			Filtered Array(All Players(All Teams), Current Array Element.Infection == Event Player.Origin)) : Custom String("Cured"),
+			Count Of(Filtered Array(All Players(All Teams), Current Array Element.Infection == Event Player.Infection)), Custom String(
+			"Infection: {0}{1}", Hero Icon String(Event Player.Infection), Event Player.Infection))), Null, Null, Left, 0, Color(White),
+			Color(White), Color(White), Visible To and String, Default Visibility);
+		Create Effect(Filtered Array(All Players(All Teams), Event Player.Last_Stand), Ana Nano Boosted Effect, Null, Event Player, 1,
+			Visible To);
+		Create Effect(Filtered Array(All Players(All Teams), Event Player.Last_Stand), Ana Nano Boosted Sound, Null, Event Player, 100,
+			Visible To);
+		Wait Until(Global.Last_Stand_Stats != Null, 99999);
+		Skip If(Global.Last_Stand_Stats[8] == False, 2);
+		Create In-World Text(Filtered Array(All Players(All Teams), Hero Of(Event Player) == Hero(Sombra) && Is Using Ability 1(
+			Event Player) && Event Player.Last_Stand), Ability Icon String(Hero(Sombra), Button(Ability 1)), World Vector Of(Vector(0,
+			2.550, 0), Event Player, Rotation And Translation), 2, Do Not Clip, Visible To, Color(Blue), Default Visibility);
+		Create Progress Bar In-World Text(Filtered Array(All Players(All Teams),
+			Current Array Element.Infection != Event Player.Infection && Event Player.Last_Stand), Update Every Frame(Event Player.Health),
+			Custom String(""), Event Player, 0.001, Clip Against Surfaces, Event Player.Health <= 25 ? Color(Red) : (
+			Event Player.Health <= 75 ? Color(Orange) : Color(Green)), Color(White), Visible To Position Values and Color,
+			Default Visibility);
+		Chase Player Variable At Rate(Event Player, Inspire_Duration, 0, 1, Destination and Rate);
+		Chase Player Variable At Rate(Event Player, Has_Real_Inspire, 0, 1, Destination and Rate);
+		Chase Player Variable At Rate(Event Player, Center_Mass, World Vector Of(Vector(0, Distance Between(Eye Position(Event Player),
+			Position Of(Event Player)) / 1.400, 0), Event Player, Rotation And Translation), 9999, Destination and Rate);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Entity Exists(Event Player.Heal_Beam_Target)), Mercy Heal Beam,
+			Event Player.Center_Mass, Event Player.Heal_Beam_Target.Center_Mass, Color(White), Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Entity Exists(Event Player.Heal_Beam_Target)), Mercy Heal Beam Sound, Color(
+			White), (Event Player.Center_Mass + Event Player.Heal_Beam_Target.Center_Mass) / 2, 100, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Event Player.Has_Orb), Sphere, Color(Yellow), Update Every Frame(
+			World Vector Of(Vector(-0.250, Distance Between(Eye Position(Event Player), Position Of(Event Player)) * 1.150, -0.100),
+			Event Player, Rotation And Translation)), 0.120, Visible To Position and Radius);
+		Create In-World Text(Filtered Array(Event Player, Entity Exists(Event Player.Orb_Target)), Custom String("  {0} {1}\n{2}",
+			Ability Icon String(Hero(Zenyatta), Button(Ability 1)), Hero Icon String(Hero Of(Event Player.Orb_Target)), Custom String(
+			"{0}/{1} HP", Round To Integer(Health(Event Player.Orb_Target), Up), Max Health(Event Player.Orb_Target))), Update Every Frame(
+			Eye Position(Event Player) + 100 * (1.250 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(
+			Event Player)) - 90)) + (-3 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(
+			Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(
+			Event Player))), 2, Do Not Clip, Visible To Position and String, Color(White), Default Visibility);
+		Create In-World Text(Filtered Array(Event Player, Entity Exists(Event Player.Orb_From)), Custom String("  {0} {1}\n{2}",
+			Ability Icon String(Hero(Zenyatta), Button(Ability 1)), Hero Icon String(Hero Of(Event Player.Orb_From)), Custom String(
+			"{0}/{1} HP", Round To Integer(Health(Event Player.Orb_From), Up), Max Health(Event Player.Orb_From))), Update Every Frame(
+			Eye Position(Event Player) + 100 * (3.500 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(
+			Event Player)) - 90)) + (-1.800 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(
+			Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(
+			Event Player))), 2, Do Not Clip, Visible To Position and String, Color(White), Default Visibility);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Entity Exists(Event Player.Boost_Beam_Target)), Mercy Boost Beam,
+			Event Player.Center_Mass, Event Player.Boost_Beam_Target.Center_Mass, Color(White), Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Entity Exists(Event Player.Boost_Beam_Target)), Mercy Boost Beam Sound, Color(
+			White), (Event Player.Center_Mass + Event Player.Boost_Beam_Target.Center_Mass) / 2, 100, Visible To Position and Radius);
+	}
+}
+
+rule("Spawn")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Origin = Hero Of(Event Player);
+		Event Player.Infection = Event Player.Origin;
+		Skip If(Global.Ally_Outlines == False, 2);
+		Start Forcing Player Outlines(Event Player, Filtered Array(All Players(All Teams),
+			Current Array Element.Infection == Event Player.Infection), True, Color(Blue), Always);
+		Start Forcing Player Outlines(Filtered Array(All Players(All Teams), Current Array Element.Infection == Event Player.Infection),
+			Event Player, True, Color(Blue), Always);
+		Wait(0.100, Ignore Condition);
+		If(Event Player.Origin == Hero(D.Va));
+			Set Ultimate Charge(Event Player, 100);
+			Wait(1, Ignore Condition);
+			Press Button(Event Player, Button(Ultimate));
+		End;
+	}
+}
+
+rule("Convert")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		If(Hero Of(Attacker) != Hero Of(Victim) && Entity Exists(Attacker));
+			Event Player.Convert = Hero Of(Attacker);
+			Event Player.Infection = Event Player.Convert;
+			Filtered Array(All Players(All Teams), Current Array Element.Infection == Event Player.Infection).Inital_Spawn = False;
+			Skip If(Global.Ally_Outlines == False, 4);
+			Stop Forcing Player Outlines(Event Player, All Players(All Teams));
+			Stop Forcing Player Outlines(All Players(All Teams), Event Player);
+			Start Forcing Player Outlines(Event Player, Filtered Array(All Players(All Teams),
+				Current Array Element.Infection == Event Player.Infection), True, Color(Blue), Always);
+			Start Forcing Player Outlines(Filtered Array(All Players(All Teams), Current Array Element.Infection == Event Player.Infection),
+				Event Player, True, Color(Blue), Always);
+			Skip If(Global.Last_Stand_Stats[8] == False, 1);
+			Start Forcing Player Outlines(Filtered Array(All Players(All Teams),
+				Current Array Element.Infection != Event Player.Infection && Current Array Element.Last_Stand), Event Player, True, Color(Red),
+				Always);
+			Wait(3, Ignore Condition);
+			Skip If(Count Of(Filtered Array(All Players(All Teams), Current Array Element.Infection == Hero Of(Event Player)))
+				> 0 || !Array Contains(Global.Alive, Hero Of(Event Player)), 3);
+			Modify Global Variable(Alive, Remove From Array By Value, Hero Of(Event Player));
+			Small Message(All Players(All Teams), Custom String("{0}{1}: Cured", Hero Icon String(Hero Of(Event Player)), Hero Of(
+				Event Player)));
+			Set Player Allowed Heroes(Filtered Array(All Players(All Teams), !Has Spawned(Current Array Element)), Global.Alive);
+			Start Forcing Player To Be Hero(Event Player, Event Player.Convert);
+			Respawn(Event Player);
+			Wait(0.100, Ignore Condition);
+			Skip If(Global.Ally_Outlines == False, 4);
+			Stop Forcing Player Outlines(Event Player, All Players(All Teams));
+			Stop Forcing Player Outlines(All Players(All Teams), Event Player);
+			Start Forcing Player Outlines(Event Player, Filtered Array(All Players(All Teams),
+				Current Array Element.Infection == Event Player.Infection), True, Color(Blue), Always);
+			Start Forcing Player Outlines(Filtered Array(All Players(All Teams), Current Array Element.Infection == Event Player.Infection),
+				Event Player, True, Color(Blue), Always);
+			Skip If(Global.Last_Stand_Stats[8] == False, 1);
+			Start Forcing Player Outlines(Filtered Array(All Players(All Teams),
+				Current Array Element.Infection != Event Player.Infection && Current Array Element.Last_Stand), Event Player, True, Color(Red),
+				Always);
+			If(Event Player.Convert == Hero(D.Va));
+				Wait(1, Ignore Condition);
+				Set Ultimate Charge(Event Player, 100);
+			End;
+		Else;
+			Wait(3, Ignore Condition);
+			Respawn(Event Player);
+			If(Hero Of(Event Player) == Hero(D.Va));
+				Wait(1, Ignore Condition);
+				Set Ultimate Charge(Event Player, 100);
+				Press Button(Event Player, Button(Ultimate));
+			End;
+		End;
+	}
+}
+
+rule("Last Stand")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+		Count Of(Filtered Array(All Players(All Teams), Current Array Element.Infection == Event Player.Infection)) == 1;
+		Array(True == False, Is Alive(Event Player), Event Player.Inital_Spawn == False, Event Player.Infection != Event Player.Origin)
+			[Global.Last_Stand_Stats[0]] == True;
+	}
+
+	actions
+	{
+		Wait(Global.Last_Stand_Stats[6], Abort When False);
+		Small Message(Event Player, Custom String("You Are {0}{1}'s Last Stand", Hero Icon String(Event Player.Infection),
+			Event Player.Infection));
+		Event Player.Last_Stand = True;
+		Skip If(Global.Last_Stand_Stats[8] == False, 1);
+		Start Forcing Player Outlines(Event Player, Filtered Array(All Players(All Teams),
+			Current Array Element.Infection != Event Player.Infection), True, Color(Red), Always);
+		Set Damage Dealt(Event Player, 100 + Global.Last_Stand_Stats[1]);
+		Set Damage Received(Event Player, 100 - Global.Last_Stand_Stats[2]);
+		Set Healing Dealt(Event Player, 100 + Global.Last_Stand_Stats[3]);
+		Heal(Event Player, Null, Global.Last_Stand_Stats[4]);
+		Set Ultimate Charge(Event Player, Ultimate Charge Percent(Event Player) + Global.Last_Stand_Stats[5]);
+		Wait Until(Count Of(Filtered Array(All Players(All Teams), Current Array Element.Infection == Event Player.Infection))
+			!= 1 || !Has Spawned(Event Player), 99999);
+		Wait(Global.Last_Stand_Stats[7], Ignore Condition);
+		Set Damage Dealt(Event Player, 100);
+		Set Damage Received(Event Player, 100);
+		Set Healing Dealt(Event Player, 100);
+		Event Player.Last_Stand = False;
+		Stop Forcing Player Outlines(Event Player, Filtered Array(All Players(All Teams),
+			Current Array Element.Infection != Event Player.Infection));
+	}
+}
+
+rule("Remove Knockback")
+{
+	event
+	{
+		Player Received Knockback;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero Of(Victim);
+		Attacker != Victim;
+	}
+
+	actions
+	{
+		If(Is True For Any(Array(Hero(Ashe), Hero(Brigitte), Hero(D.Va), Hero(Doomfist), Hero(Illari), Hero(Lúcio), Hero(Orisa), Hero(
+			Sigma), Hero(Winston), Hero(Wrecking Ball), Hero(Zenyatta)), (Is Duplicating(Attacker) ? Hero Being Duplicated(Attacker)
+			: Hero Of(Attacker)) == Current Array Element));
+			Wait(0.100, Ignore Condition);
+			Apply Impulse(Victim, Direction Towards(Victim, Attacker), 0.001, To World, Cancel Contrary Motion);
+		Else If(Is True For Any(Array(Hero(Bastion), Hero(Junkrat), Hero(Pharah)), (Is Duplicating(Attacker) ? Hero Being Duplicated(
+				Attacker) : Hero Of(Attacker)) == Current Array Element));
+			Wait(0.100, Ignore Condition);
+			Apply Impulse(Victim, Velocity Of(Victim) * -1, 0.001, To World, Cancel Contrary Motion);
+		Else If((Is Duplicating(Attacker) ? Hero Being Duplicated(Attacker) : Hero Of(Attacker)) == Hero(Junker Queen));
+			Wait(0.100, Ignore Condition);
+			Apply Impulse(Victim, Direction Towards(Attacker, Victim), 0.001, To World, Cancel Contrary Motion);
+		End;
+		Skip If(!Has Status(Victim, Stunned), 2);
+		Set Status(Victim, Null, Stunned, 9999);
+		Clear Status(Victim, Stunned);
+	}
+}
+
+rule("Remove Damage")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero Of(Victim);
+		Attacker != Victim;
+	}
+
+	actions
+	{
+		Set Player Health(Victim, Health(Victim) + Event Damage);
+		Skip If(Is Alive(Victim), 2);
+		Teleport(Victim, Random Value In Array(Spawn Points(All Teams)));
+		Resurrect(Victim);
+	}
+}
+
+rule("Remove Sleep Dart")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ana;
+	}
+
+	conditions
+	{
+		Has Status(Event Player, Asleep) == True;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Frozen, 9999);
+		Clear Status(Event Player, Frozen);
+	}
+}
+
+rule("Remove Frozen")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Has Status(Event Player, Frozen) == True;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Frozen, 9999);
+		Clear Status(Event Player, Frozen);
+	}
+}
+
+rule("Prevent Softlock")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dead(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(5, Abort When False);
+		Respawn(Event Player);
+	}
+}
+
+rule("Baptiste Projectile")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Update Every Frame(Is Firing Secondary(Event Player)) == True;
+	}
+
+	actions
+	{
+		Create Projectile(Baptiste Biotic Launcher, Event Player, Null, Null, To World, Damage, All Teams, 1, 1, 3,
+			Baptiste Biotic Launcher Explosion Effect, Baptiste Biotic Launcher Explosion Sound, 0, 60, 5, 0, 0, 20);
+	}
+}
+
+rule("Baptiste Healing")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Attacker != Victim;
+		Event Damage <= 1;
+	}
+
+	actions
+	{
+		If(Hero Of(Attacker) == Hero Of(Victim));
+			Heal(Victim, Attacker, 50);
+		Else;
+			Set Player Health(Victim, Health(Victim) + Event Damage);
+		End;
+	}
+}
+
+rule("Ana Healing")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Ana;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero Of(Victim);
+		Attacker != Victim;
+		Event Ability == Button(Primary Fire);
+	}
+
+	actions
+	{
+		If(Victim.Is_AntiNaded == True);
+			Set Player Health(Victim, Health(Victim) + Event Damage * 100);
+		Else;
+			Heal(Victim, Attacker, Event Damage * 100);
+		End;
+	}
+}
+
+rule("Lucio Healing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is In Alternate Form(Event Player) == True;
+		Is True For Any(Players On Hero(Hero(Lúcio), All Teams), Distance Between(Event Player, Current Array Element)
+			<= 12 && Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS)
+			&& !Is In Alternate Form(Current Array Element)) == True;
+	}
+
+	actions
+	{
+		If(Is True For Any(Players On Hero(Hero(Lúcio), All Teams), Distance Between(Event Player, Current Array Element)
+			<= 12 && Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS)
+			&& !Is In Alternate Form(Current Array Element) && Is Using Ability 2(Current Array Element)));
+			Heal(Event Player, Filtered Array(Players On Hero(Hero(Lúcio), All Teams), Distance Between(Event Player, Current Array Element)
+				<= 12 && Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS)
+				&& !Is In Alternate Form(Current Array Element)), 5.200);
+		Else;
+			Heal(Event Player, Filtered Array(Players On Hero(Hero(Lúcio), All Teams), Distance Between(Event Player, Current Array Element)
+				<= 12 && Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS)
+				&& !Is In Alternate Form(Current Array Element) && Is Using Ability 2(Current Array Element)), 1.600);
+		End;
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Track Anti-Nade")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Ana;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Ana);
+		Event Ability == Button(Ability 2);
+	}
+
+	actions
+	{
+		Set Player Health(Victim, Health(Victim) + Event Damage * 100);
+		Event Player.Is_AntiNaded = True;
+		Wait(3, Restart When True);
+		Event Player.Is_AntiNaded = False;
+	}
+}
+
+rule("Ana Disallow Ultimate")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Ana);
+	}
+
+	actions
+	{
+		Disallow Button(Event Player, Button(Ultimate));
+		Wait Until(!(Hero Of(Event Player) == Hero(Ana)), 99999);
+		Allow Button(Event Player, Button(Ultimate));
+	}
+}
+
+rule("Use Nano Boost")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ana;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+	}
+
+	actions
+	{
+		Set Ultimate Charge(Event Player, 0);
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Set Melee Enabled(Event Player, False);
+		Set Reload Enabled(Event Player, False);
+		Cancel Primary Action(Event Player);
+		Event Player.Nano_Target = First Of(Sorted Array(Filtered Array(Remove From Array(All Living Players(All Teams), Event Player),
+			Hero Of(Current Array Element) == Hero(Ana) && Is In Line of Sight(Eye Position(Event Player), Eye Position(
+			Current Array Element), Enemy Barriers Block LOS) && Current Array Element.Has_Nano != True && Distance Between(Eye Position(
+			Event Player) + Facing Direction Of(Event Player) * Distance Between(Eye Position(Event Player), Eye Position(
+			Current Array Element)), Eye Position(Current Array Element)) <= 2 && Distance Between(Event Player, Current Array Element)
+			<= 40), Distance Between(Eye Position(Event Player) + Facing Direction Of(Event Player) * Distance Between(Eye Position(
+			Event Player), Eye Position(Current Array Element)), Eye Position(Current Array Element))));
+		Skip If(Entity Exists(Event Player.Nano_Target), 1);
+		Event Player.Nano_Target = Event Player;
+		Wait(0.128, Ignore Condition);
+		If(Event Player.Nano_Target.Is_AntiNaded == True);
+			Set Player Health(Event Player.Nano_Target, Health(Event Player.Nano_Target) + 250);
+		Else;
+			Heal(Event Player.Nano_Target, Event Player, 250);
+		End;
+		Wait(0.600, Ignore Condition);
+		Set Primary Fire Enabled(Event Player, True);
+		Set Secondary Fire Enabled(Event Player, True);
+		Set Ability 1 Enabled(Event Player, True);
+		Set Ability 2 Enabled(Event Player, True);
+		Set Melee Enabled(Event Player, True);
+		Set Reload Enabled(Event Player, True);
+		Wait(7.272, Restart When True);
+		Event Player.Nano_Target = Null;
+		Set Ultimate Charge(Event Player, 0);
+	}
+}
+
+rule("Nano Boost Effect")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Players(Team Of(Event Player)), Current Array Element.Nano_Target == Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Has_Nano = True;
+		Wait(0.128, Ignore Condition);
+		Destroy Effect(Event Player.Nano_ID_Array[0]);
+		Destroy Effect(Event Player.Nano_ID_Array[1]);
+		Create Effect(All Players(All Teams), Ana Nano Boosted Effect, Team Of(Event Player) == Team 1 ? Color(Team 1) : Color(Team 2),
+			Event Player, 1, Visible To);
+		Event Player.Nano_ID_Array[0] = Last Created Entity;
+		Create Effect(All Players(All Teams), Ana Nano Boosted Sound, Color(White), Event Player, 100, Visible To);
+		Event Player.Nano_ID_Array[1] = Last Created Entity;
+		Set Damage Dealt(Event Player, 150);
+		Set Damage Received(Event Player, 50);
+		Wait Until(Is True For All(All Players(Team Of(Event Player)), Current Array Element.Nano_Target != Event Player), 99999);
+		Destroy Effect(Event Player.Nano_ID_Array[0]);
+		Destroy Effect(Event Player.Nano_ID_Array[1]);
+		Set Damage Dealt(Event Player, 100);
+		Set Damage Received(Event Player, 100);
+		Event Player.Has_Nano = False;
+	}
+}
+
+rule("Nano Assist")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Players(Team Of(Event Player)), Current Array Element.Nano_Target == Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Assist(Event Player.Nano_ID_Array[2]);
+		Start Assist(Filtered Array(All Players(Team Of(Event Player)), Current Array Element.Nano_Target == Event Player), Victim, None);
+		Event Player.Nano_ID_Array[2] = Last Assist ID;
+		Wait(1, Restart When True);
+		Stop Assist(Event Player.Nano_ID_Array[2]);
+	}
+}
+
+rule("illari Healing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Illari;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.100, Abort When False);
+		Skip If(Hero Of(Ray Cast Hit Player(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(Event Player)
+			* 15, All Living Players(All Teams), Event Player, True)) != Hero(Illari), 1);
+		Heal(Ray Cast Hit Player(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(Event Player) * 15,
+			All Living Players(All Teams), Event Player, True), Event Player, 10.500);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Trigger Inspire")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Brigitte;
+	}
+
+	actions
+	{
+		Filtered Array(Players Within Radius(Event Player, 20, All Teams, Surfaces And Enemy Barriers), Hero Of(Current Array Element)
+			== Hero(Brigitte)).Inspire_From = Event Player;
+		Filtered Array(Players Within Radius(Event Player, 20, All Teams, Surfaces And Enemy Barriers), Hero Of(Current Array Element)
+			== Hero(Brigitte)).Inspire_Duration = 15;
+		Event Player.Has_Real_Inspire = 15;
+		Wait(1, Ignore Condition);
+	}
+}
+
+rule("Inspire Effects")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Event Player.Inspire_Duration > 0;
+		Event Player.Has_Real_Inspire == 0;
+	}
+
+	actions
+	{
+		While(Event Player.Inspire_Duration > 0 && Event Player.Has_Real_Inspire == 0);
+			Heal(Event Player, Event Player.Inspire_From, 1.500);
+			Wait(0.100, Ignore Condition);
+		End;
+	}
+}
+
+rule("Connect Heal Beam")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Firing Primary(Event Player) == True;
+		Is True For Any(All Living Players(All Teams), Hero Of(Current Array Element) == Hero(Mercy) && Is In Line of Sight(Eye Position(
+			Event Player), Current Array Element.Center_Mass, Barriers Do Not Block LOS) && Is In View Angle(Event Player,
+			Current Array Element.Center_Mass, 40) && Distance Between(Event Player, Current Array Element.Center_Mass) <= 15) == True;
+		Weapon(Event Player) == 1;
+	}
+
+	actions
+	{
+		Event Player.Heal_Beam_Target = First Of(Filtered Array(All Living Players(All Teams), Hero Of(Current Array Element) == Hero(
+			Mercy) && Is In Line of Sight(Eye Position(Event Player), Current Array Element.Center_Mass, Barriers Do Not Block LOS)
+			&& Is In View Angle(Event Player, Current Array Element.Center_Mass, 40) && Distance Between(Event Player,
+			Current Array Element.Center_Mass) <= 15));
+	}
+}
+
+rule("Heal Beam Break (LOS)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Heal_Beam_Target) == True;
+		Is In Line of Sight(Event Player.Center_Mass, Event Player.Heal_Beam_Target.Center_Mass, Barriers Do Not Block LOS) != True;
+	}
+
+	actions
+	{
+		Wait(1.300, Abort When False);
+		Event Player.Heal_Beam_Target = Null;
+	}
+}
+
+rule("Heal Beam Break (Distance)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Heal_Beam_Target) == True;
+		Distance Between(Event Player.Center_Mass, Event Player.Heal_Beam_Target.Center_Mass) > 15;
+	}
+
+	actions
+	{
+		Wait(1.300, Abort When False);
+		Event Player.Heal_Beam_Target = Null;
+	}
+}
+
+rule("Heal Beam Break (Death)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Heal_Beam_Target) == True;
+		(Is Dead(Event Player) || Is Dead(Event Player.Heal_Beam_Target)) == True;
+	}
+
+	actions
+	{
+		Event Player.Heal_Beam_Target = Null;
+	}
+}
+
+rule("Heal Beam Break (Weapon)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Heal_Beam_Target) == True;
+		Weapon(Event Player) != 1;
+	}
+
+	actions
+	{
+		Event Player.Heal_Beam_Target = Null;
+	}
+}
+
+rule("Heal Beam Break (Release)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Heal_Beam_Target) == True;
+		Is Firing Primary(Event Player) != True;
+	}
+
+	actions
+	{
+		Event Player.Heal_Beam_Target = Null;
+	}
+}
+
+rule("Beam Healing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Heal_Beam_Target) == True;
+	}
+
+	actions
+	{
+		Wait(0.192, Abort When False);
+		Heal(Event Player.Heal_Beam_Target, Event Player, 10.560);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Apply Orb")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ability 1)) == True;
+		Is True For Any(All Living Players(All Teams), Distance Between(Event Player, Current Array Element) <= 40 && Is In Line of Sight(
+			Eye Position(Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS) && Is In View Angle(Event Player,
+			Eye Position(Current Array Element), 40) && Hero Of(Current Array Element) == Hero(Zenyatta) && !Current Array Element.Has_Orb)
+			== True;
+	}
+
+	actions
+	{
+		Cancel Primary Action(Event Player);
+		Event Player.Orb_Target.Has_Orb = False;
+		Event Player.Orb_Target.Orb_From = Null;
+		Event Player.Orb_Target = First Of(Filtered Array(All Living Players(All Teams), Distance Between(Event Player,
+			Current Array Element) <= 40 && Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element),
+			Barriers Do Not Block LOS) && Is In View Angle(Event Player, Eye Position(Current Array Element), 40) && Hero Of(
+			Current Array Element) == Hero(Zenyatta) && !Current Array Element.Has_Orb));
+		Event Player.Orb_Target.Has_Orb = True;
+		Event Player.Orb_Target.Orb_From = Event Player;
+		Small Message(Event Player.Orb_Target, Custom String("{0} Orb Of Harmory Gained From {1}", Ability Icon String(Hero(Zenyatta),
+			Button(Ability 1)), Event Player));
+	}
+}
+
+rule("Orb Lost LOS")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Orb_Target) == True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(Event Player.Orb_Target), Barriers Do Not Block LOS) != True;
+	}
+
+	actions
+	{
+		Wait(5, Abort When False);
+		Event Player.Orb_Target.Has_Orb = False;
+		Event Player.Orb_Target.Orb_From = Null;
+		Event Player.Orb_Target = Null;
+	}
+}
+
+rule("Orb Out Ranged")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Orb_Target) == True;
+		Distance Between(Event Player, Event Player.Orb_Target) > 40;
+	}
+
+	actions
+	{
+		Wait(5, Abort When False);
+		Event Player.Orb_Target.Has_Orb = False;
+		Event Player.Orb_Target.Orb_From = Null;
+		Event Player.Orb_Target = Null;
+	}
+}
+
+rule("Orb Player Died")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Orb_Target) == True;
+		(Is Dead(Event Player) || Is Dead(Event Player.Orb_Target)) == True;
+	}
+
+	actions
+	{
+		Event Player.Orb_Target.Has_Orb = False;
+		Event Player.Orb_Target.Orb_From = Null;
+		Event Player.Orb_Target = Null;
+	}
+}
+
+rule("Orb Healing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Orb_Target) == True;
+	}
+
+	actions
+	{
+		Wait(0.100, Abort When False);
+		Heal(Event Player.Orb_Target, Event Player, 3);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Connect Boost Beam")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+		Is True For Any(All Living Players(All Teams), Hero Of(Current Array Element) == Hero(Mercy) && Is In Line of Sight(Eye Position(
+			Event Player), Current Array Element.Center_Mass, Barriers Do Not Block LOS) && Is In View Angle(Event Player,
+			Current Array Element.Center_Mass, 40) && Distance Between(Event Player, Current Array Element.Center_Mass) <= 15) == True;
+		Weapon(Event Player) == 1;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = First Of(Filtered Array(All Living Players(All Teams), Hero Of(Current Array Element) == Hero(
+			Mercy) && Is In Line of Sight(Eye Position(Event Player), Current Array Element.Center_Mass, Barriers Do Not Block LOS)
+			&& Is In View Angle(Event Player, Current Array Element.Center_Mass, 40) && Distance Between(Event Player,
+			Current Array Element.Center_Mass) <= 15));
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 125);
+	}
+}
+
+rule("Boost Beam Break (LOS)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Boost_Beam_Target) == True;
+		Is In Line of Sight(Event Player.Center_Mass, Event Player.Boost_Beam_Target.Center_Mass, Barriers Do Not Block LOS) != True;
+	}
+
+	actions
+	{
+		Wait(1.300, Abort When False);
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = Null;
+	}
+}
+
+rule("Boost Beam Break (Distance)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Boost_Beam_Target) == True;
+		Distance Between(Event Player.Center_Mass, Event Player.Boost_Beam_Target.Center_Mass) > 15;
+	}
+
+	actions
+	{
+		Wait(1.300, Abort When False);
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = Null;
+	}
+}
+
+rule("Boost Beam Break (Death)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Boost_Beam_Target) == True;
+		(Is Dead(Event Player) || Is Dead(Event Player.Boost_Beam_Target)) == True;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = Null;
+	}
+}
+
+rule("Boost Beam Break (Weapon)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Boost_Beam_Target) == True;
+		Weapon(Event Player) != 1;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = Null;
+	}
+}
+
+rule("Boost Beam Break (Release)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Boost_Beam_Target) == True;
+		Is Firing Secondary(Event Player) != True;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = Null;
+	}
+}
+
+rule("Support Passive For Everyone")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For All(All Support Heroes, (Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player))
+			!= Current Array Element) == True;
+		Workshop Setting Toggle(Custom String("Infection"), Custom String("Give Everybody Support Passive"), True, 0) == True;
+	}
+
+	actions
+	{
+		Stop Heal Over Time(Event Player.Support_Passive);
+		Wait(2, Restart When True);
+		Start Heal Over Time(Event Player, Event Player, 9999, 15);
+		Event Player.Support_Passive = Last Heal Over Time ID;
+	}
+}
+
+rule("Remove Support Passive, When Support")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Support Heroes, (Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player))
+			== Current Array Element) == True;
+	}
+
+	actions
+	{
+		Stop Heal Over Time(Event Player.Support_Passive);
+	}
+}
+
+disabled rule("Anti-Cheater")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Attacker == Victim;
+	}
+
+	actions
+	{
+		Event Player.Strike += 1;
+		Big Message(Event Player, Custom String("Strike {0}\n3 = Kick", Event Player.Strike));
+		Wait(1, Ignore Condition);
+		If(Event Player.Strike >= 3);
+			Big Message(All Players(All Teams), Custom String("{0} On Strike 3", Event Player));
+		End;
+	}
+}
+
+rule("Override Timer")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Button Held(Host Player, Button(Interact)) == True;
+		Is Button Held(Host Player, Button(Melee)) == True;
+	}
+
+	actions
+	{
+		Wait(5, Abort When False);
+		Set Match Time(3);
+	}
+}
+
+rule("Info - Zenyatta")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Small Message(Event Player, Custom String("{0}Harmony Orb Can Be Used On Allies", Ability Icon String(Hero(Zenyatta), Button(
+			Ability 1))));
+	}
+}
+
+rule("Info - Mercy")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Small Message(Event Player, Custom String("{0}Healing Beam And Boost Beam Can Be Used On Allies", Ability Icon String(Hero(Mercy),
+			Button(Primary Fire))));
+	}
+}
+
+rule("Info - Lucio")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Small Message(Event Player, Custom String("{0}Crossfade Healing Can Be Used On Allies", Ability Icon String(Hero(Lúcio), Button(
+			Ability 1)), Ability Icon String(Hero(Lúcio), Button(Ability 2))));
+		Small Message(Event Player, Custom String("{1} Is Affected By AMP", Ability Icon String(Hero(Lúcio), Button(Ability 1)),
+			Ability Icon String(Hero(Lúcio), Button(Ability 2))));
+	}
+}
+
+rule("Info - Ana")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ana;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Small Message(Event Player, Custom String("{0}/{1}Can Heal Alies (Ignores Anti-heal)", Ability Icon String(Hero(Ana), Button(
+			Primary Fire)), Ability Icon String(Hero(Ana), Button(Ability 2)), Ability Icon String(Hero(Ana), Button(Ultimate))));
+		Small Message(Event Player, Custom String("{2}Can Be Used On Allies And Self", Ability Icon String(Hero(Ana), Button(
+			Primary Fire)), Ability Icon String(Hero(Ana), Button(Ability 2)), Ability Icon String(Hero(Ana), Button(Ultimate))));
+	}
+}
+
+rule("Info - Baptiste")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Small Message(Event Player, Custom String("{0}Can Heal Allies", Ability Icon String(Hero(Baptiste), Button(Secondary Fire))));
+	}
+}
+
+rule("Info - Brigitte")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Small Message(Event Player, Custom String("Inspire Can Heal Allies", Ability Icon String(Hero(Baptiste), Button(Secondary Fire))));
+	}
+}
