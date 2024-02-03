@@ -1,0 +1,140 @@
+settings
+{
+	main
+	{
+		Mode Name: "Custom Movement"
+	}
+
+	modes
+	{
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Flashpoint
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: Forward_Speed
+		1: Non_Forward_Speed
+		2: Crouching_Speed
+
+	player:
+		0: Base_Speed
+		1: Desired_Speeds
+		2: Hero
+}
+
+subroutines
+{
+	0: Update_Speed
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Forward_Speed = Array(5, 6, 5.500, 5.500, 5, 4.500, 5, 6, 5.500, 4.500, 5.500, 6, 5, 4.500, 5.500, 5.500, 5, 5.500, 6,
+			4.500, 5, 5.500, 5.500, 5, 4.500, 5, 5.500, 4.500, 5, 5.500, 6, 5, 5.500, 5, 6, 5, 5.500, 5, 5.500);
+		Global.Non_Forward_Speed = Array(3, 4, 3.500, 3.500, 3, 2.500, 3, 4, 3.500, 2.500, 3.500, 4, 3, 2.500, 3.500, 3.500, 3, 3.500, 4,
+			3.500, 3, 3.500, 3.500, 3, 2.500, 3, 3.500, 2.500, 3, 3.500, 4, 3, 3.500, 3, 4, 3, 3.500, 3, 3.500);
+		Global.Crouching_Speed = Array(2, 3, 2.500, 2.500, 2, 1.500, 2, 3, 2.500, 1.500, 2.500, 3, 2, 1.500, 2.500, 2.500, 2, 2.500, 3,
+			1.500, 2, 2.500, 2.500, 2, 1.500, 2, 2.500, 1.500, 2, 2.500, 3, 2, 2.500, 2, 3, 2, 2.500, 2, 2.500);
+	}
+}
+
+rule("Hero Swapped")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) != Event Player.Hero;
+	}
+
+	actions
+	{
+		Event Player.Hero = Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player);
+		Event Player.Base_Speed = Event Player.Hero == Hero(Genji) || Event Player.Hero == Hero(Tracer) ? 0.060 : 0.055;
+		Event Player.Desired_Speeds = Array(Global.Forward_Speed[Index Of Array Value(All Heroes, Event Player.Hero)],
+			Global.Non_Forward_Speed[Index Of Array Value(All Heroes, Event Player.Hero)], Global.Crouching_Speed[Index Of Array Value(
+			All Heroes, Event Player.Hero)]);
+		Start Rule(Update_Speed, Restart Rule);
+	}
+}
+
+rule("Is Crouching")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Is Crouching(Event Player)) == True;
+	}
+
+	actions
+	{
+		Start Rule(Update_Speed, Restart Rule);
+		Wait Until(Update Every Frame(!Is Crouching(Event Player)), 99999);
+		Start Rule(Update_Speed, Restart Rule);
+	}
+}
+
+rule("Update Speed")
+{
+	event
+	{
+		Subroutine;
+		Update_Speed;
+	}
+
+	actions
+	{
+		If(Is Crouching(Event Player));
+			Set Move Speed(Event Player, Event Player.Desired_Speeds[2] / 0.030);
+			Stop Forcing Throttle(Event Player);
+		Else;
+			Set Move Speed(Event Player, Event Player.Desired_Speeds[0] / Event Player.Base_Speed);
+			Start Forcing Throttle(Event Player, 0, 1, 0, Event Player.Desired_Speeds[1] / (Event Player.Desired_Speeds[0] * 0.900), 0,
+				Event Player.Desired_Speeds[1] / Event Player.Desired_Speeds[0]);
+		End;
+	}
+}
