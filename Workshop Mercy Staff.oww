@@ -1,0 +1,287 @@
+settings
+{
+	main
+	{
+		Mode Name: "Mercy Staff - 2XBJSR"
+	}
+
+	modes
+	{
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Flashpoint
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	extensions
+	{
+		Beam Effects
+		Beam Sounds
+	}
+}
+
+variables
+{
+	player:
+		0: Center_Mass
+		1: Heal_Beam_Target
+		2: Boost_Beam_Target
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Chase Player Variable At Rate(Event Player, Center_Mass, World Vector Of(Vector(0, Distance Between(Eye Position(Event Player),
+			Position Of(Event Player)) / 1.400, 0), Event Player, Rotation And Translation), 9999, Destination and Rate);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Entity Exists(Event Player.Heal_Beam_Target)), Mercy Heal Beam,
+			Event Player.Center_Mass, Event Player.Heal_Beam_Target.Center_Mass, Team Of(Event Player) == Team 1 ? Color(Team 1) : Color(
+			Team 2), Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Entity Exists(Event Player.Heal_Beam_Target)), Mercy Heal Beam Sound, Color(
+			White), (Event Player.Center_Mass + Event Player.Heal_Beam_Target.Center_Mass) / 2, 100, Visible To Position and Radius);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Entity Exists(Event Player.Boost_Beam_Target)), Mercy Boost Beam,
+			Event Player.Center_Mass, Event Player.Boost_Beam_Target.Center_Mass, Team Of(Event Player) == Team 1 ? Color(Team 1) : Color(
+			Team 2), Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Entity Exists(Event Player.Boost_Beam_Target)), Mercy Boost Beam Sound, Color(
+			White), (Event Player.Center_Mass + Event Player.Boost_Beam_Target.Center_Mass) / 2, 100, Visible To Position and Radius);
+	}
+}
+
+rule("Connect Heal Beam")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Is Button Held(Event Player, Button(Crouch)) != True;
+		Is True For Any(All Living Players(Team Of(Event Player)), True && Is In Line of Sight(Eye Position(Event Player),
+			Current Array Element.Center_Mass, Barriers Do Not Block LOS) && Is In View Angle(Event Player,
+			Current Array Element.Center_Mass, 40) && Distance Between(Event Player, Current Array Element.Center_Mass) <= 15) == True;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = Null;
+		Event Player.Heal_Beam_Target = First Of(Filtered Array(All Living Players(Team Of(Event Player)), True && Is In Line of Sight(
+			Eye Position(Event Player), Current Array Element.Center_Mass, Barriers Do Not Block LOS) && Is In View Angle(Event Player,
+			Current Array Element.Center_Mass, 40) && Distance Between(Event Player, Current Array Element.Center_Mass) <= 15));
+	}
+}
+
+rule("Heal Beam Break (LOS)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Heal_Beam_Target) == True;
+		Is In Line of Sight(Event Player.Center_Mass, Event Player.Heal_Beam_Target.Center_Mass, Barriers Do Not Block LOS) != True;
+	}
+
+	actions
+	{
+		Wait(1.300, Abort When False);
+		Event Player.Heal_Beam_Target = Null;
+	}
+}
+
+rule("Heal Beam Break (Distance)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Heal_Beam_Target) == True;
+		Distance Between(Event Player.Center_Mass, Event Player.Heal_Beam_Target.Center_Mass) > 15;
+	}
+
+	actions
+	{
+		Wait(1.300, Abort When False);
+		Event Player.Heal_Beam_Target = Null;
+	}
+}
+
+rule("Heal Beam Break (Death)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Heal_Beam_Target) == True;
+		(Is Dead(Event Player) || Is Dead(Event Player.Heal_Beam_Target)) == True;
+	}
+
+	actions
+	{
+		Event Player.Heal_Beam_Target = Null;
+	}
+}
+
+rule("Beam Healing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Heal_Beam_Target) == True;
+	}
+
+	actions
+	{
+		Wait(0.192, Abort When False);
+		Heal(Event Player.Heal_Beam_Target, Event Player, 10.560);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Connect Boost Beam")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Is Button Held(Event Player, Button(Crouch)) == True;
+		Is True For Any(All Living Players(Team Of(Event Player)), True && Is In Line of Sight(Eye Position(Event Player),
+			Current Array Element.Center_Mass, Barriers Do Not Block LOS) && Is In View Angle(Event Player,
+			Current Array Element.Center_Mass, 40) && Distance Between(Event Player, Current Array Element.Center_Mass) <= 15) == True;
+	}
+
+	actions
+	{
+		Event Player.Heal_Beam_Target = Null;
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = First Of(Filtered Array(All Living Players(Team Of(Event Player)), True && Is In Line of Sight(
+			Eye Position(Event Player), Current Array Element.Center_Mass, Barriers Do Not Block LOS) && Is In View Angle(Event Player,
+			Current Array Element.Center_Mass, 40) && Distance Between(Event Player, Current Array Element.Center_Mass) <= 15));
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 125);
+	}
+}
+
+rule("Boost Beam Break (LOS)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Boost_Beam_Target) == True;
+		Is In Line of Sight(Event Player.Center_Mass, Event Player.Boost_Beam_Target.Center_Mass, Barriers Do Not Block LOS) != True;
+	}
+
+	actions
+	{
+		Wait(1.300, Abort When False);
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = Null;
+	}
+}
+
+rule("Boost Beam Break (Distance)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Boost_Beam_Target) == True;
+		Distance Between(Event Player.Center_Mass, Event Player.Boost_Beam_Target.Center_Mass) > 15;
+	}
+
+	actions
+	{
+		Wait(1.300, Abort When False);
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = Null;
+	}
+}
+
+rule("Boost Beam Break (Death)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Boost_Beam_Target) == True;
+		(Is Dead(Event Player) || Is Dead(Event Player.Boost_Beam_Target)) == True;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player.Boost_Beam_Target, 100);
+		Event Player.Boost_Beam_Target = Null;
+	}
+}
