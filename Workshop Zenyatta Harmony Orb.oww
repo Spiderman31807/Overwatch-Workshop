@@ -1,0 +1,202 @@
+settings
+{
+	main
+	{
+		Mode Name: "Zenyatta Hamory Orb - 0RQTS"
+	}
+
+	modes
+	{
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Flashpoint
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+}
+
+variables
+{
+	player:
+		0: Orb_Target
+		1: Has_Orb
+		2: Orb_From
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Create Effect(Filtered Array(All Players(All Teams), Event Player.Has_Orb), Sphere, Color(Yellow), Update Every Frame(
+			World Vector Of(Vector(-0.250, Distance Between(Eye Position(Event Player), Position Of(Event Player)) * 1.150, -0.100),
+			Event Player, Rotation And Translation)), 0.120, Visible To Position and Radius);
+		Create In-World Text(Filtered Array(Event Player, Entity Exists(Event Player.Orb_Target)), Custom String("  {0} {1}\n{2}",
+			Ability Icon String(Hero(Zenyatta), Button(Ability 1)), Hero Icon String(Hero Of(Event Player.Orb_Target)), Custom String(
+			"{0}/{1} HP", Round To Integer(Health(Event Player.Orb_Target), Up), Max Health(Event Player.Orb_Target))), Update Every Frame(
+			Eye Position(Event Player) + 100 * (1.250 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(
+			Event Player)) - 90)) + (-3 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(
+			Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(
+			Event Player))), 2, Do Not Clip, Visible To Position and String, Color(White), Default Visibility);
+		Create In-World Text(Filtered Array(Event Player, Entity Exists(Event Player.Orb_From)), Custom String("  {0} {1}\n{2}",
+			Ability Icon String(Hero(Zenyatta), Button(Ability 1)), Hero Icon String(Hero Of(Event Player.Orb_From)), Custom String(
+			"{0}/{1} HP", Round To Integer(Health(Event Player.Orb_From), Up), Max Health(Event Player.Orb_From))), Update Every Frame(
+			Eye Position(Event Player) + 100 * (3.500 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(
+			Event Player)) - 90)) + (-1.800 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(
+			Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(
+			Event Player))), 2, Do Not Clip, Visible To Position and String, Color(White), Default Visibility);
+	}
+}
+
+rule("Apply Orb")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Is True For Any(All Living Players(Team Of(Event Player)), Distance Between(Event Player, Current Array Element)
+			<= 40 && Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS)
+			&& Is In View Angle(Event Player, Eye Position(Current Array Element), 40) && !Current Array Element.Has_Orb) == True;
+	}
+
+	actions
+	{
+		Cancel Primary Action(Event Player);
+		Event Player.Orb_Target.Has_Orb = False;
+		Event Player.Orb_Target.Orb_From = Null;
+		Event Player.Orb_Target = First Of(Filtered Array(All Living Players(Team Of(Event Player)), Distance Between(Event Player,
+			Current Array Element) <= 40 && Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element),
+			Barriers Do Not Block LOS) && Is In View Angle(Event Player, Eye Position(Current Array Element), 40)
+			&& !Current Array Element.Has_Orb));
+		Event Player.Orb_Target.Has_Orb = True;
+		Event Player.Orb_Target.Orb_From = Event Player;
+		Small Message(Event Player.Orb_Target, Custom String("{0} Orb Of Harmory Gained From {1}", Ability Icon String(Hero(Zenyatta),
+			Button(Ability 1)), Event Player));
+	}
+}
+
+rule("Orb Lost LOS")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Orb_Target) == True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(Event Player.Orb_Target), Barriers Do Not Block LOS) != True;
+	}
+
+	actions
+	{
+		Wait(5, Abort When False);
+		Event Player.Orb_Target.Has_Orb = False;
+		Event Player.Orb_Target.Orb_From = Null;
+		Event Player.Orb_Target = Null;
+	}
+}
+
+rule("Orb Out Ranged")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Orb_Target) == True;
+		Distance Between(Event Player, Event Player.Orb_Target) > 40;
+	}
+
+	actions
+	{
+		Wait(5, Abort When False);
+		Event Player.Orb_Target.Has_Orb = False;
+		Event Player.Orb_Target.Orb_From = Null;
+		Event Player.Orb_Target = Null;
+	}
+}
+
+rule("Orb Player Died")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Orb_Target) == True;
+		(Is Dead(Event Player) || Is Dead(Event Player.Orb_Target)) == True;
+	}
+
+	actions
+	{
+		Event Player.Orb_Target.Has_Orb = False;
+		Event Player.Orb_Target.Orb_From = Null;
+		Event Player.Orb_Target = Null;
+	}
+}
+
+rule("Orb Healing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Orb_Target) == True;
+	}
+
+	actions
+	{
+		Wait(0.100, Abort When False);
+		Heal(Event Player.Orb_Target, Event Player, 3);
+		Loop If Condition Is True;
+	}
+}
