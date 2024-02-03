@@ -1,0 +1,857 @@
+settings
+{
+	main
+	{
+		Mode Name: "In-Game Menu - K9NVX"
+	}
+
+	lobby
+	{
+		Map Rotation: After A Game
+		Match Voice Chat: Enabled
+		Max Spectators: 12
+		Return To Lobby: Never
+		Swap Teams After Match: No
+	}
+
+	modes
+	{
+		disabled Assault
+		{
+			Allow Hero Switching: Off
+			Enemy Health Bars: Off
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Kill Feed: Off
+			Respawn As Random Hero: On
+			Skins: Off
+			Spawn Health Packs: Disabled
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+
+		disabled Bounty Hunter
+		{
+			Allow Hero Switching: Off
+			Enemy Health Bars: Off
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Kill Feed: Off
+			Respawn As Random Hero: On
+			Skins: Off
+			Spawn Health Packs: Disabled
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+
+		disabled Capture the Flag
+		{
+			Allow Hero Switching: Off
+			Enemy Health Bars: Off
+			Flag Dropped Lock Time: 5.0
+			Flag Return Time: 4.0
+			Flag Score Respawn Time: 15.0
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Kill Feed: Off
+			Respawn As Random Hero: On
+			Skins: Off
+			Spawn Health Packs: Disabled
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		disabled Deathmatch
+		{
+			Allow Hero Switching: Off
+			Enemy Health Bars: Off
+			Game Length In Minutes: 15
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Kill Feed: Off
+			Respawn As Random Hero: On
+			Score To Win: 5000
+			Self Initiated Respawn: Off
+			Skins: Off
+			Spawn Health Packs: Disabled
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+
+		disabled Elimination
+		{
+			Allow Hero Switching: Off
+			Enemy Health Bars: Off
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Kill Feed: Off
+			Respawn As Random Hero: On
+			Skins: Off
+			Spawn Health Packs: Disabled
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Flashpoint
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		disabled Junkenstein's Revenge
+		{
+			Allow Hero Switching: Off
+			Enemy Health Bars: Off
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Kill Feed: Off
+			Respawn As Random Hero: On
+			Skins: Off
+			Spawn Health Packs: Disabled
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+
+		disabled Practice Range
+		{
+			Allow Hero Switching: Off
+			Enemy Health Bars: Off
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Kill Feed: Off
+			Respawn As Random Hero: On
+			Skins: Off
+			Spawn Health Packs: Disabled
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		disabled Skirmish
+		{
+			Allow Hero Switching: Off
+			Enemy Health Bars: Off
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Kill Feed: Off
+			Respawn As Random Hero: On
+			Skins: Off
+			Spawn Health Packs: Disabled
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+
+		disabled Team Deathmatch
+		{
+			Allow Hero Switching: Off
+			Enemy Health Bars: Off
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Kill Feed: Off
+			Respawn As Random Hero: On
+			Skins: Off
+			Spawn Health Packs: Disabled
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+	}
+
+	workshop
+	{
+		Dev Mode: On
+	}
+}
+
+variables
+{
+	global:
+		0: Click_Area
+		1: Click_Area_Size
+		2: Click_Area_Color
+		3: Click_Area_Hover_Color
+		4: Click_Area_Page
+		5: Click_Area_Text
+		6: Click_Area_Text_Size
+		7: Click_Area_ID
+		8: Mouse_MaxX
+		9: Mouse_MinX
+		10: Mouse_MaxY
+		11: Mouse_MinY
+		12: Default_Sensitivity_Aim
+		13: Default_Sensitivity_Throttle
+		14: Debug_Dev
+		15: Temp_Dev_Text_ID
+		16: Temp_Index
+
+	player:
+		0: Menu_Text_ID_Array
+		1: Text_ID_Index
+		2: Temp_Page
+		3: Index
+		4: Clicked_Area
+		5: Page
+		6: Init_Direction
+		7: Mouse_Y
+		8: Mouse_X
+		9: Sensitivity
+		10: Mouse_Input
+		11: Enable_Menu
+		12: Dev_Click_Area_Size
+}
+
+subroutines
+{
+	0: Disable_Bindings
+	1: Enable_Bindings
+	2: Setup_Click_Areas
+	3: Detect_Click
+	4: Destroy_Click_Areas
+}
+
+disabled rule("-------------------------------------------- In-Game Menu ----------------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.Enable_Menu), Custom String(
+			"{0}{1}{2}                                                                                                                       ",
+			Custom String(
+			"                                                                                                                                "),
+			Custom String(
+			"                                                                                                                               "),
+			Custom String("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")), Null, Null, Left, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Global.Mouse_MaxX = 7.200;
+		Global.Mouse_MaxY = 4.100;
+		Global.Mouse_MinX = 0 - 7.200;
+		Global.Mouse_MinY = 0 - 3.500;
+		Global.Default_Sensitivity_Aim = Workshop Setting Integer(Custom String("Mouse"), Custom String(
+			"Default Sensitivity% (Mouse / Right Joystick)"), 0, 0, 20, 0);
+		Global.Default_Sensitivity_Throttle = Workshop Setting Integer(Custom String("Mouse"), Custom String(
+			"Default Sensitivity (WASD / Left Joystick)"), 8, 1, 20, 0);
+		Wait(1, Ignore Condition);
+		Log To Inspector(Custom String("Count Of Pos, {0}", Count Of(Global.Click_Area)));
+		Log To Inspector(Custom String("Count Of Size, {0}", Count Of(Global.Click_Area_Size)));
+		Log To Inspector(Custom String("Count Of Color, {0}", Count Of(Global.Click_Area_Color)));
+		Log To Inspector(Custom String("Count Of Hover Color, {0}", Count Of(Global.Click_Area_Hover_Color)));
+		Log To Inspector(Custom String("Count Of Page, {0}", Count Of(Global.Click_Area_Page)));
+		Log To Inspector(Custom String("Count Of Text, {0}", Count Of(Global.Click_Area_Text)));
+		Log To Inspector(Custom String("Count Of Text Size, {0}", Count Of(Global.Click_Area_Text_Size)));
+		Log To Inspector(Custom String("Count Of ID, {0}", Count Of(Global.Click_Area_ID)));
+	}
+}
+
+rule("Player Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Mouse_Input = Workshop Setting Combo(Custom String("Mouse"), Custom String("Default Input"), 0, Array(Custom String(
+			"Mouse / Right Joystick"), Custom String("WASD / Left Joystick")), 0);
+		If(Event Player.Mouse_Input == 0);
+			Event Player.Sensitivity = Global.Default_Sensitivity_Aim;
+			Chase Player Variable At Rate(Event Player, Mouse_X, Min(Max(Horizontal Facing Angle Of(Event Player) - First Of(
+				Event Player.Init_Direction) * (Absolute Value(First Of(Event Player.Init_Direction))
+				> 90 && Event Player.Init_Direction[1] != (Horizontal Facing Angle Of(Event Player) == Absolute Value(
+				Horizontal Facing Angle Of(Event Player))) ? -1 : 1), Global.Mouse_MinX), Global.Mouse_MaxX), 999, Destination and Rate);
+			Chase Player Variable At Rate(Event Player, Mouse_Y, Min(Max((Vertical Facing Angle Of(Event Player) - Last Of(
+				Event Player.Init_Direction)) * -1, Global.Mouse_MinY), Global.Mouse_MaxY), 99, Destination and Rate);
+		Else;
+			Event Player.Sensitivity = Global.Default_Sensitivity_Throttle;
+			Chase Player Variable At Rate(Event Player, Mouse_X, Min(Max(Event Player.Mouse_X + X Component Of(Throttle Of(Event Player)),
+				Global.Mouse_MinX), Global.Mouse_MaxX), Event Player.Sensitivity, Destination and Rate);
+			Chase Player Variable At Rate(Event Player, Mouse_Y, Min(Max(Event Player.Mouse_Y + Z Component Of(Throttle Of(Event Player)),
+				Global.Mouse_MinY), Global.Mouse_MaxY), Event Player.Sensitivity, Destination and Rate);
+		End;
+		Create In-World Text(Filtered Array(Event Player, Event Player.Enable_Menu == True), Custom String("▲"), Update Every Frame(
+			Eye Position(Event Player) + 100 * (Event Player.Mouse_X * -1 / 2 * Cross Product(Facing Direction Of(Event Player),
+			Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(
+			Facing Direction Of(Event Player)) - 90)) + (Event Player.Mouse_Y / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(
+			Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 3, Do Not Clip, Visible To Position and String, Color(Orange),
+			Default Visibility);
+		Wait Until(Has Spawned(Event Player), 99999);
+		Wait(0.500, Ignore Condition);
+		Small Message(Event Player, Custom String("Press {0} To Open Menu", Input Binding String(Button(Interact))));
+	}
+}
+
+rule("Click Area Values")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Click_Area = Array(Vector(5.500, 0, 3.500), Vector(-7, 0, 4.100), Vector(2, 0, 1), Vector(2, 0, -1), Vector(-2, 0, -1),
+			Vector(-2, 0, 1));
+		Global.Click_Area_Size = Array(0.500, 1, 0.300, 1, 1, 4);
+		Global.Click_Area_Color = Array(Color(White), 1, Color(Red), 1, Color(White), 4);
+		Global.Click_Area_Hover_Color = Array(Color(Lime Green), 1, Color(Rose), 1, Color(Blue), 2, Color(Green), 1, Color(Red), 1);
+		Global.Click_Area_Page = Array(Custom String("Default"), 1, Custom String("!Default"), 1, Custom String("Settings"), 4);
+		Global.Click_Area_Text = Array(Custom String("Settings"), Custom String("X"), Custom String("Mouse / Right Joystick"),
+			Custom String("WASD / Left Joystick"), Custom String("Increase Sensitivity"), Custom String("Decrease Sensitivity"));
+		Global.Click_Area_Text_Size = Array(3, 1, 2.500, 1, 2, 4);
+		Global.Click_Area_ID = Array(Custom String("Settings"), Custom String("Default Page"), Custom String("Aim"), Custom String(
+			"Throttle"), Custom String("+Sensitivity"), Custom String("-Sensitivity"));
+	}
+}
+
+rule("Click Area Value Decoder")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Temp_Dev_Text_ID = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area_Size), 2);
+			For Global Variable(Temp_Index, 0, Global.Click_Area_Size[Global.Debug_Dev + 1], 1);
+				Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Global.Click_Area_Size[Global.Debug_Dev]);
+			End;
+		End;
+		Global.Click_Area_Size = Global.Temp_Dev_Text_ID;
+		Global.Temp_Dev_Text_ID = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area_Color), 2);
+			For Global Variable(Temp_Index, 0, Global.Click_Area_Color[Global.Debug_Dev + 1], 1);
+				Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Global.Click_Area_Color[Global.Debug_Dev]);
+			End;
+		End;
+		Global.Click_Area_Color = Global.Temp_Dev_Text_ID;
+		Global.Temp_Dev_Text_ID = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area_Hover_Color), 2);
+			For Global Variable(Temp_Index, 0, Global.Click_Area_Hover_Color[Global.Debug_Dev + 1], 1);
+				Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Global.Click_Area_Hover_Color[Global.Debug_Dev]);
+			End;
+		End;
+		Global.Click_Area_Hover_Color = Global.Temp_Dev_Text_ID;
+		Global.Temp_Dev_Text_ID = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area_Page), 2);
+			For Global Variable(Temp_Index, 0, Global.Click_Area_Page[Global.Debug_Dev + 1], 1);
+				Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Global.Click_Area_Page[Global.Debug_Dev]);
+			End;
+		End;
+		Global.Click_Area_Page = Global.Temp_Dev_Text_ID;
+		Global.Temp_Dev_Text_ID = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area_Text_Size), 2);
+			For Global Variable(Temp_Index, 0, Global.Click_Area_Text_Size[Global.Debug_Dev + 1], 1);
+				Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Global.Click_Area_Text_Size[Global.Debug_Dev]);
+			End;
+		End;
+		Global.Click_Area_Text_Size = Global.Temp_Dev_Text_ID;
+	}
+}
+
+rule("Setup Click Areas")
+{
+	event
+	{
+		Subroutine;
+		Setup_Click_Areas;
+	}
+
+	actions
+	{
+		Abort If(Is Dummy Bot(Event Player));
+		Skip If(Event Player.Menu_Text_ID_Array == Empty Array, 2);
+		Call Subroutine(Destroy_Click_Areas);
+		Event Player.Menu_Text_ID_Array = Empty Array;
+		For Player Variable(Event Player, Index, 0, Count Of(Global.Click_Area), 1);
+			If(Char In String(Global.Click_Area_Page[Event Player.Index], 0) == Custom String("!"));
+				Skip If(Global.Click_Area_Page[Event Player.Index] == Event Player.Page, 2);
+				Create In-World Text(Filtered Array(Event Player, Event Player.Enable_Menu == True && Event Player.Page != String Slice(
+					Global.Click_Area_Page[Evaluate Once(Event Player.Index)], 1, String Length(Global.Click_Area_Page[Evaluate Once(
+					Event Player.Index)]))), Global.Click_Area_Text[Evaluate Once(Event Player.Index)], Update Every Frame(Eye Position(
+					Event Player) + 100 * (X Component Of(Global.Click_Area[Evaluate Once(Event Player.Index)]) * -1 / 2 * Cross Product(
+					Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+					Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (Z Component Of(Global.Click_Area[Evaluate Once(
+					Event Player.Index)]) / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+					Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(Event Player))),
+					Global.Click_Area_Text_Size[Evaluate Once(Event Player.Index)], Do Not Clip, Visible To Position String and Color,
+					Distance Between(Global.Click_Area[Evaluate Once(Event Player.Index)], Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y))
+					<= Global.Click_Area_Size[Evaluate Once(Event Player.Index)] ? Global.Click_Area_Hover_Color[Evaluate Once(Event Player.Index)
+					] : Global.Click_Area_Color[Evaluate Once(Event Player.Index)], Default Visibility);
+				Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+			Else;
+				Skip If(Global.Click_Area_Page[Event Player.Index] != Event Player.Page, 2);
+				Create In-World Text(Filtered Array(Event Player,
+					Event Player.Enable_Menu == True && Event Player.Page == Global.Click_Area_Page[Evaluate Once(Event Player.Index)]),
+					Global.Click_Area_Text[Evaluate Once(Event Player.Index)], Update Every Frame(Eye Position(Event Player) + 100 * (
+					X Component Of(Global.Click_Area[Evaluate Once(Event Player.Index)]) * -1 / 2 * Cross Product(Facing Direction Of(
+					Event Player), Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+					Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (Z Component Of(Global.Click_Area[Evaluate Once(
+					Event Player.Index)]) / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+					Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(Event Player))),
+					Global.Click_Area_Text_Size[Evaluate Once(Event Player.Index)], Do Not Clip, Visible To Position String and Color,
+					Distance Between(Global.Click_Area[Evaluate Once(Event Player.Index)], Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y))
+					<= Global.Click_Area_Size[Evaluate Once(Event Player.Index)] ? Global.Click_Area_Hover_Color[Evaluate Once(Event Player.Index)
+					] : Global.Click_Area_Color[Evaluate Once(Event Player.Index)], Default Visibility);
+				Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+			End;
+			Wait(0.010, Ignore Condition);
+		End;
+	}
+}
+
+rule("Destroy Click Areas")
+{
+	event
+	{
+		Subroutine;
+		Destroy_Click_Areas;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, Text_ID_Index, Count Of(Event Player.Menu_Text_ID_Array) - 1, -1, -1);
+			Destroy In-World Text(Event Player.Menu_Text_ID_Array[Event Player.Text_ID_Index]);
+		End;
+		Event Player.Menu_Text_ID_Array = Empty Array;
+	}
+}
+
+rule("Toggle Menu")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Event Player.Page = Custom String("Default");
+		Event Player.Temp_Page = Custom String("Default");
+		If(Event Player.Enable_Menu != True);
+			Call Subroutine(Setup_Click_Areas);
+			Event Player.Mouse_X = 0;
+			Event Player.Mouse_Y = 0;
+			Event Player.Init_Direction = Array(Horizontal Facing Angle Of(Event Player), Horizontal Facing Angle Of(Event Player)
+				== Absolute Value(Horizontal Facing Angle Of(Event Player)), Vertical Facing Angle Of(Event Player));
+			If(Event Player.Mouse_Input == 0);
+				Set Aim Speed(Event Player, Event Player.Sensitivity);
+			Else;
+				Start Facing(Event Player, Facing Direction Of(Event Player), 0, To World, None);
+			End;
+			Set Move Speed(Event Player, 0);
+			Disable Hero HUD(Event Player);
+			Disable Game Mode HUD(Event Player);
+			Event Player.Enable_Menu = True;
+			Start Rule(Disable_Bindings, Do Nothing);
+			Wait(0.250, Ignore Condition);
+			Event Player.Init_Direction = Array(Horizontal Facing Angle Of(Event Player), Horizontal Facing Angle Of(Event Player)
+				== Absolute Value(Horizontal Facing Angle Of(Event Player)), Vertical Facing Angle Of(Event Player));
+		Else;
+			Enable Hero HUD(Event Player);
+			Enable Game Mode HUD(Event Player);
+			Event Player.Enable_Menu = False;
+			Stop Facing(Event Player);
+			Set Aim Speed(Event Player, 100);
+			Set Move Speed(Event Player, 100);
+			Start Rule(Enable_Bindings, Do Nothing);
+			Call Subroutine(Destroy_Click_Areas);
+		End;
+		Wait(0.250, Ignore Condition);
+	}
+}
+
+rule("Disable_Bindings")
+{
+	event
+	{
+		Subroutine;
+		Disable_Bindings;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Disallow Button(Event Player, Button(Ultimate));
+		Set Melee Enabled(Event Player, False);
+		Set Jump Enabled(Event Player, False);
+		Set Reload Enabled(Event Player, False);
+	}
+}
+
+rule("Enable Bindings")
+{
+	event
+	{
+		Subroutine;
+		Enable_Bindings;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, True);
+		Set Secondary Fire Enabled(Event Player, True);
+		Set Ability 1 Enabled(Event Player, True);
+		Set Ability 2 Enabled(Event Player, True);
+		Allow Button(Event Player, Button(Ultimate));
+		Set Melee Enabled(Event Player, True);
+		Set Jump Enabled(Event Player, True);
+		Set Reload Enabled(Event Player, True);
+	}
+}
+
+rule("Menu Click")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Enable_Menu == True;
+		Has Spawned(Event Player) == True;
+		(Is Button Held(Event Player, Button(Primary Fire)) || Is Button Held(Event Player, Button(Secondary Fire))) == True;
+	}
+
+	actions
+	{
+		Event Player.Clicked_Area = First Of(Sorted Array(Filtered Array(Global.Click_Area_ID, Distance Between(
+			Global.Click_Area[Current Array Index], Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y))
+			<= Global.Click_Area_Size[Current Array Index] && (Char In String(Global.Click_Area_Page[Current Array Index], 0)
+			== Custom String("!") ? Event Player.Page != String Slice(Global.Click_Area_Page[Current Array Index], 1, String Length(
+			Global.Click_Area_Page[Current Array Index]) - 1) : Event Player.Page == Global.Click_Area_Page[Current Array Index])),
+			Distance Between(Current Array Element, Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y))));
+		If(Is True For All(Global.Click_Area_ID, Event Player.Clicked_Area != Current Array Element));
+			Play Effect(Event Player, Ring Explosion Sound, Color(White), Event Player, 20);
+		Else;
+			Start Rule(Detect_Click, Restart Rule);
+			Wait(0.250, Ignore Condition);
+		End;
+	}
+}
+
+rule("Update Menu Page")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Enable_Menu == True;
+		Event Player.Temp_Page != Event Player.Page;
+	}
+
+	actions
+	{
+		Wait(0.016, Abort When False);
+		Start Rule(Setup_Click_Areas, Restart Rule);
+		Event Player.Temp_Page = Event Player.Page;
+	}
+}
+
+rule("Detect Clicked Area")
+{
+	event
+	{
+		Subroutine;
+		Detect_Click;
+	}
+
+	actions
+	{
+		If(Event Player.Clicked_Area == Custom String("Settings"));
+			Event Player.Page = Custom String("Settings");
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Default Page"));
+			Event Player.Page = Custom String("Default");
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Aim"));
+			Event Player.Mouse_Input = 0;
+			Event Player.Sensitivity = Global.Default_Sensitivity_Aim;
+			Set Aim Speed(Event Player, Event Player.Sensitivity);
+			Stop Facing(Event Player);
+			Chase Player Variable At Rate(Event Player, Mouse_X, Min(Max(Horizontal Facing Angle Of(Event Player) - First Of(
+				Event Player.Init_Direction), Global.Mouse_MinX), Global.Mouse_MaxX), 999, Destination and Rate);
+			Chase Player Variable At Rate(Event Player, Mouse_Y, Min(Max((Vertical Facing Angle Of(Event Player) - Last Of(
+				Event Player.Init_Direction)) * -1, Global.Mouse_MinY), Global.Mouse_MaxY), 99, Destination and Rate);
+			Small Message(All Players(All Teams), Custom String("Mouse Input Set To Mouse / Right Joystick"));
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Throttle"));
+			Event Player.Mouse_Input = 1;
+			Event Player.Sensitivity = Global.Default_Sensitivity_Throttle;
+			Start Facing(Event Player, Facing Direction Of(Event Player), 0, To World, None);
+			Chase Player Variable At Rate(Event Player, Mouse_X, Min(Max(Event Player.Mouse_X + X Component Of(Throttle Of(Event Player)),
+				Global.Mouse_MinX), Global.Mouse_MaxX), Event Player.Sensitivity, Destination and Rate);
+			Chase Player Variable At Rate(Event Player, Mouse_Y, Min(Max(Event Player.Mouse_Y + Z Component Of(Throttle Of(Event Player)),
+				Global.Mouse_MinY), Global.Mouse_MaxY), Event Player.Sensitivity, Destination and Rate);
+			Small Message(All Players(All Teams), Custom String("Mouse Input Set To WASD / Left Joystick"));
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("-Sensitivity"));
+			Event Player.Sensitivity -= 1;
+			Modify Player Variable(Event Player, Sensitivity, Max, 0);
+			Set Aim Speed(Event Player, Event Player.Sensitivity);
+			Small Message(Event Player, Custom String("Mouse Sensitivity Set To {0}{1}", Event Player.Sensitivity,
+				Event Player.Mouse_Input == 0 ? Custom String("%") : Custom String("")));
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("+Sensitivity"));
+			Event Player.Sensitivity += 1;
+			Modify Player Variable(Event Player, Sensitivity, Min, Event Player.Mouse_Input == 0 ? 100 : 20);
+			Set Aim Speed(Event Player, Event Player.Sensitivity);
+			Small Message(Event Player, Custom String("Mouse Sensitivity Set To {0}{1}", Event Player.Sensitivity,
+				Event Player.Mouse_Input == 0 ? Custom String("%") : Custom String("")));
+			Abort;
+	}
+}
+
+disabled rule("-------------------------------------------- In-Game Menu ----------------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Create Click Area")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.Debug_Dev == True;
+		Event Player.Enable_Menu == True;
+		Is Button Held(Event Player, Button(Melee)) == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(Click_Area, Append To Array, Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y));
+		Modify Global Variable(Click_Area_Size, Append To Array, Event Player.Dev_Click_Area_Size);
+		Modify Global Variable(Click_Area_Color, Append To Array, Color(White));
+		Modify Global Variable(Click_Area_Hover_Color, Append To Array, Color(Lime Green));
+		Modify Global Variable(Click_Area_Page, Append To Array, Event Player.Page);
+		Modify Global Variable(Click_Area_Text, Append To Array, Custom String("Placeholder"));
+		Modify Global Variable(Click_Area_Text_Size, Append To Array, 2);
+		Modify Global Variable(Click_Area_ID, Append To Array, Custom String("Custom String Idenifcation"));
+		Create In-World Text(Filtered Array(Event Player, Event Player.Enable_Menu == True), Custom String("Placeholder"),
+			Update Every Frame(Eye Position(Event Player) + 100 * (Evaluate Once(X Component Of(Last Of(Global.Click_Area)))
+			* -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(
+			Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (Evaluate Once(
+			Z Component Of(Last Of(Global.Click_Area))) / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(
+			Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)
+			+ 3 * Facing Direction Of(Event Player))), 2, Do Not Clip, Visible To Position String and Color, Distance Between(
+			Evaluate Once(Last Of(Global.Click_Area)), Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y)) <= Evaluate Once(Last Of(
+			Global.Click_Area_Size)) ? Color(Lime Green) : Color(White), Default Visibility);
+		Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Last Text ID);
+		Play Effect(All Players(All Teams), Buff Impact Sound, Color(White), Event Player, 50);
+	}
+}
+
+rule("Delete Last Click Area")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.Debug_Dev == True;
+		Event Player.Enable_Menu == True;
+		Is Button Held(Event Player, Button(Jump)) == True;
+	}
+
+	actions
+	{
+		Destroy In-World Text(Last Of(Global.Temp_Dev_Text_ID));
+		Modify Global Variable(Temp_Dev_Text_ID, Remove From Array By Index, Count Of(Global.Temp_Dev_Text_ID) - 1);
+		Modify Global Variable(Click_Area_ID, Remove From Array By Index, Count Of(Global.Click_Area) - 1);
+		Modify Global Variable(Click_Area_Text_Size, Remove From Array By Index, Count Of(Global.Click_Area) - 1);
+		Modify Global Variable(Click_Area_Text, Remove From Array By Index, Count Of(Global.Click_Area) - 1);
+		Modify Global Variable(Click_Area_Page, Remove From Array By Index, Count Of(Global.Click_Area) - 1);
+		Modify Global Variable(Click_Area_Hover_Color, Remove From Array By Index, Count Of(Global.Click_Area) - 1);
+		Modify Global Variable(Click_Area_Color, Remove From Array By Index, Count Of(Global.Click_Area) - 1);
+		Modify Global Variable(Click_Area_Size, Remove From Array By Index, Count Of(Global.Click_Area) - 1);
+		Modify Global Variable(Click_Area, Remove From Array By Index, Count Of(Global.Click_Area) - 1);
+		Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 50);
+	}
+}
+
+rule("Increase Click Area Size")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.Debug_Dev == True;
+		Event Player.Enable_Menu == True;
+		Is Button Held(Event Player, Button(Ability 2)) == True;
+	}
+
+	actions
+	{
+		Event Player.Dev_Click_Area_Size += 0.010;
+		Wait(0.100, Abort When False);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Decrease Click Area Size")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.Debug_Dev == True;
+		Event Player.Enable_Menu == True;
+		Is Button Held(Event Player, Button(Ability 1)) == True;
+	}
+
+	actions
+	{
+		Event Player.Dev_Click_Area_Size -= 0.010;
+		Wait(0.100, Abort When False);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Dev Huds")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Debug_Dev = Workshop Setting Toggle(Custom String("Debug"), Custom String("Dev Mode"), False, 0);
+		Abort If(!Global.Debug_Dev);
+		Create HUD Text(Filtered Array(Local Player, Is Crouching(Local Player)), Custom String(
+			"Click Area Size {0}\nIncrease Size {1}\nDecrease Size {2}", Local Player.Dev_Click_Area_Size, Input Binding String(Button(
+			Ability 2)), Input Binding String(Button(Ability 1))), Null, Null, Right, 0, Color(White), Color(White), Color(White),
+			Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Is Crouching(Local Player)), Custom String(
+			"Click Area At X{0}, Y{1}\nCreate Click Area {2}", Local Player.Mouse_X, Local Player.Mouse_Y, Custom String(
+			"{0}\n\nInit Facing: X{1}, Y{2}", Input Binding String(Button(Melee)), First Of(Local Player.Init_Direction), Custom String(
+			"{0}, Absolute? {1}", Last Of(Local Player.Init_Direction), Local Player.Init_Direction[1]))), Null, Null, Right, 0, Color(
+			White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Local Player.Enable_Menu != True && !Is Crouching(Local Player)), Custom String(
+			"Crouch With {0}\nTo Display Dev Huds", Input Binding String(Button(Crouch))), Null, Null, Top, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Is Crouching(Local Player)), Custom String(
+			"Delete Last Created Click Area {0}\n(If None Delete Preset Area)", Input Binding String(Button(Jump))), Null, Null, Right, 0,
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Is Crouching(Local Player)), Custom String("Yaw: {0}, Pitch: {1}",
+			Horizontal Facing Angle Of(Local Player), Vertical Facing Angle Of(Local Player)), Null, Null, Top, 0, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
+	}
+}
+
+rule("Dev Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.Debug_Dev == True;
+	}
+
+	actions
+	{
+		Event Player.Dev_Click_Area_Size = 0.500;
+	}
+}
+
+rule("Export Warning!")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.Debug_Dev == True;
+		Event Player.Enable_Menu != True;
+	}
+
+	actions
+	{
+		Small Message(All Players(All Teams), Custom String("Exporting With Inspector Will Break"));
+		Wait(1.500, Ignore Condition);
+		Small Message(All Players(All Teams), Custom String("Anything In Strings That Is Not A String"));
+	}
+}
