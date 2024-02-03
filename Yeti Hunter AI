@@ -1,0 +1,1479 @@
+settings
+{
+	main
+	{
+		Description: "Yeti AI kinda bad, but concidering I can't detect\nwhere the meat is, I think its as good as it'll get.\n\nHunter AI decent on their own, deadly in packs.\ncan hide during Primal Rage to some extent."
+		Mode Name: "Yeti Hunter AI - B59C3"
+	}
+
+	lobby
+	{
+		Map Rotation: After A Game
+		Match Voice Chat: Enabled
+		Return To Lobby: Never
+	}
+
+	modes
+	{
+		Yeti Hunter
+
+		General
+		{
+			Game Mode Start: Immediately
+			Limit Roles: 1 Tank 2 Offense 2 Support
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+	}
+
+	workshop
+	{
+		Hunter Amount: 5
+	}
+
+	extensions
+	{
+		Spawn More Dummy Bots
+	}
+}
+
+variables
+{
+	global:
+		0: Path_Nodes
+		1: Healthkits
+		2: Defense_Amount_Desired
+		3: Offense_Amount_Desired
+		4: Reveal_Yeti
+		5: ObjectiveA_Nodes
+		6: ObjectiveB_Nodes
+		7: Defense_Amount_Currently
+		8: Offense_Amount_Currently
+		9: Chokepoint
+		10: Staircase_Top
+		11: Staircase_Middle
+		12: Staircase_Bottom
+		13: Healthkits_Small
+		14: Healthkits_Large
+		15: Hunter_Lives
+		16: Hidden_At
+		19: Jump_Start
+		20: Jump_End
+		21: Jump_Index
+
+	player:
+		0: Walk_To_Position
+		1: Current_Node
+		2: Targets
+		3: Using_Stairs
+		4: Node_Options
+		5: Jump_From
+		6: Stairs_Index
+		7: Walk_Max
+		8: Walk_Min
+		9: Last_Stair_Type
+		10: Node_DePrioritze
+		11: Ultimate_Charge_Yeti
+		12: Location_Without_Meat
+		13: Hiding_At
+		25: Vist_Count
+		27: Target_Order
+		66: Known_Nodes
+		67: Eaten_Meat_From
+		127: Ignore_Lower_Nodes
+}
+
+subroutines
+{
+	9: Node_Setup
+}
+
+rule("------------------------------------------- Made By Spiderman318 | YT Spiderman318 ---------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Call Subroutine(Node_Setup);
+		Global.Defense_Amount_Desired = Workshop Setting Integer(Custom String("AI"), Custom String("Yeti Amount"), 1, 0, 1, 2);
+		Global.Offense_Amount_Desired = Workshop Setting Integer(Custom String("AI"), Custom String("Hunter Amount"), 1, 0, 5, 3);
+		"Display Huds Elements For Spectators"
+		Create HUD Text(Null, Custom String("Hunter Live's: {0}\nMeat Collected: {1}/4", Global.Hunter_Lives, Ultimate Charge Percent(
+			Players In Slot(0, Team 1)) / 25), Null, Null, Left, 0, Color(White), Color(White), Color(White), String, Visible Always);
+		Global.Hunter_Lives = 5;
+		Global.Hidden_At = Empty Array;
+	}
+}
+
+rule("Hunter Use Live")
+{
+	event
+	{
+		Player Died;
+		Team 2;
+		All;
+	}
+
+	actions
+	{
+		Global.Hunter_Lives -= 1;
+	}
+}
+
+rule("Hunter Hide")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Is Using Ultimate(Players In Slot(0, Team 1)) == True;
+		Distance Between(Event Player, Event Player.Hiding_At) <= 2;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Button(Crouch));
+		Wait Until(!Is Using Ultimate(Players In Slot(0, Team 1)) || Distance Between(Event Player, Event Player.Hiding_At) > 2, 99999);
+		Stop Holding Button(Event Player, Button(Crouch));
+		Modify Global Variable(Hidden_At, Remove From Array By Value, Event Player.Hiding_At);
+		Event Player.Hiding_At = Null;
+	}
+}
+
+rule("Yeti Reveal")
+{
+	event
+	{
+		Player Took Damage;
+		Team 1;
+		All;
+	}
+
+	actions
+	{
+		Global.Reveal_Yeti = True;
+		Wait(1.500, Restart When True);
+		Global.Reveal_Yeti = False;
+	}
+}
+
+rule("Yeti Retrived Meat")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Ultimate Charge Percent(Event Player) > Event Player.Ultimate_Charge_Yeti;
+	}
+
+	actions
+	{
+		Event Player.Ultimate_Charge_Yeti = Ultimate Charge Percent(Event Player);
+		Modify Player Variable(Event Player, Eaten_Meat_From, Append To Array, First Of(Sorted Array(Global.ObjectiveA_Nodes,
+			Distance Between(Event Player, Current Array Element))));
+	}
+}
+
+rule("Yeti No Meat At Location")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Ultimate Charge Percent(Event Player) == Event Player.Ultimate_Charge_Yeti;
+		Distance Between(Event Player, First Of(Sorted Array(Remove From Array(Global.ObjectiveA_Nodes, Event Player.Eaten_Meat_From),
+			Distance Between(Event Player, Current Array Element)))) <= 2;
+	}
+
+	actions
+	{
+		Wait(0.250, Abort When False);
+		Modify Player Variable(Event Player, Location_Without_Meat, Append To Array, First Of(Sorted Array(Global.ObjectiveA_Nodes,
+			Distance Between(Event Player, Current Array Element))));
+	}
+}
+
+rule("Yeti Reset Available Meat")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) != True;
+	}
+
+	actions
+	{
+		Event Player.Eaten_Meat_From = Empty Array;
+		Event Player.Location_Without_Meat = Empty Array;
+	}
+}
+
+rule("Yeti Re-Check Prevous Meat Locations")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Remove From Array(Remove From Array(Global.ObjectiveA_Nodes, Event Player.Location_Without_Meat), Event Player.Eaten_Meat_From)
+			== Empty Array;
+	}
+
+	actions
+	{
+		Event Player.Location_Without_Meat = Empty Array;
+	}
+}
+
+disabled rule("----------------------------------- AI Communicate ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Bot Say Hello")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Communicating(Event Player, Hello) == True;
+		Is Dummy Bot(Event Player) != True;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Communicate(Filtered Array(Remove From Array(All Living Players(Team Of(Event Player)), Event Player), Is In View Angle(
+			Event Player, Eye Position(Current Array Element), 45) == True && Is In Line of Sight(Eye Position(Event Player), Eye Position(
+			Current Array Element), Barriers Do Not Block LOS) == True && Distance Between(Event Player, Current Array Element)
+			< 20 && Is Dummy Bot(Current Array Element)), Hello);
+	}
+}
+
+rule("Bot Say Need Help")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Communicating(Event Player, Need Help) != True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Communicate(Event Player, Need Help);
+		Wait(8, Ignore Condition);
+	}
+}
+
+rule("Bot Say Need Healing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Communicating(Event Player, Need Healing) != True;
+		Is Dummy Bot(Event Player) == True;
+		Normalized Health(Event Player) <= 0.800;
+	}
+
+	actions
+	{
+		Communicate(Event Player, Need Healing);
+		Wait(8, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Bot Say Understood")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Communicating(Event Player, Ultimate Status) == True;
+		Is Dummy Bot(Event Player) != True;
+		Ultimate Charge Percent(Event Player) == 100;
+	}
+
+	actions
+	{
+		Communicate(Filtered Array(Remove From Array(All Living Players(Team Of(Event Player)), Event Player), Is Dummy Bot(
+			Current Array Element)), Acknowledge);
+	}
+}
+
+rule("Bot Say Thanks")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Communicating(Event Player, Thanks) != True;
+		Is Dummy Bot(Event Player) == True;
+		Healer != Healee;
+		Entity Exists(Healer) == True;
+	}
+
+	actions
+	{
+		Communicate(Event Player, Thanks);
+		Wait(8, Ignore Condition);
+	}
+}
+
+disabled rule("----------------------------------- AI Communicate ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- Pathfinder ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Nodes Setup")
+{
+	event
+	{
+		Subroutine;
+		Node_Setup;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(-145.252, -92.665, -78.798), Vector(-153.062, -90.579, -65.817), Vector(-151.972, -89.956,
+			-53.770), Vector(-156.397, -89.031, -46.380), Vector(-160.329, -88.422, -41.661), Vector(-173.839, -88.450, -41.677), Vector(
+			-177.869, -88.450, -37.663), Vector(-180.585, -88.443, -32.630), Vector(-180.862, -88.442, -26.218), Vector(-142.100, -95.781,
+			-83.575), Vector(-153.396, -95.864, -88.520), Vector(-151.414, -95.863, -81.212), Vector(-158.188, -95.972, -79.441), Vector(
+			-160.077, -95.842, -86.349), Vector(-166.262, -95.781, -91.586), Vector(-164.859, -96.851, -106.370), Vector(-155.682, -96.851,
+			-102.313), Vector(-134.229, -96.853, -90.397), Vector(-141.270, -96.851, -94.379), Vector(-144.090, -97.413, -107.030), Vector(
+			-160.001, -96.968, -65.380), Vector(-164.860, -97.556, -65.325), Vector(-174.313, -95.655, -46.415), Vector(-177.701, -95.773,
+			-49.909), Vector(-189.836, -96.538, -52.832), Vector(-187.939, -96.536, -59.024), Vector(-193.491, -96.931, -60.651), Vector(
+			-196.210, -92.876, -37.875), Vector(-201.019, -92.441, -32.286), Vector(-197.933, -92.401, -29.032), Vector(-188.438, -92.441,
+			-34.992), Vector(-184.335, -92.576, -28.765), Vector(-189.341, -92.400, -22.979), Vector(-195.496, -92.400, -22.969), Vector(
+			-187.307, -92.607, -14.729), Vector(-196.408, -92.474, -16.409), Vector(-202.164, -92.405, -16.371), Vector(-202.169, -92.450,
+			-21.223), Vector(-216.196, -90.449, -21.865), Vector(-215.872, -90.449, -15.143), Vector(-210.990, -89.562, -14.827), Vector(
+			-219.179, -90.658, -24.110), Vector(-225.239, -92.406, 8.801), Vector(-225.256, -92.406, -0.019), Vector(-225.058, -92.406,
+			-8.739), Vector(-221.443, -92.488, -5.382), Vector(-221.541, -92.262, 5.804), Vector(-218.124, -92.450, 5.871), Vector(
+			-218.039, -92.450, -0.224), Vector(-221.727, -92.272, -0.510), Vector(-217.969, -92.450, -6.103), Vector(-212.545, -92.450,
+			-6.056), Vector(-212.979, -92.450, 0.007), Vector(-212.878, -92.450, 5.974), Vector(-207.943, -92.722, 5.592), Vector(-207.868,
+			-92.716, -5.845), Vector(-204.718, -92.452, 0.053), Vector(-198.388, -92.310, 0.029), Vector(-190.894, -92.310, -0.061),
+			Vector(-185.817, -92.463, 0.078), Vector(-181.479, -92.670, 4.272), Vector(-177.877, -92.363, 0.205), Vector(-181.505, -92.678,
+			-4.093), Vector(-186.032, -92.422, -8.807), Vector(-203.674, -92.302, -8.722), Vector(-192.455, -92.489, -11.344), Vector(
+			-206.752, -92.656, -14.077), Vector(-222.463, -86.646, -5.069), Vector(-220.223, -86.656, 0.070), Vector(-222.159, -86.646,
+			6.461), Vector(-208.638, -86.378, 0.030), Vector(-199.294, -85.450, -4.883), Vector(-195.025, -85.450, -4.913), Vector(
+			-194.818, -85.991, -7.687), Vector(-190.161, -85.450, -4.776), Vector(-190.631, -85.450, 4.837), Vector(-195.416, -85.450,
+			5.106), Vector(-195.218, -86.097, 7.814), Vector(-200.274, -85.450, 4.573), Vector(-179.767, -86.410, -0.166), Vector(-175.814,
+			-86.441, 5.532), Vector(-175.998, -86.442, -5.473), Vector(-157.938, -87.512, -3.011), Vector(-165.736, -87.580, -31.330),
+			Vector(-171.348, -90.471, -13.897), Vector(-162.533, -90.561, -15.717), Vector(-164.500, -90.450, -19.486), Vector(-170.690,
+			-90.450, -19.383), Vector(-182.834, -97.034, -80.526), Vector(-177.846, -97.506, -77.353), Vector(-184.615, -96.730, -65.652),
+			Vector(-171.256, -96.786, -61.094), Vector(-182.279, -97.561, -69.622), Vector(-169.678, -97.833, -70.772), Vector(-171.608,
+			-90.455, 13.563), Vector(-170.416, -90.450, 20.052), Vector(-162.809, -90.450, 19.663), Vector(-162.457, -90.452, 12.664),
+			Vector(-180.651, -88.444, 26.143), Vector(-180.640, -88.450, 32.792), Vector(-177.832, -88.450, 38.102), Vector(-173.865,
+			-88.450, 41.984), Vector(-163.072, -88.561, 41.918), Vector(-158.528, -88.336, 38.351), Vector(-165.710, -87.571, 31.240),
+			Vector(-157.235, -89.043, 46.202), Vector(-153.629, -89.444, 50.832), Vector(-151.159, -90.133, 54.743), Vector(-147.003,
+			-90.387, 61.124), Vector(-143.301, -96.697, 72.546), Vector(-154.036, -96.728, 71.418), Vector(-152.623, -96.054, 77.349),
+			Vector(-158.250, -95.928, 80.540), Vector(-156.841, -95.312, 82.908), Vector(-153.877, -94.278, 88.297), Vector(-160.729,
+			-96.739, 76.008), Vector(-160.736, -97.270, 70.175), Vector(-162.333, -97.250, 63.602), Vector(-173.604, -95.642, 46.467),
+			Vector(-177.951, -95.792, 49.639), Vector(-194.133, -92.772, 39.740), Vector(-200.641, -92.471, 34.674), Vector(-200.121,
+			-92.449, 29.039), Vector(-194.183, -92.411, 22.894), Vector(-186.243, -92.405, 22.822), Vector(-186.056, -92.522, 14.799),
+			Vector(-197.167, -92.443, 15.656), Vector(-202.206, -92.410, 16.160), Vector(-202.840, -92.450, 21.742), Vector(-218.954,
+			-90.658, 23.800), Vector(-216.832, -90.449, 17.755), Vector(-211.158, -89.634, 15.185), Vector(-188.567, -92.423, 35.528),
+			Vector(-186.906, -92.476, 29.347), Vector(-176.332, -92.629, 30.040), Vector(-189.558, -96.539, 52.533), Vector(-188.608,
+			-96.539, 58.050), Vector(-200.536, -96.540, 61.229), Vector(-201.915, -95.998, 55.792), Vector(-202.223, -95.160, 52.998),
+			Vector(-185.573, -96.735, 65.231), Vector(-182.229, -97.570, 69.757), Vector(-171.180, -96.982, 60.779), Vector(-166.391,
+			-97.513, 73.835), Vector(-173.854, -97.834, 71.542), Vector(-176.238, -97.505, 81.078), Vector(-181.176, -97.038, 82.436),
+			Vector(-181.438, -97.622, 91.392), Vector(-173.386, -96.719, 90.300), Vector(-164.841, -96.164, 84.935), Vector(-202.961,
+			-92.232, 8.007), Vector(-207.014, -92.580, 14.891), Vector(-186.446, -92.290, 8.807), Vector(-194.514, -92.543, 11.696));
+		Global.Healthkits = Array();
+		Global.ObjectiveA_Nodes = Array(Vector(-167.996, -88.383, -41.726), Vector(-194.202, -92.437, -35.380), Vector(-220.165, -91.861,
+			-0.030), Vector(-194.957, -92.217, 0.020), Vector(-161.761, -87.480, -0.033), Vector(-205.991, -86.231, -0.005), Vector(
+			-194.283, -92.436, 35.385), Vector(-168.021, -88.383, 41.703));
+		Global.ObjectiveB_Nodes = Array(Vector(-183.858, -87.426, -25.197), Vector(-165.929, -89.654, -16.869), Vector(-165.859, -90.450,
+			16.803), Vector(-183.940, -87.453, 25.119), Vector(-174.617, -87.725, 38.867), Vector(-191.790, -96.206, 49.347), Vector(
+			-148.934, -88.579, 49.633), Vector(-184.359, -100.154, 78.822), Vector(-201.796, -94.616, 51.367), Vector(-214.996, -94.427,
+			24.912), Vector(-205.195, -92.450, 18.755), Vector(-211.005, -90.860, 9.245), Vector(-211.005, -90.962, -9.245), Vector(
+			-200.995, -91.091, -5.995), Vector(-189.005, -91.079, -5.995), Vector(-189.005, -91.090, 5.995), Vector(-200.995, -91.091,
+			5.995), Vector(-166.201, -87.500, -27.198), Vector(-149.250, -88.531, -49.107), Vector(-142.591, -96.161, -89.389), Vector(
+			-168.666, -95.851, -88.105), Vector(-184.542, -100.082, -78.538), Vector(-191.920, -96.172, -49.351), Vector(-174.734, -87.776,
+			-38.996), Vector(-214.996, -94.428, -24.898), Vector(-171.099, -97.503, -84.284), Vector(-166.063, -87.498, 26.955), Vector(
+			-141.092, -96.878, 68.359), Vector(-150.350, -93.553, 95.324), Vector(-200.656, -85.450, 5.795), Vector(-200.795, -85.449,
+			-5.656), Vector(-189.308, -85.450, -5.748), Vector(-189.342, -85.449, 5.794));
+		Global.Chokepoint = Array();
+		Global.Staircase_Top = Array(Vector(-158.270, -95.842, -76.987), Vector(-160.603, -95.971, -78.349), Vector(-145.834, -90.742,
+			-64.646), Vector(-143.394, -90.793, -64.104), Vector(-159.933, -89.175, -47.446), Vector(-180.771, -88.450, -20.039), Vector(
+			-179.326, -88.450, -42.094), Vector(-191.713, -93.179, -46.451), Vector(-169.642, -95.851, -98.145), Vector(-137.182, -95.851,
+			-84), Vector(-172.483, -92.830, -30.300), Vector(-197.201, -93.334, -43.676), Vector(-213.143, -90.450, -22.112), Vector(
+			-220.379, -86.656, -9.453), Vector(-202.350, -92.492, -29.676), Vector(-220.136, -92.488, -8.308), Vector(-220.227, -92.475,
+			8.513), Vector(-177.721, -90.659, -13.705), Vector(-171.276, -90.452, -8.529), Vector(-162.097, -87.467, -3.553), Vector(
+			-200.832, -85.450, -0.059), Vector(-188.684, -85.450, -0.010), Vector(-172.683, -86.485, -0.085), Vector(-157.107, -86.517,
+			-16.816), Vector(-157.662, -86.517, -25.379), Vector(-194.024, -97.053, -65.366), Vector(-162.022, -87.480, 3.398), Vector(
+			-157.078, -86.517, 16.876), Vector(-157.923, -86.517, 25.480), Vector(-171.443, -90.466, 8.614), Vector(-177.521, -90.591,
+			14.109), Vector(-179.785, -88.450, 19.977), Vector(-159.974, -89.194, 47.538), Vector(-171.729, -92.919, 30.422), Vector(
+			-192.021, -93.058, 45.654), Vector(-179.065, -88.450, 42.087), Vector(-196.636, -93.510, 45.363), Vector(-214.631, -90.449,
+			21.982), Vector(-220.236, -86.656, 9.288), Vector(-202.407, -92.492, 29.837), Vector(-192.871, -97.041, 65.752));
+		Global.Staircase_Bottom = Array(Vector(-160.166, -97.398, -73.331), Vector(-162.565, -97.385, -74.609), Vector(-150.166, -95.850,
+			-74.021), Vector(-149.018, -95.973, -76.487), Vector(-158.213, -96.515, -63.674), Vector(-174.497, -90.408, -20.007), Vector(
+			-189.992, -92.450, -42.068), Vector(-176.893, -95.520, -45.874), Vector(-168.315, -96.793, -100.788), Vector(-135.748, -96.851,
+			-86.688), Vector(-163.726, -96.865, -55.281), Vector(-194.993, -96.627, -56.263), Vector(-208.017, -92.401, -21.973), Vector(
+			-220.408, -90.658, -17.981), Vector(-215.253, -94.352, -28.789), Vector(-220.052, -94.137, -13.764), Vector(-220.285, -94.143,
+			13.905), Vector(-183.146, -92.293, -13.453), Vector(-175.897, -92.263, -8.528), Vector(-162.044, -90.384, -10.421), Vector(
+			-204.002, -86.119, -0.021), Vector(-185.540, -86.362, -0.088), Vector(-169.440, -87.471, 0.001), Vector(-157.153, -87.579,
+			-13.126), Vector(-158.829, -87.669, -32.010), Vector(-188.290, -100.554, -81.535), Vector(-162.201, -90.390, 10.244), Vector(
+			-157.075, -87.550, 12.972), Vector(-158.682, -87.813, 32.893), Vector(-175.658, -92.137, 8.609), Vector(-183.614, -92.368,
+			13.592), Vector(-174.204, -90.450, 20.050), Vector(-157.387, -96.307, 62.210), Vector(-164.224, -96.984, 55.503), Vector(
+			-178.284, -95.326, 45.942), Vector(-189.399, -92.450, 41.960), Vector(-195.316, -96.880, 58.050), Vector(-207.401, -92.450,
+			22.026), Vector(-220.311, -90.529, 17.652), Vector(-215.832, -94.375, 28.652), Vector(-189.026, -100.519, 81.354));
+		Global.Healthkits_Small = Array();
+		Global.Healthkits_Large = Array();
+		Global.Staircase_Middle = Array(0, 0, Vector(-143.247, -92.851, -69.684), Vector(-140.385, -92.851, -71.825), Vector(-157.352,
+			-93.805, -56.354), 0, 0, 0, 0, 0, Vector(-169.473, -95.518, -44.253), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Vector(
+			-193.167, -98.250, -72.670), 0, 0, 0, 0, 0, 0, Vector(-157.783, -92.326, 53.433), Vector(-168.763, -95.451, 44.155), 0, 0, 0,
+			0, 0, 0, Vector(-192.699, -98.478, 73.516));
+		Global.Jump_Start = Array(Vector(-145.690, -90.633, 63.577));
+		Global.Jump_End = Array(Vector(-145.163, -90.786, 64.867));
+		For Global Variable(Jump_Index, 0, Count Of(Global.Jump_End), 1);
+			Create Projectile(Orb Projectile, Null, Global.Jump_End[Global.Jump_Index], Down, To World, Damage, All Teams, 0, 1, 8,
+				Bad Explosion, Explosion Sound, 0, 50, 1, 0, 0, 0);
+		End;
+	}
+}
+
+rule("Use Jump Node")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Array Contains(Global.Jump_Start, Event Player.Current_Node) == True;
+		Distance Between(Event Player, Event Player.Current_Node) <= 3;
+	}
+
+	actions
+	{
+		Event Player.Jump_From = Event Player.Current_Node;
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player, Event Player.Jump_From), Distance Between(Event Player,
+			Event Player.Jump_From) / 2, To World, Replace existing throttle, Direction and Magnitude);
+		Wait Until(Update Every Frame(Distance Between(Event Player, Event Player.Jump_From)) <= 1.600, 99999);
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player.Jump_From, Global.Jump_End[Index Of Array Value(
+			Global.Jump_Start, Event Player.Jump_From)]), 1, To World, Replace existing throttle, None);
+		Wait Until(Update Every Frame(Distance Between(Event Player, Global.Jump_End[Index Of Array Value(Global.Jump_Start,
+			Event Player.Jump_From)])) <= 1.600, 99999);
+		Press Button(Event Player, Button(Jump));
+		Wait Until(Is On Ground(Event Player), 4);
+		Wait(1, Ignore Condition);
+		Start Throttle In Direction(Event Player, Y Component Of(Position Of(Event Player)) + 2.750 >= Y Component Of(
+			Event Player.Walk_To_Position) && Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position,
+			Barriers Do Not Block LOS) ? (Distance Between(Event Player, Event Player.Walk_To_Position) < 2 ? Direction Towards(
+			Event Player.Walk_To_Position, Event Player) : Direction Towards(Event Player, Event Player.Walk_To_Position))
+			: Direction Towards(Position Of(Event Player), Event Player.Current_Node), (Distance Between(Event Player,
+			Event Player.Walk_To_Position) < 2 || Distance Between(Event Player, Event Player.Walk_To_Position) > 2)
+			&& Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 1 : (
+			Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 0 : 1), To World,
+			Replace existing throttle, Direction and Magnitude);
+	}
+}
+
+rule("Pathfind Melee/Jump")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Magnitude Of(Throttle Of(Event Player)) > 0;
+		Is Alive(Event Player) == True;
+		Horizontal Speed Of(Event Player) < 2;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(Max(Server Load / 1000, 0.250), Abort When False);
+		Press Button(Event Player, Button(Jump));
+		Wait(Max(Server Load / 1000, 0.250), Abort When False);
+		Press Button(Event Player, Button(Melee));
+		Loop If Condition Is True;
+	}
+}
+
+rule("Current Node")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Using_Stairs = Array Contains(Append To Array(Append To Array(Global.Staircase_Middle, Filtered Array(
+			Global.Staircase_Bottom, Current Array Element != Null)), Global.Staircase_Top), Event Player.Current_Node) ? True : False;
+		Skip If(Y Component Of(Position Of(Event Player)) + 2.750 >= Y Component Of(Event Player.Walk_To_Position), 2);
+		Event Player.Ignore_Lower_Nodes = 5;
+		Chase Player Variable Over Time(Event Player, Ignore_Lower_Nodes, 0, 5, Destination and Duration);
+		If(Distance Between(Position Of(Event Player), Event Player.Current_Node) < 3);
+			If(Event Player.Using_Stairs);
+				If(Array Contains(Global.Staircase_Bottom, Event Player.Current_Node));
+					Event Player.Last_Stair_Type = Custom String("Bottom");
+				Else If(Array Contains(Filtered Array(Global.Staircase_Middle, Current Array Element != Null), Event Player.Current_Node));
+					Event Player.Last_Stair_Type = Custom String("Middle");
+				Else If(Array Contains(Filtered Array(Global.Staircase_Top, Current Array Element != Null), Event Player.Current_Node));
+					Event Player.Last_Stair_Type = Custom String("Top");
+				End;
+			End;
+			If(Array Contains(Event Player.Known_Nodes, Event Player.Current_Node) != True);
+				Modify Player Variable(Event Player, Known_Nodes, Append To Array, Event Player.Current_Node);
+				Modify Player Variable(Event Player, Vist_Count, Append To Array, 1);
+			Else;
+				Event Player.Vist_Count[Index Of Array Value(Event Player.Known_Nodes, Event Player.Current_Node)] += 1;
+			End;
+			Event Player.Node_DePrioritze[Index Of Array Value(Event Player.Known_Nodes, Event Player.Current_Node)] += 10;
+		End;
+		Event Player.Node_Options = Filtered Array(Append To Array(Append To Array(Global.Path_Nodes, Append To Array(
+			Global.ObjectiveA_Nodes, Global.Chokepoint)), Append To Array(Append To Array(Global.Staircase_Bottom, Filtered Array(
+			Global.Staircase_Middle, Current Array Element != Null)), Global.Staircase_Top)),
+			Event Player.Node_DePrioritze[Index Of Array Value(Event Player.Known_Nodes, Current Array Element)] <= 9999);
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Event Player, Current Array Element) <= 30);
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Y Component Of(Position Of(Event Player))
+			+ 2.750 > Y Component Of(Current Array Element));
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 1.200), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 1.200) + Vector(0, -99, 0),
+			Null, All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 1.200)) < Max(Y Component Of(
+			Position Of(Event Player)) + 1 - Y Component Of(Current Array Element), 8));
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 2), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 2) + Vector(0, -99, 0), Null,
+			All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 2)) < Max(Y Component Of(
+			Position Of(Event Player)) + 1 - Y Component Of(Current Array Element), 8));
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 4), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 4) + Vector(0, -99, 0), Null,
+			All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 4)) < Max(Y Component Of(
+			Position Of(Event Player)) + 1 - Y Component Of(Current Array Element), 8));
+		If(Event Player.Using_Stairs);
+			If(Array Contains(Global.Staircase_Bottom, Event Player.Current_Node));
+				Event Player.Stairs_Index = Index Of Array Value(Global.Staircase_Bottom, Event Player.Current_Node);
+			Else If(Array Contains(Filtered Array(Global.Staircase_Middle, Current Array Element != Null), Event Player.Current_Node));
+				Event Player.Stairs_Index = Index Of Array Value(Global.Staircase_Middle, Event Player.Current_Node);
+			Else If(Array Contains(Filtered Array(Global.Staircase_Top, Current Array Element != Null), Event Player.Current_Node));
+				Event Player.Stairs_Index = Index Of Array Value(Global.Staircase_Top, Event Player.Current_Node);
+			End;
+			If(Event Player.Last_Stair_Type == Custom String("Bottom"));
+				If(Global.Staircase_Middle[Event Player.Stairs_Index] == Null);
+					Modify Player Variable(Event Player, Node_Options, Append To Array, Global.Staircase_Top[Event Player.Stairs_Index]);
+				Else;
+					Modify Player Variable(Event Player, Node_Options, Append To Array, Global.Staircase_Middle[Event Player.Stairs_Index]);
+				End;
+			Else If(Event Player.Last_Stair_Type == Custom String("Middle"));
+				Modify Player Variable(Event Player, Node_Options, Append To Array, Global.Staircase_Top[Event Player.Stairs_Index]);
+			End;
+		End;
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Is In Line of Sight(Eye Position(Event Player),
+			Current Array Element, Barriers Do Not Block LOS) == True);
+		Event Player.Node_Options = Sorted Array(Event Player.Node_Options, Distance Between(Event Player, Current Array Element) * (
+			Y Component Of(Position Of(Event Player)) + 1 <= Y Component Of(Current Array Element)
+			|| !Event Player.Ignore_Lower_Nodes ? 1 : (Distance Between(Event Player, Event Player.Walk_To_Position) < Distance Between(
+			Current Array Element, Event Player.Walk_To_Position) ? 5 : 2.500)) + Distance Between(Event Player.Walk_To_Position,
+			Current Array Element) + Event Player.Node_DePrioritze[Index Of Array Value(Event Player.Known_Nodes, Current Array Element)]);
+		Skip If(Distance Between(Vector(X Component Of(Position Of(Event Player)), Y Component Of(Event Player.Walk_To_Position),
+			Z Component Of(Position Of(Event Player))), Event Player.Walk_To_Position) > 15, 1);
+		Event Player.Node_Options = Sorted Array(Event Player.Node_Options, Current Array Index * (
+			Event Player.Ignore_Lower_Nodes != 0 && Y Component Of(Position Of(Event Player)) + (Array Contains(Global.Staircase_Middle,
+			Current Array Element) ? 1.500 : 2.750) <= Y Component Of(Current Array Element) && Array Contains(Append To Array(
+			Append To Array(Global.Staircase_Middle, Global.Staircase_Bottom), Global.Staircase_Top), Current Array Element) ? 1 : 5));
+		Event Player.Current_Node = First Of(Event Player.Node_Options) < 0 ? First Of(Sorted Array(Filtered Array(
+			Event Player.Node_Options, Current Array Index < 0), Absolute Value(Current Array Index))) : First Of(
+			Event Player.Node_Options);
+		If(Count Of(Event Player.Node_Options) == 0);
+			Event Player.Node_DePrioritze = Empty Array;
+			Event Player.Vist_Count = Empty Array;
+			Event Player.Known_Nodes = Empty Array;
+		End;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop;
+	}
+}
+
+rule("Walk To Target")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		(Team Of(Event Player) == Team 1 ? Is Using Ultimate(Event Player) : !Is Using Ultimate(Players In Slot(0, Team 1))) == True;
+	}
+
+	actions
+	{
+		Event Player.Walk_To_Position = Position Of(First Of(Event Player.Target_Order)) + Vector(0, 1.550, 0);
+		Event Player.Walk_Max = Team Of(Event Player) == Team 1 ? 2 : 10;
+		Event Player.Walk_Min = 1;
+		Event Player.Node_DePrioritze = Empty Array;
+		Event Player.Vist_Count = Empty Array;
+		Event Player.Known_Nodes = Empty Array;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Walk To Meat (Yeti)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		!Is Using Ultimate(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Is True For All(Remove From Array(Remove From Array(Global.ObjectiveA_Nodes, Event Player.Location_Without_Meat),
+			Event Player.Eaten_Meat_From), Event Player.Walk_To_Position != Current Array Element) == True;
+	}
+
+	actions
+	{
+		Event Player.Walk_To_Position = Random Value In Array(Remove From Array(Remove From Array(Global.ObjectiveA_Nodes,
+			Event Player.Location_Without_Meat), Event Player.Eaten_Meat_From));
+		Event Player.Walk_Max = 2;
+		Event Player.Walk_Min = 0;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Swap Walk To Meat (Yeti Flee)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Target_Order) == True;
+	}
+
+	actions
+	{
+		Event Player.Walk_To_Position = Random Value In Array(Filtered Array(Remove From Array(Remove From Array(Global.ObjectiveA_Nodes,
+			Event Player.Location_Without_Meat), Event Player.Eaten_Meat_From), Distance Between(Event Player, Current Array Element)
+			< Distance Between(First Of(Event Player.Target_Order), Current Array Element) && Distance Between(Event Player,
+			Current Array Element) < Distance Between(Event Player, First Of(Event Player.Target_Order))));
+		Wait(Max(Server Load / 1000, 5), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Target Search (Yeti)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) != True;
+		Distance Between(Event Player, Event Player.Walk_To_Position) < Event Player.Walk_Max + 1;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Node_DePrioritze = Empty Array;
+		Event Player.Vist_Count = Empty Array;
+		Event Player.Known_Nodes = Empty Array;
+		Event Player.Walk_Max = 2;
+		Event Player.Walk_Min = 0;
+		Event Player.Walk_To_Position = Random Value In Array(Global.ObjectiveB_Nodes);
+		Wait(Max(Server Load / 1000, 1.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Target Search (Hunter)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) != True;
+		Distance Between(Event Player, Event Player.Walk_To_Position) < Event Player.Walk_Max + 1;
+		(Team Of(Event Player) == Team 1 ? Is Using Ultimate(Event Player) : !Is Using Ultimate(Players In Slot(0, Team 1))) == True;
+		!Is Using Ultimate(Players In Slot(0, Team 1)) == True;
+	}
+
+	actions
+	{
+		Event Player.Node_DePrioritze = Empty Array;
+		Event Player.Vist_Count = Empty Array;
+		Event Player.Known_Nodes = Empty Array;
+		Event Player.Walk_Max = 2;
+		Event Player.Walk_Min = 0;
+		Event Player.Walk_To_Position = Random Value In Array(Global.ObjectiveA_Nodes);
+		Wait(Max(Server Load / 1000, 1.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Walk To Hiding Location (Hunter)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Using Ultimate(Players In Slot(0, Team 1)) == True;
+		Is Alive(Event Player) == True;
+		Event Player.Walk_To_Position != First Of(Sorted Array(Append To Array(Remove From Array(Global.ObjectiveB_Nodes,
+			Global.Hidden_At), Event Player.Hiding_At), Distance Between(Event Player, Current Array Element)));
+	}
+
+	actions
+	{
+		Wait(Random Real(0.100, 0.200), Ignore Condition);
+		Event Player.Hiding_At = First Of(Sorted Array(Remove From Array(Global.ObjectiveB_Nodes, Global.Hidden_At), Distance Between(
+			Event Player, Current Array Element)));
+		Skip If(Array Contains(Global.Hidden_At, Event Player.Hiding_At), 1);
+		Modify Global Variable(Hidden_At, Append To Array, Event Player.Hiding_At);
+		Event Player.Walk_To_Position = Event Player.Hiding_At;
+		Event Player.Walk_Max = 2;
+		Event Player.Walk_Min = 0;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("----------------------------------- Pathfinder ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- AI ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Dummy Vote Skip")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is In Setup == True;
+	}
+
+	actions
+	{
+		Destroy Dummy Bot(Team Of(Event Player), Slot Of(Event Player));
+	}
+}
+
+rule("Create Dummy Bot")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		(Number Of Players(Team 1) < Global.Defense_Amount_Desired || Number Of Players(Team 2) < Global.Offense_Amount_Desired) == True;
+		(Is Waiting For Players || Is Game In Progress) == True;
+	}
+
+	actions
+	{
+		Skip If(Number Of Players(Team 1) >= Global.Defense_Amount_Desired, 2);
+		Create Dummy Bot(Hero(Winston), Team 1, -1 + Global.Defense_Amount_Currently, Random Value In Array(Spawn Points(Team 1)), Null);
+		Global.Defense_Amount_Currently += 1;
+		Skip If(Number Of Players(Team 2) >= Global.Offense_Amount_Desired, 2);
+		Create Dummy Bot(Hero(Mei), Team 2, -1 + Global.Offense_Amount_Currently, Random Value In Array(Spawn Points(Team 2)), Null);
+		Global.Offense_Amount_Currently += 1;
+		Wait(Max(Server Load / 1000, 0.100), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Destroy Dummy Bot")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		(Number Of Players(Team 1) > Global.Defense_Amount_Desired || Number Of Players(Team 2) > Global.Offense_Amount_Desired) == True;
+	}
+
+	actions
+	{
+		Skip If(Number Of Players(Team 1) <= Global.Defense_Amount_Desired, 2);
+		Global.Defense_Amount_Currently -= 1;
+		Destroy Dummy Bot(Team 1, 5 + Global.Defense_Amount_Currently);
+		Skip If(Number Of Players(Team 2) <= Global.Offense_Amount_Desired, 2);
+		Global.Offense_Amount_Currently -= 1;
+		Destroy Dummy Bot(Team 2, 5 + Global.Offense_Amount_Currently);
+		Wait(Max(Server Load / 1000, 0.100), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Setup Bots")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Forcing Dummy Bot Name(Event Player, Team Of(Event Player) == Team 1 ? Custom String("Yeti") : Custom String("Hunter {0}",
+			Global.Offense_Amount_Currently - 1));
+		Start Throttle In Direction(Event Player, Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position,
+			Barriers Do Not Block LOS) ? (Distance Between(Event Player, Event Player.Walk_To_Position)
+			< Event Player.Walk_Min ? Direction Towards(Event Player.Walk_To_Position, Event Player) : Direction Towards(Event Player,
+			Event Player.Walk_To_Position)) : Direction Towards(Position Of(Event Player), Event Player.Current_Node), (Distance Between(
+			Event Player, Event Player.Walk_To_Position) < Event Player.Walk_Min || Distance Between(Event Player,
+			Event Player.Walk_To_Position) > Event Player.Walk_Max) && Is In Line of Sight(Eye Position(Event Player),
+			Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 1 : (Is In Line of Sight(Eye Position(Event Player),
+			Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 0 : 1), To World, Replace existing throttle,
+			Direction and Magnitude);
+		Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) ? Direction Towards(Eye Position(Event Player),
+			!Has Status(First Of(Event Player.Target_Order), Knocked Down) && !Has Status(First Of(Event Player.Target_Order), Asleep)
+			? Eye Position(First Of(Event Player.Target_Order)) : Position Of(First Of(Event Player.Target_Order))) : (Is In Line of Sight(
+			Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? Direction Towards(Eye Position(
+			Event Player), Event Player.Walk_To_Position) : Direction Towards(Eye Position(Event Player), Event Player.Current_Node)),
+			Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player,
+			Frozen), Has Status(Event Player, Stunned)), Current Array Element == True) ? 0 : (Magnitude Of(Throttle Of(Event Player))
+			== 0 && !Entity Exists(First Of(Event Player.Target_Order)) ? 0 : 225), To World, Direction and Turn Rate);
+		Chase Player Variable At Rate(Event Player, Ignore_Lower_Nodes, 0, 1, Destination and Rate);
+		Event Player.Node_DePrioritze = Empty Array;
+		Event Player.Vist_Count = Empty Array;
+		Event Player.Known_Nodes = Empty Array;
+	}
+}
+
+rule("Targeting List")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Targets = Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))), Is In Line of Sight(
+			Eye Position(Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS) == True || (Team Of(Event Player)
+			== Team 2 && Global.Reveal_Yeti));
+		Modify Player Variable(Event Player, Targets, Remove From Array By Value, Filtered Array(Event Player.Targets, !Has Spawned(
+			Current Array Element)));
+		Modify Player Variable(Event Player, Targets, Remove From Array By Value, Filtered Array(Event Player.Targets, Has Status(
+			Current Array Element, Invincible)));
+		Modify Player Variable(Event Player, Targets, Remove From Array By Value, Filtered Array(Event Player.Targets, Has Status(
+			Current Array Element, Phased Out)));
+		Modify Player Variable(Event Player, Targets, Remove From Array By Value, Filtered Array(Event Player.Targets, (
+			Hero Being Duplicated(Current Array Element) == Hero(Mei) || Hero Of(Current Array Element) == Hero(Mei))
+			&& Is Using Ability 1(Current Array Element)));
+		Modify Player Variable(Event Player, Targets, Remove From Array By Value, Filtered Array(Event Player.Targets, Is Dead(
+			Current Array Element)));
+		Event Player.Target_Order = Sorted Array(Event Player.Targets, Distance Between(Event Player, Current Array Element)
+			* Normalized Health(Current Array Element));
+		If(Count Of(Event Player.Target_Order) == 0);
+			Press Button(Event Player, Button(Reload));
+		End;
+		Wait(Max(Server Load / 1000, 0.100), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Start Firing Primary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Is Button Held(Event Player, Button(Primary Fire)) != True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Distance Between(Event Player, First Of(Event Player.Target_Order)) <= (Is Using Ultimate(Event Player) ? 4 : 10);
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Button(Primary Fire));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Stop Firing Primary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is True For Any(Array(!Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+			Barriers Do Not Block LOS), !Entity Exists(First Of(Event Player.Target_Order)), Distance Between(Event Player, First Of(
+			Event Player.Target_Order)) > (Is Using Ultimate(Event Player) ? 4 : 10)), Current Array Element) == True;
+		Is Button Held(Event Player, Button(Primary Fire)) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Button(Primary Fire));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Start Firing Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Is Button Held(Event Player, Button(Secondary Fire)) != True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Distance Between(Event Player, First Of(Event Player.Target_Order)) > 10;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Button(Secondary Fire));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Stop Firing Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is True For Any(Array(!Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+			Barriers Do Not Block LOS), !Entity Exists(First Of(Event Player.Target_Order)), Distance Between(Event Player, First Of(
+			Event Player.Target_Order)) <= 10), Current Array Element) == True;
+		Is Button Held(Event Player, Button(Secondary Fire)) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Button(Secondary Fire));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Yeti Leap (Height)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Distance Between(Vector(X Component Of(Position Of(Event Player)), Y Component Of(Event Player.Walk_To_Position), Z Component Of(
+			Position Of(Event Player))), Event Player.Walk_To_Position) < 20;
+		Distance Between(Vector(0, Y Component Of(Position Of(Event Player)), 0), Vector(0, Y Component Of(Event Player.Walk_To_Position),
+			0)) > 6;
+		Ability Cooldown(Event Player, Button(Ability 1)) == Null;
+		Has Status(Event Player, Frozen) != True;
+		Is In Line of Sight(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Up * 15, Null, Event Player,
+			False), Event Player.Walk_To_Position, Barriers Do Not Block LOS) == True;
+		Has Status(Event Player, Rooted) != True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Jump));
+		Wait(0.400, Ignore Condition);
+		Stop Facing(Event Player);
+		Set Facing(Event Player, Direction From Angles(Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player),
+			Event Player.Walk_To_Position)), -80), To World);
+		Wait(0.100, Ignore Condition);
+		Press Button(Event Player, Button(Ability 1));
+		Wait(0.100, Ignore Condition);
+		Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) ? Direction Towards(Eye Position(Event Player),
+			!Has Status(First Of(Event Player.Target_Order), Knocked Down) && !Has Status(First Of(Event Player.Target_Order), Asleep)
+			? Eye Position(First Of(Event Player.Target_Order)) : Position Of(First Of(Event Player.Target_Order))) : (Is In Line of Sight(
+			Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? Direction Towards(Eye Position(
+			Event Player), Event Player.Walk_To_Position) : Direction Towards(Eye Position(Event Player), Event Player.Current_Node)),
+			Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player,
+			Frozen), Has Status(Event Player, Stunned)), Current Array Element == True) ? 0 : (Magnitude Of(Throttle Of(Event Player))
+			== 0 && !Entity Exists(First Of(Event Player.Target_Order)) ? 0 : 225), To World, Direction and Turn Rate);
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Yeti Leap (Mobility)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) != True;
+		Distance Between(Event Player, Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position,
+			Barriers Do Not Block LOS) ? Event Player.Walk_To_Position : Event Player.Current_Node) > 20;
+		Ability Cooldown(Event Player, Button(Ability 1)) == Null;
+		Has Status(Event Player, Frozen) != True;
+		Has Status(Event Player, Rooted) != True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Facing(Event Player, Direction From Angles(Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player),
+			Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS)
+			? Event Player.Walk_To_Position : Event Player.Current_Node)), Vertical Angle Towards(Event Player, Is In Line of Sight(
+			Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS)
+			? Event Player.Walk_To_Position : Event Player.Current_Node)), To World);
+		Wait(0.100, Ignore Condition);
+		Press Button(Event Player, Button(Ability 1));
+		Wait(0.100, Ignore Condition);
+		Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) ? Direction Towards(Eye Position(Event Player),
+			!Has Status(First Of(Event Player.Target_Order), Knocked Down) && !Has Status(First Of(Event Player.Target_Order), Asleep)
+			? Eye Position(First Of(Event Player.Target_Order)) : Position Of(First Of(Event Player.Target_Order))) : (Is In Line of Sight(
+			Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? Direction Towards(Eye Position(
+			Event Player), Event Player.Walk_To_Position) : Direction Towards(Eye Position(Event Player), Event Player.Current_Node)),
+			Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player,
+			Frozen), Has Status(Event Player, Stunned)), Current Array Element == True) ? 0 : (Magnitude Of(Throttle Of(Event Player))
+			== 0 && !Entity Exists(First Of(Event Player.Target_Order)) ? 0 : 225), To World, Direction and Turn Rate);
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Yeti Leap (Flee)")
+{
+	event
+	{
+		Player Took Damage;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Is Using Ultimate(Event Player) != True;
+		Ability Cooldown(Event Player, Button(Ability 1)) == Null;
+		Has Status(Event Player, Frozen) != True;
+		Has Status(Event Player, Rooted) != True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Facing(Event Player, Direction From Angles(Horizontal Angle From Direction(Direction Towards(Event Player, Is In Line of Sight(
+			Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS)
+			? Event Player.Walk_To_Position : Event Player.Current_Node)), Vertical Angle Towards(Event Player, Is In Line of Sight(
+			Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS)
+			? Event Player.Walk_To_Position : Event Player.Current_Node)), To World);
+		Wait(0.100, Ignore Condition);
+		Press Button(Event Player, Button(Ability 1));
+		Wait(0.100, Ignore Condition);
+		Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) ? Direction Towards(Eye Position(Event Player),
+			!Has Status(First Of(Event Player.Target_Order), Knocked Down) && !Has Status(First Of(Event Player.Target_Order), Asleep)
+			? Eye Position(First Of(Event Player.Target_Order)) : Position Of(First Of(Event Player.Target_Order))) : (Is In Line of Sight(
+			Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? Direction Towards(Eye Position(
+			Event Player), Event Player.Walk_To_Position) : Direction Towards(Eye Position(Event Player), Event Player.Current_Node)),
+			Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player,
+			Frozen), Has Status(Event Player, Stunned)), Current Array Element == True) ? 0 : (Magnitude Of(Throttle Of(Event Player))
+			== 0 && !Entity Exists(First Of(Event Player.Target_Order)) ? 0 : 225), To World, Direction and Turn Rate);
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Yeti Leap (Offensive)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Distance Between(Event Player, First Of(Event Player.Target_Order)) >= 6;
+		Is Using Ultimate(Event Player) == True;
+		Ability Cooldown(Event Player, Button(Ability 1)) == Null;
+		Has Status(Event Player, Frozen) != True;
+		Has Status(Event Player, Rooted) != True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 1));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Yeti Bubble")
+{
+	event
+	{
+		Player Took Damage;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Is Using Ultimate(Event Player) != True;
+		Ability Cooldown(Event Player, Button(Ability 2)) == Null;
+		Has Status(Event Player, Frozen) != True;
+		Event Ability == Button(Secondary Fire);
+		Distance Between(Event Player, Event Player.Walk_To_Position) >= 20;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 2));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Hunter Cryofreeze (Out Of Comabt)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) != True;
+		Health(Event Player) < Max Health(Event Player);
+		Ability Cooldown(Event Player, Button(Ability 1)) == Null;
+		Is Using Ability 1(Event Player) != True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 1));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Hunter Cryofreeze (On Hit)")
+{
+	event
+	{
+		Player Took Damage;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Health(Event Player) < (Is Using Ultimate(Players In Slot(0, Team 1)) ? 160 : 60);
+		Ability Cooldown(Event Player, Button(Ability 1)) == Null;
+		Is Using Ability 1(Event Player) != True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 1));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Hunter Ice Wall")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		((Health(Event Player) <= (Is Using Ultimate(Players In Slot(0, Team 1)) ? 160 : 60) && Ability Cooldown(Event Player, Button(
+			Ability 1)) != Null) || Is Using Ultimate(Players In Slot(0, Team 1))) == True;
+		Ability Cooldown(Event Player, Button(Ability 2)) == Null;
+		Is Using Ability 1(Event Player) != True;
+		Is Using Ability 2(Event Player) != True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Facing(Event Player, Direction From Angles(Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player),
+			Eye Position(First Of(Event Player.Target_Order))) * 1), 60), To World);
+		Wait(0.100, Ignore Condition);
+		Press Button(Event Player, Button(Ability 2));
+		Wait(0.100, Ignore Condition);
+		Press Button(Event Player, Button(Primary Fire));
+		Wait(0.100, Ignore Condition);
+		Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) ? Direction Towards(Eye Position(Event Player),
+			!Has Status(First Of(Event Player.Target_Order), Knocked Down) && !Has Status(First Of(Event Player.Target_Order), Asleep)
+			? Eye Position(First Of(Event Player.Target_Order)) : Position Of(First Of(Event Player.Target_Order))) : (Is In Line of Sight(
+			Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? Direction Towards(Eye Position(
+			Event Player), Event Player.Walk_To_Position) : Direction Towards(Eye Position(Event Player), Event Player.Current_Node)),
+			Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player,
+			Frozen), Has Status(Event Player, Stunned)), Current Array Element == True) ? 0 : (Magnitude Of(Throttle Of(Event Player))
+			== 0 && !Entity Exists(First Of(Event Player.Target_Order)) ? 0 : 225), To World, Direction and Turn Rate);
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Hunter Trap")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Distance Between(Event Player, First Of(Event Player.Target_Order)) <= 8;
+		Ultimate Charge Percent(Event Player) == 100;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Facing(Event Player, Direction From Angles(Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player),
+			Eye Position(First Of(Event Player.Target_Order))) * 1), -45), To World);
+		Press Button(Event Player, Button(Ultimate));
+		Wait(0.100, Ignore Condition);
+		Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) ? Direction Towards(Eye Position(Event Player),
+			!Has Status(First Of(Event Player.Target_Order), Knocked Down) && !Has Status(First Of(Event Player.Target_Order), Asleep)
+			? Eye Position(First Of(Event Player.Target_Order)) : Position Of(First Of(Event Player.Target_Order))) : (Is In Line of Sight(
+			Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? Direction Towards(Eye Position(
+			Event Player), Event Player.Walk_To_Position) : Direction Towards(Eye Position(Event Player), Event Player.Current_Node)),
+			Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player,
+			Frozen), Has Status(Event Player, Stunned)), Current Array Element == True) ? 0 : (Magnitude Of(Throttle Of(Event Player))
+			== 0 && !Entity Exists(First Of(Event Player.Target_Order)) ? 0 : 225), To World, Direction and Turn Rate);
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
