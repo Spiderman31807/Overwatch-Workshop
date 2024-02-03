@@ -11,7 +11,7 @@ And paste it into the orange clipbard option in the top right of the settings ta
 * [Mind Transfer](https://workshop.codes/mind-transfer)
 * [Clone Wars](https://workshop.codes/clone-wars)
 * [Classic Snake](https://workshop.codes/classic-snake)
-* [Chaos Mod](https://workshop.codes/chaos-mod)
+* [Chaos Mode](https://workshop.codes/chaos-mod)
 * [Hero Wars](https://workshop.codes/hero-wars)
 * [Attributes (Beta, Pending Idea's)](https://workshop.codes/attributes)
 * [Infection](https://workshop.codes/enhanced-infection)
