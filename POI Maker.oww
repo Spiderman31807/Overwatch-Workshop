@@ -1,0 +1,288 @@
+settings
+{
+	main
+	{
+		Mode Name: "POI Maker - TT4H36"
+	}
+
+	modes
+	{
+		Assault
+
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Flashpoint
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	extensions
+	{
+		Play More Effects
+	}
+}
+
+variables
+{
+	global:
+		0: POI
+		1: POI2
+		2: Dir
+		3: Dir2
+
+	player:
+		0: POI_Array
+		1: ID_Array
+		2: Dir_Array
+		3: Destory_Index
+		4: POI2_Array
+		5: POI2_ID
+		6: POI2_Dir
+}
+
+rule("--------------------------------------------------POI Loader---------------------------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Generate POI     (Change To Whatever Slot/Name You Need Here)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Play Effect(Event Player, Ring Explosion Sound, Color(White), Event Player, 25);
+		Global.POI = Event Player.POI_Array;
+		Global.POI2 = Event Player.POI2_Array;
+		Global.Dir = Event Player.Dir_Array;
+		Global.Dir2 = Event Player.POI2_Dir;
+	}
+}
+
+rule("Create POI")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Primary Fire)) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, POI_Array, Append To Array, Ray Cast Hit Position(Eye Position(Event Player), Eye Position(
+			Event Player) + Facing Direction Of(Event Player) * 99, Null, Event Player, False));
+		Modify Player Variable(Event Player, Dir_Array, Append To Array, Ray Cast Hit Normal(Eye Position(Event Player), Eye Position(
+			Event Player) + Facing Direction Of(Event Player) * 99, Null, Event Player, False));
+		Create Beam Effect(Filtered Array(Event Player, Is In View Angle(Current Array Element, Evaluate Once(Last Of(
+			Current Array Element.POI_Array)), 80) && Is In Line of Sight(Eye Position(Current Array Element), Evaluate Once(Last Of(
+			Current Array Element.POI_Array)), Barriers Do Not Block LOS)), Good Beam, Evaluate Once(Last Of(Event Player.POI_Array)),
+			Evaluate Once(Last Of(Event Player.POI_Array)) + Evaluate Once(Last Of(Event Player.Dir_Array)), Color(Green), Visible To);
+		Modify Player Variable(Event Player, ID_Array, Append To Array, Last Created Entity);
+		Play Effect(Event Player, Buff Impact Sound, Color(White), Event Player, 25);
+	}
+}
+
+rule("Destroy POI")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Secondary Fire)) == True;
+	}
+
+	actions
+	{
+		Event Player.Destory_Index = Index Of Array Value(Event Player.POI_Array, First Of(Sorted Array(Event Player.POI_Array,
+			Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * 99, Null, Event Player, False), Current Array Element))));
+		Abort If(Distance Between(Event Player.POI_Array[Event Player.Destory_Index], Ray Cast Hit Position(Eye Position(Event Player),
+			Eye Position(Event Player) + Facing Direction Of(Event Player) * 99, Null, Event Player, False)) > 0.500);
+		Destroy Effect(Event Player.ID_Array[Event Player.Destory_Index]);
+		Modify Player Variable(Event Player, POI_Array, Remove From Array By Index, Event Player.Destory_Index);
+		Modify Player Variable(Event Player, ID_Array, Remove From Array By Index, Event Player.Destory_Index);
+		Modify Player Variable(Event Player, Dir_Array, Remove From Array By Index, Event Player.Destory_Index);
+		Play Effect(Event Player, Debuff Impact Sound, Color(White), Event Player, 25);
+	}
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Disallow Button(Event Player, Button(Primary Fire));
+		Disallow Button(Event Player, Button(Secondary Fire));
+		Disallow Button(Event Player, Button(Ability 1));
+		Disallow Button(Event Player, Button(Ability 2));
+		Disallow Button(Event Player, Button(Interact));
+		Disallow Button(Event Player, Button(Reload));
+		Create HUD Text(All Players(All Teams), Custom String("{0} Primary: Create POI\n{1} Secondary: Destroy POI\n{2}",
+			Input Binding String(Button(Primary Fire)), Input Binding String(Button(Secondary Fire)), Custom String(
+			"{2}\n{0} Interact: Copy POI To Global\n{1} Reload: Teleport 4 Meters", Input Binding String(Button(Interact)),
+			Input Binding String(Button(Reload)), Custom String("{0} Ability2: Create POI2\n{1} Ability1: Destroy POI2\n",
+			Input Binding String(Button(Ability 2)), Input Binding String(Button(Ability 1))))), Null, Null, Left, 0, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Null, Custom String("POI Count: {0}", Count Of(Event Player.POI_Array)), Null, Left, 0,
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Event Player.POI_Array = Global.POI == Null ? Empty Array : Global.POI;
+		Event Player.ID_Array = Empty Array;
+		Event Player.Dir_Array = Empty Array;
+		Event Player.POI2_Array = Global.POI2 == Null ? Empty Array : Global.POI2;
+		Event Player.POI2_ID = Empty Array;
+		Event Player.POI2_Dir = Empty Array;
+		Create Beam Effect(Event Player, Grapple Beam, Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player)
+			+ Facing Direction Of(Event Player) * 99, Null, Event Player, False), Ray Cast Hit Position(Eye Position(Event Player),
+			Eye Position(Event Player) + Facing Direction Of(Event Player) * 99, Null, Event Player, False) + Ray Cast Hit Normal(
+			Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(Event Player) * 99, Null, Event Player, False)
+			* 0.500, Color(White), Visible To Position and Radius);
+		Set Status(Event Player, Null, Phased Out, 9999);
+		If(Event Player.POI_Array > 0);
+			For Player Variable(Event Player, Destory_Index, 0, Count Of(Event Player.POI_Array), 1);
+				Create Effect(Filtered Array(Event Player, Is In View Angle(Current Array Element, Evaluate Once(
+					Current Array Element.POI_Array[Current Array Element.Destory_Index]), 80) && Is In Line of Sight(Eye Position(
+					Current Array Element), Evaluate Once(Current Array Element.POI_Array[Current Array Element.Destory_Index]),
+					Barriers Do Not Block LOS)), Sphere, Color(Green), Evaluate Once(Event Player.POI_Array[Event Player.Destory_Index]), 0.250,
+					Visible To);
+				Modify Player Variable(Event Player, ID_Array, Append To Array, Last Created Entity);
+			End;
+		End;
+		If(Event Player.POI2_Array > 0);
+			For Player Variable(Event Player, Destory_Index, 0, Count Of(Event Player.POI_Array), 1);
+				Create Effect(Filtered Array(Event Player, Is In View Angle(Current Array Element, Evaluate Once(
+					Current Array Element.POI2_Array[Current Array Element.Destory_Index]), 80) && Is In Line of Sight(Eye Position(
+					Current Array Element), Evaluate Once(Current Array Element.POI2_Array[Current Array Element.Destory_Index]),
+					Barriers Do Not Block LOS)), Sphere, Color(Yellow), Evaluate Once(Event Player.POI2_Array[Event Player.Destory_Index]), 0.250,
+					Visible To);
+				Modify Player Variable(Event Player, ID_Array, Append To Array, Last Created Entity);
+			End;
+		End;
+	}
+}
+
+rule("Teleport Forward")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Reload)) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Position Of(Event Player) + Facing Direction Of(Event Player) * 4);
+	}
+}
+
+rule("Create POI2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ability 2)) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, POI2_Array, Append To Array, Ray Cast Hit Position(Eye Position(Event Player), Eye Position(
+			Event Player) + Facing Direction Of(Event Player) * 99, Null, Event Player, False));
+		Modify Player Variable(Event Player, POI2_Dir, Append To Array, Ray Cast Hit Normal(Eye Position(Event Player), Eye Position(
+			Event Player) + Facing Direction Of(Event Player) * 99, Null, Event Player, False));
+		Create Beam Effect(Filtered Array(Event Player, Is In View Angle(Current Array Element, Evaluate Once(Last Of(
+			Current Array Element.POI2_Array)), 80) && Is In Line of Sight(Eye Position(Current Array Element), Evaluate Once(Last Of(
+			Current Array Element.POI2_Array)), Barriers Do Not Block LOS)), Good Beam, Evaluate Once(Last Of(Event Player.POI2_Array)),
+			Evaluate Once(Last Of(Event Player.POI2_Array)) + Evaluate Once(Last Of(Event Player.POI2_Dir)), Color(Yellow), Visible To);
+		Modify Player Variable(Event Player, POI2_ID, Append To Array, Last Created Entity);
+		Play Effect(Event Player, Buff Impact Sound, Color(White), Event Player, 25);
+	}
+}
+
+rule("Destroy POI2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ability 1)) == True;
+	}
+
+	actions
+	{
+		Event Player.Destory_Index = Index Of Array Value(Event Player.POI2_Array, First Of(Sorted Array(Event Player.POI2_Array,
+			Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * 99, Null, Event Player, False), Current Array Element))));
+		Abort If(Distance Between(Event Player.POI2_Array[Event Player.Destory_Index], Ray Cast Hit Position(Eye Position(Event Player),
+			Eye Position(Event Player) + Facing Direction Of(Event Player) * 99, Null, Event Player, False)) > 0.500);
+		Destroy Effect(Event Player.POI2_ID[Event Player.Destory_Index]);
+		Modify Player Variable(Event Player, POI2_Array, Remove From Array By Index, Event Player.Destory_Index);
+		Modify Player Variable(Event Player, POI2_ID, Remove From Array By Index, Event Player.Destory_Index);
+		Modify Player Variable(Event Player, POI2_Dir, Remove From Array By Index, Event Player.Destory_Index);
+		Play Effect(Event Player, Debuff Impact Sound, Color(White), Event Player, 25);
+	}
+}
