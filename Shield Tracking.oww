@@ -1,0 +1,804 @@
+settings
+{
+	main
+	{
+		Description: "!Only Works While Game Is In Progress!\n\nPlease Match Multiplyer To Those In Hero\nSettings Tab, Shield Health Linked To Health\n\nSigma Tracking Will Break If His Cooldown Is 0%\n\nRamattra Pos Tracker Is Not Accurate At Any\nLedge Closer Then 35 Meters (Max Distance)\n\nDisplay Shields Dont Rotate Up/Down With The\nReal Shield, However I Track The Shield From\nA Single Point So That Wont Affect Data."
+		Mode Name: "Shield Tracker - XQG9N"
+	}
+
+	lobby
+	{
+		Map Rotation: After A Game
+		Match Voice Chat: Enabled
+		Return To Lobby: Never
+	}
+
+	modes
+	{
+		Control
+
+		Escort
+
+		Flashpoint
+
+		Hybrid
+
+		Push
+
+		General
+		{
+			Game Mode Start: Immediately
+			Limit Roles: 1 Tank 2 Offense 2 Support
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+	}
+
+	workshop
+	{
+		Brigitte Shield Cooldown: 1.000
+		Brigitte Shield Health: 1.000
+		Brigitte Shield Recharge Rate: 1.000
+		Display Barrier's: On
+		Huds: On
+		Mauga Shield Health: 1.000
+		Ramattra Shield Cooldown: 1.000
+		Ramattra Shield Health: 1.000
+		Reinhardt Shield Cooldown: 1.000
+		Reinhardt Shield Health: 1.000
+		Reinhardt Shield Recharge Rate: 1.000
+		Sigma Shield Cooldown: 1.000
+		Sigma Shield Health: 1.000
+		Sigma Shield Recharge Rate: 1.000
+		Skip Assemble + Setup: On
+		Symmetra Shield Health: 1.000
+		Winston Shield Cooldown: 1.000
+		Winston Shield Health: 1.000
+	}
+}
+
+variables
+{
+	global:
+		0: Brigitte_Stats
+		1: Ramattra_Stats
+		2: Reinhardt_Stats
+		3: Sigma_Stats
+		4: Winston_Stats
+		5: Symmetra_Stats
+		6: Mauga_Stats
+
+	player:
+		0: Blocked_Stat
+		1: Brigitte_Health
+		2: Ramattra_Health
+		3: Reinhardt_Health
+		4: Sigma_Health
+		5: Winston_Heath
+		6: Ramattra_Pos
+		7: Sigma_Pos
+		8: Winston_Pos
+		9: Ramattra_Timer
+		10: Winston_Timer
+		11: Ramattra_Using
+		12: Sigma_Using
+		13: Winston_Using
+		14: Ramattra_Dir
+		15: Sigma_Dir
+		16: Symmetra_Health
+		17: Symmetra_Pos
+		18: Symmetra_Timer
+		19: Symmetra_Dir
+		20: Mauga_Health
+		21: Mauga_Pos
+}
+
+rule("Display Barrier")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Workshop Setting Toggle(Custom String("Debug"), Custom String("Display Barrier's"), False, 0) == True;
+	}
+
+	actions
+	{
+		"Brigitte -1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Brigitte) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(0.750, 0, 1), Local Player, Rotation And Translation), World Vector Of(Vector(-0.750, 0,
+			1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Brigitte -1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Brigitte) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(0.750, 2.250, 1), Local Player, Rotation And Translation), World Vector Of(Vector(-0.750,
+			2.250, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Brigitte X1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Brigitte) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(0.750, 2.250, 1), Local Player, Rotation And Translation), World Vector Of(Vector(-0.750,
+			0, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Brigitte X2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Brigitte) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(0.750, 0, 1), Local Player, Rotation And Translation), World Vector Of(Vector(-0.750,
+			2.250, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Brigitte |1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Brigitte) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(0.750, 2.250, 1), Local Player, Rotation And Translation), World Vector Of(Vector(0.750,
+			0, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Brigitte |2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Brigitte) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(-0.750, 0, 1), Local Player, Rotation And Translation), World Vector Of(Vector(-0.750,
+			2.250, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Ramattra -1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Ramattra) && Local Player.Ramattra_Using),
+			Grapple Beam, Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * 3.250 + Up * -1.500,
+			Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * -3.250 + Up * -1.500, Color(White), Visible To Position and Radius);
+		"Ramattra -2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Ramattra) && Local Player.Ramattra_Using),
+			Grapple Beam, Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * 3.250 + Up * 3,
+			Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * -3.250 + Up * 3, Color(White), Visible To Position and Radius);
+		"Ramattra X1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Ramattra) && Local Player.Ramattra_Using),
+			Grapple Beam, Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * 3.250 + Up * 3,
+			Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * -3.250 + Up * -1.500, Color(White), Visible To Position and Radius);
+		"Ramattra X2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Ramattra) && Local Player.Ramattra_Using),
+			Grapple Beam, Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * -3.250 + Up * 3,
+			Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * 3.250 + Up * -1.500, Color(White), Visible To Position and Radius);
+		"Ramattra |1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Ramattra) && Local Player.Ramattra_Using),
+			Grapple Beam, Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * 3.250 + Up * 3,
+			Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * 3.250 + Up * -1.500, Color(White), Visible To Position and Radius);
+		"Ramattra |2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Ramattra) && Local Player.Ramattra_Using),
+			Grapple Beam, Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * -3.250 + Up * 3,
+			Local Player.Ramattra_Pos + Local Player.Ramattra_Dir * -3.250 + Up * -1.500, Color(White), Visible To Position and Radius);
+		"Rein -1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Reinhardt) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(3.475, -0.800, 1), Local Player, Rotation And Translation), World Vector Of(Vector(-3.325,
+			-0.800, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Rein -2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Reinhardt) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(3.475, 3.450, 1), Local Player, Rotation And Translation), World Vector Of(Vector(-3.325,
+			3.450, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Rein X1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Reinhardt) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(3.475, -0.800, 1), Local Player, Rotation And Translation), World Vector Of(Vector(-3.325,
+			3.450, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Rein X2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Reinhardt) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(3.475, 3.450, 1), Local Player, Rotation And Translation), World Vector Of(Vector(-3.325,
+			-0.800, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Rein |1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Reinhardt) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(3.475, -0.800, 1), Local Player, Rotation And Translation), World Vector Of(Vector(3.475,
+			3.450, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Rein |2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Reinhardt) && Is Firing Secondary(Local Player)),
+			Grapple Beam, World Vector Of(Vector(-3.325, 3.450, 1), Local Player, Rotation And Translation), World Vector Of(Vector(-3.325,
+			-0.800, 1), Local Player, Rotation And Translation), Color(White), Visible To Position and Radius);
+		"Sigma -1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Sigma) && Local Player.Sigma_Using), Grapple Beam,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * 3.250 + Up * -2,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * -3.250 + Up * -2, Color(White), Visible To Position and Radius);
+		"Sigma -2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Sigma) && Local Player.Sigma_Using), Grapple Beam,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * 3.250 + Up * 2.500,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * -3.250 + Up * 2.500, Color(White), Visible To Position and Radius);
+		"Sigma X1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Sigma) && Local Player.Sigma_Using), Grapple Beam,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * 3.250 + Up * 2.500,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * -3.250 + Up * -2, Color(White), Visible To Position and Radius);
+		"Sigma X2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Sigma) && Local Player.Sigma_Using), Grapple Beam,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * -3.250 + Up * 2.500,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * 3.250 + Up * -2, Color(White), Visible To Position and Radius);
+		"Sigma |1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Sigma) && Local Player.Sigma_Using), Grapple Beam,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * 3.250 + Up * -2,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * 3.250 + Up * 2.500, Color(White), Visible To Position and Radius);
+		"Sigma |2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Sigma) && Local Player.Sigma_Using), Grapple Beam,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * -3.250 + Up * 2.500,
+			Local Player.Sigma_Pos + Local Player.Sigma_Dir * -3.250 + Up * -2, Color(White), Visible To Position and Radius);
+		"Winston Projector"
+		Create Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Winston) && Local Player.Winston_Timer > 0), Bad Aura,
+			Color(White), Local Player.Winston_Pos, 0.250, Visible To Position and Radius);
+		"Winston Barrier"
+		Create Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Winston) && Local Player.Winston_Timer > 0), Sphere,
+			Color(Aqua), Local Player.Winston_Pos, 5, Visible To Position and Radius);
+		"Symmetra -1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Symmetra) && Is Using Ultimate(Local Player)),
+			Grapple Beam, Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * 242 + Up * 50,
+			Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * -242 + Up * 50, Color(White), Visible To Position and Radius);
+		"Symmetra -2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Symmetra) && Is Using Ultimate(Local Player)),
+			Grapple Beam, Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * 242 + Up * -50,
+			Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * -242 + Up * -50, Color(White), Visible To Position and Radius);
+		"Symmetra X1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Symmetra) && Is Using Ultimate(Local Player)),
+			Grapple Beam, Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * 50 + Up * -50,
+			Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * -50 + Up * 50, Color(White), Visible To Position and Radius);
+		"Symmetra X2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Symmetra) && Is Using Ultimate(Local Player)),
+			Grapple Beam, Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * 50 + Up * 50,
+			Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * -50 + Up * -50, Color(White), Visible To Position and Radius);
+		"Symmetra X3"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Symmetra) && Is Using Ultimate(Local Player)),
+			Grapple Beam, Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * 242 + Up * -50,
+			Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * -242 + Up * 50, Color(White), Visible To Position and Radius);
+		"Symmetra X4"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Symmetra) && Is Using Ultimate(Local Player)),
+			Grapple Beam, Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * 242 + Up * 50,
+			Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * -242 + Up * -50, Color(White), Visible To Position and Radius);
+		"Symmetra |1"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Symmetra) && Is Using Ultimate(Local Player)),
+			Grapple Beam, Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * -242 + Up * -50,
+			Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * -242 + Up * 50, Color(White), Visible To Position and Radius);
+		"Symmetra |2"
+		Create Beam Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Symmetra) && Is Using Ultimate(Local Player)),
+			Grapple Beam, Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * 242 + Up * 50,
+			Local Player.Symmetra_Pos + Local Player.Symmetra_Dir * 242 + Up * -50, Color(White), Visible To Position and Radius);
+		"Mauga Projector"
+		Create Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Mauga) && Is Using Ultimate(Local Player)), Bad Aura,
+			Color(White), Local Player.Mauga_Pos, 0.250, Visible To Position and Radius);
+		"Mauga Barrier"
+		Create Effect(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Mauga) && Is Using Ultimate(Local Player)), Light Shaft,
+			Color(Aqua), Local Player.Mauga_Pos + Vector(0, -2, 0), 9, Visible To Position and Radius);
+	}
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Blocked_Stat = Player Stat(Event Player, Damage Blocked);
+		Chase Player Variable At Rate(Event Player, Ramattra_Timer, 0, 1, Destination and Rate);
+		Chase Player Variable At Rate(Event Player, Winston_Timer, 0, 1, Destination and Rate);
+		Chase Player Variable At Rate(Event Player, Symmetra_Timer, 0, 1, Destination and Rate);
+		Chase Player Variable At Rate(Event Player, Winston_Pos, Ray Cast Hit Position(Event Player.Winston_Pos,
+			Event Player.Winston_Pos - Vector(0, 1, 0), Null, Event Player, False) + Vector(0, 0.010, 0), 6, Destination and Rate);
+		Chase Player Variable At Rate(Event Player, Mauga_Pos, Ray Cast Hit Position(Event Player.Mauga_Pos,
+			Event Player.Mauga_Pos - Vector(0, 1, 0), Null, Event Player, False) + Vector(0, 0.010, 0), 6, Destination and Rate);
+	}
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Skip If(!Workshop Setting Toggle(Custom String("Debug"), Custom String("Skip Assemble + Setup"), False, 0), 4);
+		Wait Until(Is Assembling Heroes, 99999);
+		Set Match Time(0);
+		Wait Until(Is In Setup, 99999);
+		Set Match Time(0);
+		Global.Brigitte_Stats = Array(Workshop Setting Real(Custom String("Multiplyer"), Custom String("Brigitte Shield Health"), 1, 0.100,
+			5, 0), Workshop Setting Real(Custom String("Multiplyer"), Custom String("Brigitte Shield Cooldown"), 1, 0, 5, 1),
+			Workshop Setting Real(Custom String("Multiplyer"), Custom String("Brigitte Shield Recharge Rate"), 1, 0, 5, 2));
+		Global.Ramattra_Stats = Array(Workshop Setting Real(Custom String("Multiplyer"), Custom String("Ramattra Shield Health"), 1, 0.100,
+			5, 3), Workshop Setting Real(Custom String("Multiplyer"), Custom String("Ramattra Shield Cooldown"), 1, 0, 5, 4));
+		Global.Reinhardt_Stats = Array(Workshop Setting Real(Custom String("Multiplyer"), Custom String("Reinhardt Shield Health"), 1,
+			0.100, 5, 5), Workshop Setting Real(Custom String("Multiplyer"), Custom String("Reinhardt Shield Cooldown"), 1, 0, 5, 6),
+			Workshop Setting Real(Custom String("Multiplyer"), Custom String("Reinhardt Shield Recharge Rate"), 1, 0, 5, 7));
+		Global.Sigma_Stats = Array(Workshop Setting Real(Custom String("Multiplyer"), Custom String("Sigma Shield Health"), 1, 0.100, 5,
+			8), Workshop Setting Real(Custom String("Multiplyer"), Custom String("Sigma Shield Cooldown"), 1, 0, 5, 9),
+			Workshop Setting Real(Custom String("Multiplyer"), Custom String("Sigma Shield Recharge Rate"), 1, 0, 5, 10));
+		Global.Winston_Stats = Array(Workshop Setting Real(Custom String("Multiplyer"), Custom String("Winston Shield Health"), 1, 0.100,
+			5, 11), Workshop Setting Real(Custom String("Multiplyer"), Custom String("Winston Shield Cooldown"), 1, 0, 5, 12));
+		Global.Symmetra_Stats = Array(Workshop Setting Real(Custom String("Multiplyer"), Custom String("Symmetra Shield Health"), 1, 0.100,
+			5, 13));
+		Global.Mauga_Stats = Array(Workshop Setting Real(Custom String("Multiplyer"), Custom String("Mauga Shield Health"), 1, 0.100, 5,
+			14));
+		Abort If(!Workshop Setting Toggle(Custom String("Debug"), Custom String("Huds"), False, 0));
+		Create HUD Text(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Brigitte)), Custom String("{0}: {1}/{2}",
+			Ability Icon String(Hero(Brigitte), Button(Secondary Fire)), Round To Integer(Local Player.Brigitte_Health, To Nearest), (
+			Is Using Ultimate(Local Player) ? 700 : 250) * Global.Brigitte_Stats[0]), Null, Custom String("{0}", Is Firing Secondary(
+			Local Player)), Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Ramattra)), Custom String("{0}: {1}/{2}",
+			Ability Icon String(Hero(Ramattra), Button(Secondary Fire)), Round To Integer(Local Player.Ramattra_Health, To Nearest),
+			1000 * Global.Ramattra_Stats[0]), Null, Custom String("{0}, {1}", Local Player.Ramattra_Using, Round To Integer(
+			Local Player.Ramattra_Timer, Up)), Left, 0, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Reinhardt)), Custom String("{0}: {1}/{2}",
+			Ability Icon String(Hero(Reinhardt), Button(Secondary Fire)), Round To Integer(Local Player.Reinhardt_Health, To Nearest),
+			1400 * Global.Reinhardt_Stats[0]), Null, Custom String("{0}", Is Firing Secondary(Local Player)), Left, 0, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Sigma)), Custom String("{0}: {1}/{2}",
+			Ability Icon String(Hero(Sigma), Button(Secondary Fire)), Round To Integer(Local Player.Sigma_Health, To Nearest),
+			700 * Global.Sigma_Stats[0]), Null, Custom String("{0}", Local Player.Sigma_Using), Left, 0, Color(White), Color(White), Color(
+			White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Winston)), Custom String("{0}: {1}/{2}",
+			Ability Icon String(Hero(Winston), Button(Ability 2)), Round To Integer(Local Player.Winston_Heath, To Nearest),
+			650 * Global.Winston_Stats[0]), Null, Custom String("{0}, {1}", Local Player.Winston_Using, Round To Integer(
+			Local Player.Winston_Timer, Up)), Left, 0, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Symmetra)), Custom String("{0}: {1}/{2}",
+			Ability Icon String(Hero(Symmetra), Button(Ultimate)), Round To Integer(Local Player.Symmetra_Health, To Nearest),
+			4000 * Global.Symmetra_Stats[0]), Null, Custom String("{0}", Round To Integer(Local Player.Symmetra_Timer, Up)), Left, 0,
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Hero Of(Local Player) == Hero(Mauga)), Custom String("{0}: {1}/{2}",
+			Ability Icon String(Hero(Mauga), Button(Ultimate)), Round To Integer(Local Player.Mauga_Health, To Nearest),
+			1500 * Global.Mauga_Stats[0]), Null, Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+	}
+}
+
+rule("Brigitte Buff")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Brigitte_Health = 700 * Global.Brigitte_Stats[0];
+		Wait Until(!Is Using Ultimate(Event Player), 99999);
+		Modify Player Variable(Event Player, Brigitte_Health, Min, 250 * Global.Brigitte_Stats[0]);
+	}
+}
+
+rule("Brigitte Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	actions
+	{
+		Event Player.Brigitte_Health = 250 * Global.Brigitte_Stats[0];
+		Stop Chasing Player Variable(Event Player, Brigitte_Health);
+	}
+}
+
+rule("Brigitte Block")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Event Player.Blocked_Stat != Player Stat(Event Player, Damage Blocked);
+	}
+
+	actions
+	{
+		Event Player.Brigitte_Health -= Min(Event Player.Brigitte_Health, Player Stat(Event Player, Damage Blocked)
+			- Event Player.Blocked_Stat);
+		Event Player.Blocked_Stat = Player Stat(Event Player, Damage Blocked);
+	}
+}
+
+rule("Brigitte Recharge")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) != True;
+	}
+
+	actions
+	{
+		Wait(2, Abort When False);
+		Chase Player Variable At Rate(Event Player, Brigitte_Health, (Is Using Ultimate(Event Player) ? 700 : 250)
+			* Global.Brigitte_Stats[0], 85 * Global.Brigitte_Stats[2], Destination and Rate);
+		Wait Until(Is Firing Secondary(Event Player), 99999);
+		Stop Chasing Player Variable(Event Player, Brigitte_Health);
+	}
+}
+
+rule("Ramattra Toggle Barrier")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ramattra;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait Until(!Is Firing Secondary(Event Player), 99999);
+		Press Button(Event Player, Button(Secondary Fire));
+		Wait Until(Is Firing Secondary(Event Player), 0.100);
+		Abort If(Is Firing Secondary(Event Player));
+		Event Player.Ramattra_Pos = Ray Cast Hit Position(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player)
+			+ Facing Direction Of(Event Player) * 35, Null, Event Player, True) + Vector(0, 0.010, 0), Ray Cast Hit Position(Eye Position(
+			Event Player), Eye Position(Event Player) + Facing Direction Of(Event Player) * 35, Null, Event Player, True) + Vector(0,
+			0.010, 0) - Vector(0, 3, 0), Null, Event Player, True);
+		Event Player.Ramattra_Dir = World Vector Of(Left, Event Player, Rotation);
+		Event Player.Ramattra_Using = True;
+		Event Player.Ramattra_Timer = 4;
+		Wait Until(Event Player.Ramattra_Health == 0, 4);
+		Event Player.Ramattra_Using = False;
+	}
+}
+
+rule("Ramattra Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ramattra;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Ramattra_Health = 1000 * Global.Ramattra_Stats[0];
+	}
+}
+
+rule("Ramattra Block")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ramattra;
+	}
+
+	conditions
+	{
+		Event Player.Blocked_Stat != Player Stat(Event Player, Damage Blocked);
+	}
+
+	actions
+	{
+		Event Player.Ramattra_Health -= Min(Event Player.Ramattra_Health, Player Stat(Event Player, Damage Blocked)
+			- Event Player.Blocked_Stat);
+		Event Player.Blocked_Stat = Player Stat(Event Player, Damage Blocked);
+	}
+}
+
+rule("Reinhardt Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	actions
+	{
+		Event Player.Reinhardt_Health = 1400 * Global.Reinhardt_Stats[0];
+		Stop Chasing Player Variable(Event Player, Reinhardt_Health);
+	}
+}
+
+rule("Reinhardt Block")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Event Player.Blocked_Stat != Player Stat(Event Player, Damage Blocked);
+	}
+
+	actions
+	{
+		Event Player.Reinhardt_Health -= Min(Event Player.Reinhardt_Health, Player Stat(Event Player, Damage Blocked)
+			- Event Player.Blocked_Stat);
+		Event Player.Blocked_Stat = Player Stat(Event Player, Damage Blocked);
+	}
+}
+
+rule("Reinhardt Recharge")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) != True;
+	}
+
+	actions
+	{
+		Wait(2, Abort When False);
+		Chase Player Variable At Rate(Event Player, Reinhardt_Health, 1400 * Global.Reinhardt_Stats[0], 140 * Global.Reinhardt_Stats[2],
+			Destination and Rate);
+		Wait Until(Is Firing Secondary(Event Player), 99999);
+		Stop Chasing Player Variable(Event Player, Reinhardt_Health);
+	}
+}
+
+rule("Sigma Toggle Barrier")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Update Every Frame(Is Firing Secondary(Event Player)) == True;
+	}
+
+	actions
+	{
+		Event Player.Sigma_Using = True;
+		Event Player.Sigma_Pos = Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * 2.250, Null, Event Player, True);
+		Event Player.Sigma_Dir = World Vector Of(Left, Event Player, Rotation);
+		Chase Player Variable At Rate(Event Player, Sigma_Pos, Ray Cast Hit Position(Event Player.Sigma_Pos,
+			Event Player.Sigma_Pos + Evaluate Once(Facing Direction Of(Event Player)), Null, Event Player, True) + Evaluate Once(
+			Facing Direction Of(Event Player)) * -0.010, 16.500, Destination and Rate);
+		Wait Until(!Is Firing Secondary(Event Player), 99999);
+		Stop Chasing Player Variable(Event Player, Sigma_Pos);
+		Wait Until(Update Every Frame(Ability Cooldown(Event Player, Button(Secondary Fire))) != Null, 99999);
+		Event Player.Sigma_Using = False;
+	}
+}
+
+rule("Sigma Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	actions
+	{
+		Event Player.Sigma_Health = 700 * Global.Sigma_Stats[0];
+		Stop Chasing Player Variable(Event Player, Sigma_Health);
+	}
+}
+
+rule("Sigma Block")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Event Player.Blocked_Stat != Player Stat(Event Player, Damage Blocked);
+	}
+
+	actions
+	{
+		Event Player.Sigma_Health -= Min(Event Player.Sigma_Health, Player Stat(Event Player, Damage Blocked) - Event Player.Blocked_Stat);
+		Event Player.Blocked_Stat = Player Stat(Event Player, Damage Blocked);
+	}
+}
+
+rule("Sigma Recharge")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Update Every Frame(Event Player.Sigma_Using) != True;
+	}
+
+	actions
+	{
+		Wait(2, Abort When False);
+		Chase Player Variable At Rate(Event Player, Sigma_Health, 700 * Global.Sigma_Stats[0], 100 * Global.Sigma_Stats[2],
+			Destination and Rate);
+		Wait Until(Update Every Frame(Event Player.Sigma_Using), 99999);
+		Stop Chasing Player Variable(Event Player, Sigma_Health);
+	}
+}
+
+rule("Winston Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Update Every Frame(Is Using Ability 2(Event Player)) == True;
+	}
+
+	actions
+	{
+		Event Player.Winston_Heath = 650 * Global.Winston_Stats[0];
+		Event Player.Winston_Timer = 8;
+		Event Player.Winston_Pos = World Vector Of(Vector(0, 0.100, 0), Event Player, Rotation And Translation);
+		Event Player.Winston_Using = True;
+		Wait Until(Event Player.Winston_Heath == 0, 8);
+		Event Player.Winston_Using = False;
+	}
+}
+
+rule("Winston Block")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Event Player.Blocked_Stat != Player Stat(Event Player, Damage Blocked);
+	}
+
+	actions
+	{
+		Event Player.Winston_Heath -= Min(Event Player.Winston_Heath, Player Stat(Event Player, Damage Blocked)
+			- Event Player.Blocked_Stat);
+		Event Player.Blocked_Stat = Player Stat(Event Player, Damage Blocked);
+	}
+}
+
+rule("Symmetra Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Symmetra;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Is True For All(Array(Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player, Frozen),
+			Has Status(Event Player, Stunned)), !Current Array Element) == True;
+	}
+
+	actions
+	{
+		Event Player.Symmetra_Dir = Custom String("Sideways");
+		While(True);
+			Wait Until(!Is Button Held(Event Player, Button(Ultimate)), 99999);
+			Wait Until(Is True For Any(Array(Button(Primary Fire), Button(Secondary Fire), Button(Ultimate)), Is Button Held(Event Player,
+				Current Array Element)), 99999);
+			Abort If(Is Button Held(Event Player, Button(Secondary Fire)));
+			If(Is Using Ultimate(Event Player));
+				Break;
+			End;
+			Event Player.Symmetra_Dir = Event Player.Symmetra_Dir == Custom String("Sideways") ? Custom String("Forward") : Custom String(
+				"Sideways");
+			Wait(0.250, Ignore Condition);
+			Wait Until(!Is Button Held(Event Player, Button(Ultimate)), 99999);
+		End;
+		Event Player.Symmetra_Health = 4000 * Global.Symmetra_Stats[0];
+		Event Player.Symmetra_Timer = 12;
+		Event Player.Symmetra_Pos = Ray Cast Hit Position(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player)
+			+ Facing Direction Of(Event Player) * 25, Null, Event Player, True) + Vector(0, 0.010, 0), Ray Cast Hit Position(Eye Position(
+			Event Player), Eye Position(Event Player) + Facing Direction Of(Event Player) * 25, Null, Event Player, True) + Vector(0,
+			0.010, 0) - Vector(0, 3, 0), Null, Event Player, True);
+		Event Player.Symmetra_Dir = World Vector Of(Event Player.Symmetra_Dir == Custom String("Sideways") ? Left : Forward, Event Player,
+			Rotation);
+	}
+}
+
+rule("Symmetra Block")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Symmetra;
+	}
+
+	conditions
+	{
+		Event Player.Blocked_Stat != Player Stat(Event Player, Damage Blocked);
+	}
+
+	actions
+	{
+		Event Player.Symmetra_Health -= Min(Event Player.Symmetra_Health, Player Stat(Event Player, Damage Blocked)
+			- Event Player.Blocked_Stat);
+		Event Player.Blocked_Stat = Player Stat(Event Player, Damage Blocked);
+	}
+}
+
+rule("Mauga Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mauga;
+	}
+
+	conditions
+	{
+		Update Every Frame(Is Using Ultimate(Event Player)) == True;
+	}
+
+	actions
+	{
+		Event Player.Mauga_Health = 1500 * Global.Mauga_Stats[0];
+		Event Player.Mauga_Pos = World Vector Of(Vector(0, 0.100, 0), Event Player, Rotation And Translation);
+	}
+}
+
+rule("Mauga Block")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mauga;
+	}
+
+	conditions
+	{
+		Event Player.Blocked_Stat != Player Stat(Event Player, Damage Blocked);
+	}
+
+	actions
+	{
+		Event Player.Mauga_Health -= Min(Event Player.Mauga_Health, Player Stat(Event Player, Damage Blocked) - Event Player.Blocked_Stat);
+		Event Player.Blocked_Stat = Player Stat(Event Player, Damage Blocked);
+	}
+}
