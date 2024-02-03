@@ -1,0 +1,444 @@
+settings
+{
+	main
+	{
+		Description: "After Timer Has Run Out All Bodys Are\r\nRandomised With The Mind\r\n(Body = Character, Mind = Player)\r\n\r\nAfter Mind Transfers Are Completed The Timer\r\nIs Randomised Using The Values In Workshop\r\nSettings (Starting Value Can Also Be Random)\r\n\r\nIf Using Bots Toggle On Bot Mode, Since I Cant\r\nForce Bots Hero, Using Bot Mode The Hero\r\nAnd Health Values Aren't Swapped"
+		Mode Name: "Mind Transfer"
+	}
+
+	modes
+	{
+		disabled Assault
+		{
+			Limit Roles: 2 Of Each Role Per Team
+		}
+
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	workshop
+	{
+		If In Spawn Room: [2]
+		Is Starting Timer Random: On
+		Random Highest: [1]
+		Random Highest Value: 6
+		Random Lowest: [1]
+		Random Lowest Value: 2
+		Starting Value In Minutes Ingore If Random: 5
+	}
+}
+
+variables
+{
+	global:
+		0: Body_Hero
+		1: Body_Health
+		2: Body_Cooldown_Ability1
+		3: Body_Cooldown_Ability2
+		4: Body_Cooldown_Ability3
+		5: Body_Resource_Ability1
+		6: Body_Resource_Ability2
+		7: Body_Resource_Ability3
+		8: Body_Charge_Ability1
+		9: Body_Charge_Ability2
+		10: Body_Charge_Ability3
+		11: Body_Ultimate_Charge
+		12: Body_Direction
+		13: Body_Ammo1
+		14: Body_Ammo2
+		15: Body_Is_Dead
+		16: Body_Postion
+		17: Body_Is_Spawn
+		18: Random_Min
+		19: Random_Max
+		20: Starting_Value
+		21: Mind_Tranfer_Timer
+		22: Random_Mind
+		23: Mind_Array
+		24: Body_Array
+		25: Mind_Index
+		26: Is_Starting_Random
+		27: Ingore_Dead
+		28: Combo_Spawn_Room
+		29: Random_Min_Type
+		30: Random_Max_Type
+		31: Bot_Mode
+		32: Swap_Targets
+
+	player:
+		0: Get_Body_Stats
+		1: Set_Body_Stats
+		2: Ready_For_Swap
+		3: Mind_Swap_Index
+		4: Eye_Pos
+		5: Dir
+}
+
+subroutines
+{
+	0: Set_Body_Stats
+	1: Get_Body_Stats
+	2: Empty_Body_Stats
+	3: Disable_Bindings
+	4: Enable_Bindings
+	5: Setup_Rules
+}
+
+rule("Setup Rules")
+{
+	event
+	{
+		Subroutine;
+		Setup_Rules;
+	}
+
+	actions
+	{
+		Global.Random_Min_Type = Workshop Setting Combo(Custom String("Timer"), Custom String("Random Lowest"), 0, Array(Custom String(
+			"Seconds"), Custom String("Minutes"), Custom String("Hours")), 0);
+		Global.Random_Max_Type = Workshop Setting Combo(Custom String("Timer"), Custom String("Random Highest"), 0, Array(Custom String(
+			"Seconds"), Custom String("Minutes"), Custom String("Hours")), 1);
+		Global.Combo_Spawn_Room = Workshop Setting Combo(Custom String("Settings"), Custom String("If In Spawn Room"), 0, Array(
+			Custom String("Teleport (Body Postion)"), Custom String("Teleport (Mind Spawn)"), Custom String("Ingore Players In Spawn")),
+			1);
+		Global.Ingore_Dead = Workshop Setting Toggle(Custom String("Settings"), Custom String("Ingore Dead Players"), True, 2);
+		Global.Is_Starting_Random = Workshop Setting Toggle(Custom String("Timer"), Custom String("Is Starting Timer Random"), False, 2);
+		Global.Starting_Value = Workshop Setting Integer(Custom String("Timer"), Custom String(
+			"Starting Value In Minutes (Ingore If Random)"), 15, 1, 30, 3);
+		Global.Random_Min = Workshop Setting Integer(Custom String("Timer"), Custom String("Random Lowest Value"), 5, 1, 30, 4);
+		Global.Random_Max = Workshop Setting Integer(Custom String("Timer"), Custom String("Random Highest Value"), 5, 1, 30, 5);
+		Global.Bot_Mode = Workshop Setting Toggle(Custom String("Settings"), Custom String("Bot Mode"), False, 5);
+	}
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Call Subroutine(Setup_Rules);
+		Global.Random_Min = Global.Random_Min * (Global.Random_Min_Type == 0 ? 1 : (Global.Random_Min_Type == 1 ? 60 : 3600));
+		Global.Random_Max = Global.Random_Max * (Global.Random_Max_Type == 0 ? 1 : (Global.Random_Max_Type == 1 ? 60 : 3600));
+		Chase Global Variable At Rate(Mind_Tranfer_Timer, 0, 1, Destination and Rate);
+		If(Global.Is_Starting_Random == True);
+			Global.Mind_Tranfer_Timer = Random Integer(Global.Random_Min, Global.Random_Max);
+		Else;
+			Global.Mind_Tranfer_Timer = Global.Starting_Value * 60;
+		End;
+	}
+}
+
+rule("Empty Body Stats")
+{
+	event
+	{
+		Subroutine;
+		Empty_Body_Stats;
+	}
+
+	actions
+	{
+		Global.Body_Hero = Empty Array;
+		Global.Body_Health = Empty Array;
+		Global.Body_Cooldown_Ability1 = Empty Array;
+		Global.Body_Cooldown_Ability2 = Empty Array;
+		Global.Body_Cooldown_Ability3 = Empty Array;
+		Global.Body_Resource_Ability1 = Empty Array;
+		Global.Body_Resource_Ability2 = Empty Array;
+		Global.Body_Resource_Ability3 = Empty Array;
+		Global.Body_Charge_Ability1 = Empty Array;
+		Global.Body_Charge_Ability2 = Empty Array;
+		Global.Body_Charge_Ability3 = Empty Array;
+		Global.Body_Ultimate_Charge = Empty Array;
+		Global.Body_Direction = Empty Array;
+		Global.Body_Ammo1 = Empty Array;
+		Global.Body_Ammo2 = Empty Array;
+		Global.Body_Is_Dead = Empty Array;
+		Global.Body_Postion = Empty Array;
+		Global.Body_Is_Spawn = Empty Array;
+	}
+}
+
+rule("Transfer Warning - 5 Minutes")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global.Mind_Tranfer_Timer <= 300;
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("5 Minutes Until Mind Transfer"));
+	}
+}
+
+rule("Transfer Warning - 1 Minutes")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global.Mind_Tranfer_Timer <= 60;
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("1 Minute Until Mind Transfer"));
+	}
+}
+
+rule("Transfer Warning - 15 Seconds")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global.Mind_Tranfer_Timer <= 15;
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("15 Seconds Until Mind Transfer"));
+	}
+}
+
+rule("Start Body Swap")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global.Mind_Tranfer_Timer == 0;
+	}
+
+	actions
+	{
+		Global.Swap_Targets = Filtered Array(All Players(All Teams), (Global.Combo_Spawn_Room == 2 ? !Is In Spawn Room(
+			Current Array Element) : Has Spawned(Current Array Element)) && (Global.Ingore_Dead ? Is Alive(Current Array Element)
+			: Has Spawned(Current Array Element)) && Has Spawned(Current Array Element));
+		Call Subroutine(Empty_Body_Stats);
+		Set Slow Motion(10);
+		Global.Swap_Targets.Get_Body_Stats = True;
+		Wait Until(Is True For All(Global.Swap_Targets, Current Array Element.Ready_For_Swap), 99999);
+		Global.Mind_Array = Global.Swap_Targets;
+		Global.Body_Array = Empty Array;
+		For Global Variable(Mind_Index, 0, Count Of(Global.Swap_Targets), 1);
+			Global.Random_Mind = Random Value In Array(Global.Mind_Array);
+			Modify Global Variable(Mind_Array, Remove From Array By Value, Global.Random_Mind);
+			Modify Global Variable(Body_Array, Append To Array, Global.Random_Mind);
+		End;
+		Global.Swap_Targets.Set_Body_Stats = True;
+		Wait Until(Is True For All(Global.Swap_Targets, !Current Array Element.Ready_For_Swap), 99999);
+		Wait(0.250, Ignore Condition);
+		Set Slow Motion(100);
+		Global.Mind_Tranfer_Timer = Random Integer(Global.Random_Min, Global.Random_Max);
+	}
+}
+
+rule("Start Setting Body Stats")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Get_Body_Stats == True;
+	}
+
+	actions
+	{
+		Event Player.Eye_Pos = Eye Position(Event Player) + World Vector Of(Vector(0, 2, -2), Event Player, Rotation);
+		Event Player.Dir = Eye Position(Event Player);
+		Start Camera(Event Player, Event Player.Eye_Pos, Event Player.Dir, 25);
+		Call Subroutine(Disable_Bindings);
+		Wait(Random Real(0, 0.500), Ignore Condition);
+		Call Subroutine(Set_Body_Stats);
+		Event Player.Get_Body_Stats = False;
+		Event Player.Ready_For_Swap = True;
+	}
+}
+
+rule("Start Getting Body Stats")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Set_Body_Stats == True;
+	}
+
+	actions
+	{
+		Call Subroutine(Get_Body_Stats);
+		Event Player.Eye_Pos = Eye Position(Event Player);
+		Event Player.Dir = Eye Position(Event Player) + Facing Direction Of(Event Player);
+		Wait(0.100, Ignore Condition);
+		Stop Camera(Event Player);
+		Event Player.Set_Body_Stats = False;
+		Event Player.Ready_For_Swap = False;
+		Call Subroutine(Enable_Bindings);
+	}
+}
+
+rule("Disable Bindings")
+{
+	event
+	{
+		Subroutine;
+		Disable_Bindings;
+	}
+
+	actions
+	{
+		Disallow Button(Event Player, Button(Primary Fire));
+		Disallow Button(Event Player, Button(Secondary Fire));
+		Disallow Button(Event Player, Button(Ability 1));
+		Disallow Button(Event Player, Button(Ability 2));
+		Disallow Button(Event Player, Button(Ultimate));
+		Disallow Button(Event Player, Button(Interact));
+		Disallow Button(Event Player, Button(Jump));
+		Disallow Button(Event Player, Button(Crouch));
+		Disallow Button(Event Player, Button(Melee));
+		Disallow Button(Event Player, Button(Reload));
+	}
+}
+
+rule("Enable Bindings")
+{
+	event
+	{
+		Subroutine;
+		Enable_Bindings;
+	}
+
+	actions
+	{
+		Allow Button(Event Player, Button(Primary Fire));
+		Allow Button(Event Player, Button(Secondary Fire));
+		Allow Button(Event Player, Button(Ability 1));
+		Allow Button(Event Player, Button(Ability 2));
+		Allow Button(Event Player, Button(Ultimate));
+		Allow Button(Event Player, Button(Interact));
+		Allow Button(Event Player, Button(Jump));
+		Allow Button(Event Player, Button(Crouch));
+		Allow Button(Event Player, Button(Melee));
+		Allow Button(Event Player, Button(Reload));
+	}
+}
+
+rule("Set Body Stats")
+{
+	event
+	{
+		Subroutine;
+		Set_Body_Stats;
+	}
+
+	actions
+	{
+		Modify Global Variable(Body_Hero, Append To Array, Hero Of(Event Player));
+		Modify Global Variable(Body_Health, Append To Array, Health(Event Player));
+		Modify Global Variable(Body_Cooldown_Ability1, Append To Array, Ability Cooldown(Event Player, Button(Ability 1)));
+		Modify Global Variable(Body_Cooldown_Ability2, Append To Array, Ability Cooldown(Event Player, Button(Ability 2)));
+		Modify Global Variable(Body_Cooldown_Ability3, Append To Array, Ability Cooldown(Event Player, Button(Secondary Fire)));
+		Modify Global Variable(Body_Resource_Ability1, Append To Array, Ability Resource(Event Player, Button(Ability 1)));
+		Modify Global Variable(Body_Resource_Ability2, Append To Array, Ability Resource(Event Player, Button(Ability 2)));
+		Modify Global Variable(Body_Resource_Ability3, Append To Array, Ability Resource(Event Player, Button(Secondary Fire)));
+		Modify Global Variable(Body_Charge_Ability1, Append To Array, Ability Resource(Event Player, Button(Ability 1)));
+		Modify Global Variable(Body_Charge_Ability2, Append To Array, Ability Resource(Event Player, Button(Ability 2)));
+		Modify Global Variable(Body_Charge_Ability3, Append To Array, Ability Resource(Event Player, Button(Secondary Fire)));
+		Modify Global Variable(Body_Ultimate_Charge, Append To Array, Ultimate Charge Percent(Event Player));
+		Modify Global Variable(Body_Direction, Append To Array, Facing Direction Of(Event Player));
+		Modify Global Variable(Body_Ammo1, Append To Array, Ammo(Event Player, 0));
+		Modify Global Variable(Body_Ammo2, Append To Array, Ammo(Event Player, 1));
+		Modify Global Variable(Body_Is_Dead, Append To Array, Is Dead(Event Player));
+		Modify Global Variable(Body_Postion, Append To Array, Position Of(Event Player));
+		Modify Global Variable(Body_Is_Spawn, Append To Array, Is In Spawn Room(Event Player));
+	}
+}
+
+rule("Get Body Stats")
+{
+	event
+	{
+		Subroutine;
+		Get_Body_Stats;
+	}
+
+	actions
+	{
+		Event Player.Mind_Swap_Index = Index Of Array Value(Global.Body_Array, Event Player);
+		Teleport(Event Player,
+			Global.Combo_Spawn_Room == 1 && Global.Body_Is_Spawn[Event Player.Mind_Swap_Index] == True ? Random Value In Array(
+			Spawn Points(Team Of(Event Player))) : Global.Body_Postion[Event Player.Mind_Swap_Index]);
+		Skip If(Global.Bot_Mode, 3);
+		Start Forcing Player To Be Hero(Event Player, Global.Body_Hero[Event Player.Mind_Swap_Index]);
+		Wait(0.100, Ignore Condition);
+		Stop Forcing Player To Be Hero(Event Player);
+		Set Facing(Event Player, Global.Body_Direction[Event Player.Mind_Swap_Index], To World);
+		If(Global.Body_Is_Dead[Event Player.Mind_Swap_Index] == True);
+			Kill(Event Player, Event Player);
+		Else;
+			Resurrect(Event Player);
+		End;
+		Skip If(Global.Bot_Mode, 1);
+		Set Player Health(Event Player, Global.Body_Health[Event Player.Mind_Swap_Index]);
+		Set Ability Cooldown(Event Player, Button(Ability 1), Global.Body_Cooldown_Ability1[Event Player.Mind_Swap_Index]);
+		Set Ability Cooldown(Event Player, Button(Ability 2), Global.Body_Cooldown_Ability2[Event Player.Mind_Swap_Index]);
+		Set Ability Cooldown(Event Player, Button(Secondary Fire), Global.Body_Cooldown_Ability3[Event Player.Mind_Swap_Index]);
+		Set Ability Resource(Event Player, Button(Ability 1), Global.Body_Resource_Ability1[Event Player.Mind_Swap_Index]);
+		Set Ability Resource(Event Player, Button(Ability 2), Global.Body_Resource_Ability2[Event Player.Mind_Swap_Index]);
+		Set Ability Resource(Event Player, Button(Secondary Fire), Global.Body_Resource_Ability3[Event Player.Mind_Swap_Index]);
+		Set Ability Charge(Event Player, Button(Ability 1), Global.Body_Charge_Ability1[Event Player.Mind_Swap_Index]);
+		Set Ability Charge(Event Player, Button(Ability 2), Global.Body_Charge_Ability2[Event Player.Mind_Swap_Index]);
+		Set Ability Charge(Event Player, Button(Secondary Fire), Global.Body_Charge_Ability3[Event Player.Mind_Swap_Index]);
+		Set Ultimate Charge(Event Player, Global.Body_Ultimate_Charge[Event Player.Mind_Swap_Index]);
+		Set Ammo(Event Player, 0, Global.Body_Ammo1[Event Player.Mind_Swap_Index]);
+		Set Ammo(Event Player, 1, Global.Body_Ammo2[Event Player.Mind_Swap_Index]);
+	}
+}
