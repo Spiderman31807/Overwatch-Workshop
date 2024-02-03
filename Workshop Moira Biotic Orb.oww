@@ -1,0 +1,228 @@
+settings
+{
+	main
+	{
+		Mode Name: "Moira Biotic Orb - 8QT4R"
+	}
+
+	modes
+	{
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	extensions
+	{
+		Beam Effects
+		Projectiles
+	}
+}
+
+variables
+{
+	player:
+		0: Orb_Position
+		1: Orb_Stats
+		2: Selecting_Orb
+		3: Orb_Targets
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Create Projectile Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Damage")),
+			Moira Damage Orb, All Players(Team Of(Event Player)), Event Player.Orb_Position, Event Player.Orb_Stats[1], 0,
+			Visible To Friendly To Position Direction and Size);
+		Create Projectile Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Healing")),
+			Moira Heal Orb, All Players(Team Of(Event Player)), Event Player.Orb_Position, Event Player.Orb_Stats[1], 0,
+			Visible To Friendly To Position Direction and Size);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Healing") && Entity Exists(
+			Event Player.Orb_Targets[0])), Moira Orb Heal Beam, Event Player.Orb_Position, Event Player.Orb_Targets[0], Team Of(
+			Event Player) == Team 1 ? Color(Team 1) : Color(Team 2), Visible To Position Radius and Color);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Damage") && Entity Exists(
+			Event Player.Orb_Targets[0])), Moira Orb Damage Beam, Event Player.Orb_Position, Event Player.Orb_Targets[0], Team Of(
+			Event Player) == Team 1 ? Color(Team 1) : Color(Team 2), Visible To Position Radius and Color);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Healing") && Entity Exists(
+			Event Player.Orb_Targets[1])), Moira Orb Heal Beam, Event Player.Orb_Position, Event Player.Orb_Targets[1], Team Of(
+			Event Player) == Team 1 ? Color(Team 1) : Color(Team 2), Visible To Position Radius and Color);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Damage") && Entity Exists(
+			Event Player.Orb_Targets[1])), Moira Orb Damage Beam, Event Player.Orb_Position, Event Player.Orb_Targets[1], Team Of(
+			Event Player) == Team 1 ? Color(Team 1) : Color(Team 2), Visible To Position Radius and Color);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Healing") && Entity Exists(
+			Event Player.Orb_Targets[2])), Moira Orb Heal Beam, Event Player.Orb_Position, Event Player.Orb_Targets[2], Team Of(
+			Event Player) == Team 1 ? Color(Team 1) : Color(Team 2), Visible To Position Radius and Color);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Damage") && Entity Exists(
+			Event Player.Orb_Targets[2])), Moira Orb Damage Beam, Event Player.Orb_Position, Event Player.Orb_Targets[2], Team Of(
+			Event Player) == Team 1 ? Color(Team 1) : Color(Team 2), Visible To Position Radius and Color);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Healing") && Entity Exists(
+			Event Player.Orb_Targets[3])), Moira Orb Heal Beam, Event Player.Orb_Position, Event Player.Orb_Targets[3], Team Of(
+			Event Player) == Team 1 ? Color(Team 1) : Color(Team 2), Visible To Position Radius and Color);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Damage") && Entity Exists(
+			Event Player.Orb_Targets[3])), Moira Orb Damage Beam, Event Player.Orb_Position, Event Player.Orb_Targets[3], Team Of(
+			Event Player) == Team 1 ? Color(Team 1) : Color(Team 2), Visible To Position Radius and Color);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Healing") && Entity Exists(
+			Event Player.Orb_Targets[4])), Moira Orb Heal Beam, Event Player.Orb_Position, Event Player.Orb_Targets[4], Team Of(
+			Event Player) == Team 1 ? Color(Team 1) : Color(Team 2), Visible To Position Radius and Color);
+		Create Beam Effect(Filtered Array(All Players(All Teams), Event Player.Orb_Stats[0] == Custom String("Damage") && Entity Exists(
+			Event Player.Orb_Targets[4])), Moira Orb Damage Beam, Event Player.Orb_Position, Event Player.Orb_Targets[4], Team Of(
+			Event Player) == Team 1 ? Color(Team 1) : Color(Team 2), Visible To Position Radius and Color);
+		Create In-World Text(Filtered Array(Event Player, Event Player.Selecting_Orb), Custom String("Heal {0} |", Input Binding String(
+			Button(Primary Fire))), Update Every Frame(Eye Position(Event Player) + 100 * (2.250 * -1 / 2 * Cross Product(
+			Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+			Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (0.300 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(
+			Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 1.750, Do Not Clip, Visible To Position and String, Color(
+			White), Default Visibility);
+		Create In-World Text(Filtered Array(Event Player, Event Player.Selecting_Orb), Custom String("| {0} Damage", Input Binding String(
+			Button(Secondary Fire))), Update Every Frame(Eye Position(Event Player) + 100 * (-2.250 * -1 / 2 * Cross Product(
+			Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+			Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (0.300 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(
+			Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 1.750, Do Not Clip, Visible To Position and String, Color(
+			White), Default Visibility);
+		Chase Player Variable At Rate(Event Player, Orb_Position, Event Player.Orb_Position + Event Player.Orb_Stats[1], Count Of(
+			Event Player.Orb_Targets) > 0 ? 5.500 : 20, Destination and Rate);
+	}
+}
+
+rule("Use Biotic Orb")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Disallow Button(Event Player, Button(Ultimate));
+		Set Melee Enabled(Event Player, False);
+		Set Reload Enabled(Event Player, False);
+		Event Player.Selecting_Orb = True;
+		Wait Until(Is True For Any(Array(Is Button Held(Event Player, Button(Primary Fire)), Is Button Held(Event Player, Button(
+			Secondary Fire)), !Is Button Held(Event Player, Button(Interact))), Current Array Element), 99999);
+		Wait Until(Is True For Any(Array(Button(Primary Fire), Button(Secondary Fire), Button(Interact)), Is Button Held(Event Player,
+			Current Array Element)), 99999);
+		Event Player.Selecting_Orb = False;
+		If(Is Button Held(Event Player, Button(Primary Fire)));
+			Event Player.Orb_Stats = Array(Custom String("Healing"), Facing Direction Of(Event Player), 300, 7);
+		Else If(Is Button Held(Event Player, Button(Secondary Fire)));
+			Event Player.Orb_Stats = Array(Custom String("Damage"), Facing Direction Of(Event Player), 200, 7);
+		Else;
+			Set Primary Fire Enabled(Event Player, True);
+			Set Secondary Fire Enabled(Event Player, True);
+			Set Ability 1 Enabled(Event Player, True);
+			Set Ability 2 Enabled(Event Player, True);
+			Allow Button(Event Player, Button(Ultimate));
+			Set Melee Enabled(Event Player, True);
+			Set Reload Enabled(Event Player, True);
+			Abort If(Is Button Held(Event Player, Button(Interact)));
+		End;
+		Event Player.Orb_Position = Eye Position(Event Player);
+		Wait(0.400, Ignore Condition);
+		Set Primary Fire Enabled(Event Player, True);
+		Set Secondary Fire Enabled(Event Player, True);
+		Set Ability 1 Enabled(Event Player, True);
+		Set Ability 2 Enabled(Event Player, True);
+		Allow Button(Event Player, Button(Ultimate));
+		Set Melee Enabled(Event Player, True);
+		Set Reload Enabled(Event Player, True);
+		"Cooldown"
+		Wait(8, Ignore Condition);
+	}
+}
+
+rule("Bounce Biotic Orb")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Ray Cast Hit Position(Event Player.Orb_Position, Event Player.Orb_Position + Event Player.Orb_Stats[1], Null, Event Player, False)
+			!= Event Player.Orb_Position + Event Player.Orb_Stats[1];
+	}
+
+	actions
+	{
+		"Limited To Simple World For Workshop Ray Casts So Bounce Is By No Means Perfect"
+		Event Player.Orb_Stats[1] = Ray Cast Hit Normal(Event Player.Orb_Position, Event Player.Orb_Position + Event Player.Orb_Stats[1],
+			Null, Event Player, False);
+	}
+}
+
+rule("Biotic Orb")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Orb_Stats[0] != Null;
+	}
+
+	actions
+	{
+		If(Event Player.Orb_Stats[0] == Custom String("Damage"));
+			Event Player.Orb_Targets = Filtered Array(Players Within Radius(Event Player.Orb_Position, 4, Opposite Team Of(Team Of(
+				Event Player)), Surfaces And Enemy Barriers), Is Alive(Current Array Element) && !Has Status(Current Array Element,
+				Phased Out));
+			Damage(Event Player.Orb_Targets, Event Player, 5);
+			Event Player.Orb_Stats[2] -= 5 * Count Of(Event Player.Orb_Targets);
+		Else;
+			Event Player.Orb_Targets = Filtered Array(Players Within Radius(Event Player.Orb_Position, 5, Team Of(Event Player),
+				Surfaces And Enemy Barriers), Is Alive(Current Array Element) && Normalized Health(Event Player) < 1);
+			Heal(Event Player.Orb_Targets, Event Player, 6.500);
+			Event Player.Orb_Stats[2] -= 6.500 * Count Of(Event Player.Orb_Targets);
+		End;
+		Event Player.Orb_Stats[3] -= 0.100;
+		If(Event Player.Orb_Stats[2] <= 0 || Event Player.Orb_Stats[3] <= 0);
+			Event Player.Orb_Stats = Null;
+		End;
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
