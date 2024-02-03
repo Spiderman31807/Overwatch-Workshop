@@ -1,0 +1,3521 @@
+settings
+{
+	main
+	{
+		Description: "Interact: Reset Mouse Pos\n\nAim/Throttle: Mouse Movement\n(Aim or Throttle not both, default is Aim)\n\nPrimary/Secondary: Mouse Click (Left/Right)"
+		Mode Name: "Chess - ECN9J"
+	}
+
+	lobby
+	{
+		Max Spectators: 0
+		Max Team 1 Players: 2
+		Max Team 2 Players: 0
+	}
+
+	modes
+	{
+		Skirmish
+		{
+			enabled maps
+			{
+				Workshop Expanse Night 972777519512064577
+			}
+		}
+
+		General
+		{
+			Game Mode Start: Immediately
+			Respawn As Random Hero: On
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			enabled heroes
+			{
+				Ana
+			}
+		}
+	}
+
+	extensions
+	{
+		Beam Effects
+		Beam Sounds
+		Buff Status Effects
+		Debuff Status Effects
+		Buff and Debuff Sounds
+		Energy Explosion Effects
+		Kinetic Explosion Effects
+		Explosion Sounds
+		Play More Effects
+		Spawn More Dummy Bots
+		Projectiles
+	}
+}
+
+variables
+{
+	global:
+		0: Starting_X
+		1: Starting_Y
+		2: Board_SizeX
+		3: Board_SizeY
+		4: Grid_Array
+		5: Grid_IndexX
+		6: Grid_IndexY
+		7: Board_Edge_Left
+		8: Board_Edge_Right
+		9: Camera_Height
+		10: Is_Ready
+		11: Click_Area
+		12: Click_Area_Size
+		13: Click_Area_Color
+		14: Click_Area_Hover_Color
+		15: Click_Area_Page
+		16: Click_Area_Text
+		17: Click_Area_Text_Size
+		18: Click_Area_ID
+		19: Mouse_MaxX
+		20: Mouse_MinX
+		21: Mouse_MaxY
+		22: Mouse_MinY
+		23: Default_Sensitivity_Aim
+		24: Default_Sensitivity_Throttle
+		25: Debug_Dev
+		26: Temp_Dev_Text_ID
+		27: Temp_Index
+		28: Board_Confi
+		29: Board_Current
+		30: Load_Confi
+		31: Board_Index
+		32: Piece_META
+		33: Piece_Confi
+		34: Temp_Confi
+		35: Temp_Tile
+		36: Tile_Click_Pos
+		37: Settings
+		38: Vaild_Moves_White
+		39: Vaild_Moves_Black
+		40: White_King_Index
+		41: Black_King_Index
+		42: Defended_White
+		43: Defended_Black
+		44: Check_Index
+		45: Check_SubIndex
+		46: Vaild_Moves
+		47: Selected_Piece
+		48: Check_Value
+		49: Sub_DisplayBoard
+		50: White_Mat
+		51: White_In_Check
+		52: Black_In_Check
+		53: Reset_Board_Type
+		54: Player_Black
+		55: Player_White
+		56: Current_Turn
+		57: Match_Final_Result
+		58: Settings_Confi
+		59: Temp_Settings_Confi
+		60: Is_Game_In_Progress
+		61: Randomise_Board
+		62: Temp_META
+		63: Click_Area_Index
+		64: Black_Mat
+		65: Temp_Visable
+		66: White_Pieces
+		67: Black_Pieces
+		68: White_Bank
+		69: Black_Bank
+		70: Temp_White
+		71: Checks_White
+		72: Checks_Black
+		73: Hill_Tiles
+		74: Duck_Index
+		75: Setup_Chess_Max_Mat
+		76: White_Mat_Without_King
+		77: Black_Mat_Without_King
+		78: Setup_Phase
+		79: Black_Setup_Done
+		80: White_Setup_Done
+		81: Current_Mat
+		82: White_3_Ranks
+		83: Black_3_Ranks
+
+	player:
+		0: Menu_Text_ID_Array
+		1: Text_ID_Index
+		2: Temp_Page
+		3: Index
+		4: Clicked_Area
+		5: Page
+		6: Init_Direction
+		7: Mouse_Y
+		8: Mouse_X
+		9: Sensitivity
+		10: Mouse_Input
+		11: Enable_Menu
+		12: Camera_Pos
+		13: Facing_Pos
+		14: Tile_Click
+		15: Selected_Piece
+		16: Blast_Tiles
+		17: Vaild_Moves
+		18: Moves_ID
+		19: Temp_META
+		20: Start_Vector
+		21: Temp_Value
+		22: Spawn_Piece
+		23: Spawn_META
+		24: Mouse_Icon
+		25: Mouse_Color
+		26: Saved_Mouse_Icon
+		27: Saved_Mouse_Color
+		28: Page_Path
+		29: Display_Hud_Index
+		30: Allowed_Spawns
+		31: Temp_Allowed
+		32: Spawns_ID
+		33: Bank
+		34: Can_Click
+		35: Allowed_Type
+		36: Current_Mat
+		37: Has_King
+		38: Setup_Chess_Spawns
+		39: Drawn_Moves
+		40: Drawn_Allowed
+		41: Voted_Draw
+		42: Current_Team
+}
+
+subroutines
+{
+	0: Disable_Bindings
+	1: Load_Board
+	2: Setup_Click_Areas
+	3: Detect_Click
+	4: Destroy_Click_Areas
+	5: Save_Board
+	6: Cycle_Turn
+	7: Decompile_Piece_Confi
+	8: Chess_Click
+	9: Get_Vaild_Moves
+	10: Pawn_Moves
+	11: King_Moves
+	12: Knight_Moves
+	13: Horizontal_Moves
+	14: Diagonal_Moves
+	15: Display_Moves
+	16: Clear_Moves
+	17: Move_Piece
+	18: Promote_Pawn
+	19: Get_Vaild_Moves_White
+	20: Get_Vaild_Moves_Black
+	21: King_Moves_White
+	22: King_Moves_Black
+	23: Get_All_Knight
+	24: Get_All_King
+	25: Get_All_Horizontal
+	26: Get_All_Diagonal
+	27: Get_Attacks_Pawn
+	28: Get_All_Moves
+	29: Drag_Piece
+	30: Can_Castle_Left
+	31: Can_Castle_Right
+	32: Change_Rule
+	33: Calc_Mat
+	34: Get_Allowed_Spawns
+	35: Displayed_Allowed
+	36: Clear_Allowed
+	37: Select_Crazy_Piece
+	38: Spawn_Piece
+	39: Crazy_Hud
+	40: Setup_Drag
+	41: Get_Match_Final
+	42: Atomic_Capture
+	43: Piece_Capture
+	44: Place_Duck
+	45: Setup_Cycle
+	46: Is_Done_Calc
+	48: Setup_Hud
+	49: Empty_Board
+	50: Setup_Select
+}
+
+rule("Create Board Grid")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Is_Ready = False;
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Please Wait, Board Generating{0}", Array(Custom String(""),
+			Custom String("."), Custom String(".."), Custom String("..."))[Round To Integer(Total Time Elapsed % 4, Down)]), Top, 0, Color(
+			White), Color(White), Color(Black), Visible To and String, Default Visibility);
+		Global.Board_SizeX = 8;
+		Global.Board_SizeY = 8;
+		Global.Starting_X = Global.Board_SizeX % 2 != 0 ? 2 : 0;
+		Global.Starting_Y = Global.Board_SizeY % 2 != 0 ? 2 : 0;
+		Global.Camera_Height = Max(Global.Board_SizeX * 1.750, Global.Board_SizeY * 3);
+		Create Beam Effect(All Players(All Teams), Bad Beam, First Of(Global.Grid_Array) + Vector(-2, -0.500, -2),
+			Global.Grid_Array[Global.Board_SizeX - 1] + Vector(2, -0.500, -2), Color(Green), Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, Last Of(Global.Grid_Array) + Vector(2, -0.500, 2),
+			Global.Grid_Array[Global.Board_SizeX - 1] + Vector(2, -0.500, -2), Color(Green), Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, Last Of(Global.Grid_Array) + Vector(2, -0.500, 2), Global.Grid_Array[(
+			Global.Board_SizeX - 1) * Global.Board_SizeY] + Vector(-2, -0.500, 2), Color(Green), Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, First Of(Global.Grid_Array) + Vector(-2, -0.500, -2), Global.Grid_Array[(
+			Global.Board_SizeX - 1) * Global.Board_SizeY] + Vector(-2, -0.500, 2), Color(Green), Visible To Position and Radius);
+		Global.Grid_Array = Empty Array;
+		Global.Board_Edge_Left = Empty Array;
+		Global.Board_Edge_Right = Empty Array;
+		For Global Variable(Grid_IndexY, Global.Board_SizeY * -0.500, Global.Board_SizeY * 0.500, 1);
+			For Global Variable(Grid_IndexX, Global.Board_SizeX * -0.500, Global.Board_SizeX * 0.500, 1);
+				Modify Global Variable(Grid_Array, Append To Array, Vector(Global.Starting_X + 2 + 4 * Global.Grid_IndexX, 0.500,
+					Global.Starting_Y + 2 + 4 * Global.Grid_IndexY));
+				Wait(0.010, Ignore Condition);
+			End;
+		End;
+		For Global Variable(Grid_IndexX, 0, Global.Board_SizeX * Global.Board_SizeY, Global.Board_SizeX);
+			Modify Global Variable(Board_Edge_Right, Append To Array, Global.Grid_Array[Global.Grid_IndexX]);
+			Wait(0.010, Ignore Condition);
+		End;
+		For Global Variable(Grid_IndexX, 0, Count Of(Global.Board_Edge_Right), 1);
+			Modify Global Variable(Board_Edge_Left, Append To Array, Vector(X Component Of(Global.Board_Edge_Right[Global.Grid_IndexX]) * -1,
+				0.500, Z Component Of(Global.Board_Edge_Right[Global.Grid_IndexX])));
+			Wait(0.010, Ignore Condition);
+		End;
+		Global.Tile_Click_Pos = Empty Array;
+		Global.Temp_Tile = Vector(-3.500, 0, -3);
+		For Global Variable(Grid_IndexY, 0, Global.Board_SizeY, 1);
+			For Global Variable(Grid_IndexX, 0, Global.Board_SizeX, 1);
+				Modify Global Variable(Tile_Click_Pos, Append To Array, Global.Temp_Tile);
+				Global.Temp_Tile += Vector(1, 0, 0);
+			End;
+			Global.Temp_Tile = Vector(-3.500, 0, Z Component Of(Global.Temp_Tile) + 1);
+		End;
+		Destroy All HUD Text;
+		Play Effect(All Players(All Teams), Buff Impact Sound, Color(White), Vector(0, Global.Camera_Height, 0), 75);
+		Global.Is_Ready = True;
+	}
+}
+
+rule("Setup Global")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Completion;
+		Disable Built-In Game Mode Announcer;
+		Disable Built-In Game Mode Music;
+		Set Match Time(0);
+	}
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Start Forcing Player Position(Event Player, Vector(0, Global.Camera_Height, 0), True);
+		Set Invisible(Event Player, All);
+		Disable Hero HUD(Event Player);
+		Disable Game Mode HUD(Event Player);
+		Disable Scoreboard(Event Player);
+		Start Camera(Event Player, Vector(Global.Starting_X, Global.Camera_Height, Global.Starting_Y), Vector(Global.Starting_X, 0,
+			Global.Starting_Y + 0.010), 0);
+		Event Player.Camera_Pos = Vector(Global.Starting_X, Global.Camera_Height, Global.Starting_Y);
+		Event Player.Facing_Pos = Down;
+		Start Facing(Event Player, Direction From Angles(90, 0), 9999, To World, None);
+		Call Subroutine(Disable_Bindings);
+		Wait Until(Global.Is_Ready, 99999);
+		Event Player.Page = Custom String("Default");
+		Call Subroutine(Setup_Click_Areas);
+		Event Player.Mouse_X = 0;
+		Event Player.Mouse_Y = 0;
+		Event Player.Init_Direction = Array(90, 0);
+		If(Event Player.Mouse_Input == 0);
+			Set Aim Speed(Event Player, Event Player.Sensitivity);
+			Stop Facing(Event Player);
+			Set Facing(Event Player, Direction From Angles(90, 0), To World);
+		Else;
+			Start Facing(Event Player, Facing Direction Of(Event Player), 0, To World, None);
+		End;
+		Event Player.Enable_Menu = True;
+	}
+}
+
+disabled rule("-------------------------------------------- In-Game Menu ----------------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		disabled Create HUD Text(Filtered Array(All Players(All Teams), Current Array Element.Enable_Menu), Custom String(
+			"{0}{1}{2}                                                                                                                       ",
+			Custom String(
+			"                                                                                                                                "),
+			Custom String(
+			"                                                                                                                               "),
+			Custom String("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")), Null, Null, Left, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Create In-World Text(Filtered Array(Local Player, Local Player.Enable_Menu == True), Local Player.Mouse_Icon, Update Every Frame(
+			Local Player.Camera_Pos + 100 * (Local Player.Mouse_X * -1 / 2 * Cross Product(Local Player.Facing_Pos, Direction From Angles(
+			Horizontal Angle From Direction(Local Player.Facing_Pos), Vertical Angle From Direction(Local Player.Facing_Pos) - 90)) + (
+			Local Player.Mouse_Y / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Local Player.Facing_Pos),
+			Vertical Angle From Direction(Local Player.Facing_Pos) - 90) + 3 * Local Player.Facing_Pos)), 3, Do Not Clip,
+			Visible To Position String and Color, Local Player.Mouse_Color, Default Visibility);
+		Create In-World Text(Filtered Array(Local Player, Array Contains(Global.Tile_Click_Pos, Local Player.Tile_Click)
+			&& Local Player.Selected_Piece <= Null), Local Player.Spawn_Piece <= Null ? Local Player.Mouse_Icon : Array(
+			Local Player.Mouse_Icon, Icon String(Arrow: Up), Icon String(Moon), Icon String(Bolt), Icon String(Spade), Icon String(Club),
+			Icon String(Diamond), Icon String(Dizzy))[Local Player.Spawn_Piece], Update Every Frame(Local Player.Camera_Pos + 100 * (
+			X Component Of(Local Player.Tile_Click) * -1 / 2 * Cross Product(Local Player.Facing_Pos, Direction From Angles(
+			Horizontal Angle From Direction(Local Player.Facing_Pos), Vertical Angle From Direction(Local Player.Facing_Pos) - 90)) + (
+			Z Component Of(Local Player.Tile_Click) / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(
+			Local Player.Facing_Pos), Vertical Angle From Direction(Local Player.Facing_Pos) - 90) + 3 * Local Player.Facing_Pos)), 3,
+			Do Not Clip, Visible To Position and String, Custom Color(0, 0, 0, 20), Default Visibility);
+		Global.Mouse_MaxX = 7.200;
+		Global.Mouse_MaxY = 4.100;
+		Global.Mouse_MinX = 0 - 7.200;
+		Global.Mouse_MinY = 0 - 3.500;
+		Global.Default_Sensitivity_Aim = Workshop Setting Integer(Custom String("Mouse"), Custom String(
+			"Default Sensitivity% (Mouse / Right Joystick)"), 0, 0, 20, 0);
+		Global.Default_Sensitivity_Throttle = Workshop Setting Integer(Custom String("Mouse"), Custom String(
+			"Default Sensitivity (WASD / Left Joystick)"), 8, 1, 20, 0);
+		Wait(1, Ignore Condition);
+		Log To Inspector(Custom String("Count Of Pos, {0}", Count Of(Global.Click_Area)));
+		Log To Inspector(Custom String("Count Of Size, {0}", Count Of(Global.Click_Area_Size)));
+		Log To Inspector(Custom String("Count Of Color, {0}", Count Of(Global.Click_Area_Color)));
+		Log To Inspector(Custom String("Count Of Hover Color, {0}", Count Of(Global.Click_Area_Hover_Color)));
+		Log To Inspector(Custom String("Count Of Page, {0}", Count Of(Global.Click_Area_Page)));
+		Log To Inspector(Custom String("Count Of Text, {0}", Count Of(Global.Click_Area_Text)));
+		Log To Inspector(Custom String("Count Of Text Size, {0}", Count Of(Global.Click_Area_Text_Size)));
+		Log To Inspector(Custom String("Count Of ID, {0}", Count Of(Global.Click_Area_ID)));
+	}
+}
+
+rule("Player Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Page_Path = Empty Array;
+		Event Player.Mouse_Icon = Custom String("▲");
+		Event Player.Mouse_Color = Color(Orange);
+		Event Player.Mouse_Input = Workshop Setting Combo(Custom String("Mouse"), Custom String("Default Input"), 0, Array(Custom String(
+			"Mouse / Right Joystick"), Custom String("WASD / Left Joystick")), 0);
+		Chase Player Variable At Rate(Event Player, Tile_Click, First Of(Sorted Array(Filtered Array(Global.Tile_Click_Pos,
+			Distance Between(Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y), Current Array Element) <= 1), Distance Between(Vector(
+			Event Player.Mouse_X, 0, Event Player.Mouse_Y), Current Array Element))), 9999, Destination and Rate);
+		If(Event Player.Mouse_Input == 0);
+			Event Player.Sensitivity = Global.Default_Sensitivity_Aim;
+			Chase Player Variable At Rate(Event Player, Mouse_X, Min(Max(Horizontal Facing Angle Of(Event Player) - First Of(
+				Event Player.Init_Direction), Global.Mouse_MinX), Global.Mouse_MaxX), 999, Destination and Rate);
+			Chase Player Variable At Rate(Event Player, Mouse_Y, Min(Max((Vertical Facing Angle Of(Event Player) - Last Of(
+				Event Player.Init_Direction)) * -1, Global.Mouse_MinY), Global.Mouse_MaxY), 99, Destination and Rate);
+		Else;
+			Event Player.Sensitivity = Global.Default_Sensitivity_Throttle;
+			Chase Player Variable At Rate(Event Player, Mouse_X, Min(Max(Event Player.Mouse_X + X Component Of(Throttle Of(Event Player)),
+				Global.Mouse_MinX), Global.Mouse_MaxX), Event Player.Sensitivity, Destination and Rate);
+			Chase Player Variable At Rate(Event Player, Mouse_Y, Min(Max(Event Player.Mouse_Y + Z Component Of(Throttle Of(Event Player)),
+				Global.Mouse_MinY), Global.Mouse_MaxY), Event Player.Sensitivity, Destination and Rate);
+		End;
+		Wait Until(Has Spawned(Event Player), 99999);
+		Wait(0.500, Ignore Condition);
+		Small Message(Event Player, Custom String("Press {0} To Open Menu", Input Binding String(Button(Interact))));
+	}
+}
+
+rule("Click Area Values")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Click_Area = Array(Vector(5.500, 0, 3.500), Vector(-7, 0, 4.100), Vector(5.500, 0, 3.500), Vector(5.500, 0, 2), Vector(
+			5.500, 0, 0.500), Vector(5.500, 0, -1), Vector(5.500, 0, -2.500), Vector(5.500, 0, 2.500), Vector(5.500, 0, 3.500), Vector(
+			5.500, 0, 2), Vector(5.500, 0, 0.500), Vector(5.500, 0, -1), Vector(5.500, 0, -2.500), Vector(5.500, 0, 1.500), Vector(5.500,
+			0, 0.500), Vector(5.500, 0, -0.500), Vector(5.500, 0, -1.500), Vector(6, 0, 3.500), Vector(6, 0, 2), Vector(6, 0, 0.500),
+			Vector(6, 0, -1), Vector(6, 0, -2.500), Vector(5, 0, 3.500), Vector(5, 0, 2), Vector(5, 0, 0.500), Vector(5, 0, -1), Vector(5,
+			0, -2.500), Vector(5.500, 0, 1.500), Vector(5.500, 0, 3.500), Vector(5.500, 0, 2.500), Vector(5.500, 0, 1.500), Vector(5.500,
+			0, 0.500), Vector(5.500, 0, -0.500), Vector(5.500, 0, -1.500), Vector(5.500, 0, 3.500), Vector(5.500, 0, 2.500), Vector(5.500,
+			0, 3.500), Vector(5.500, 0, 2.500), Vector(5, 0, 1.500), Vector(6, 0, 1.500), Vector(5, 0, 0.500), Vector(6, 0, 0.500), Vector(
+			5.500, 0, -0.500), Vector(5.500, 0, 0.500), Vector(5.500, 0, 3.500), Vector(5.500, 0, 2.500), Vector(5.500, 0, 1.500), Vector(
+			5.500, 0, 0.500), Vector(5.500, 0, -0.500), Vector(5.500, 0, -1.500), Vector(5.500, 0, -2.500), Vector(5.500, 0, 3.500),
+			Vector(5.500, 0, 2), Vector(5.500, 0, 0.500), Vector(5.500, 0, -1), Vector(5, 0, 1.500), Vector(5, 0, 1.500), Vector(6, 0,
+			1.500), Vector(5, 0, 0.500), Vector(6, 0, 0.500), Vector(5, 0, -0.500), Vector(6, 0, -0.500), Vector(5.500, 0, -0.500), Vector(
+			5.500, 0, -2.500), Vector(5.500, 0, -2.500), Vector(5, 0, 3), Vector(6, 0, 3), Vector(5, 0, 1.500), Vector(6, 0, 1.500),
+			Vector(5, 0, 0), Vector(6, 0, 0), Vector(5.500, 0, -2), Vector(5, 0, 2.600), Vector(6, 0, 2.600), Vector(5, 0, 1.100), Vector(
+			6, 0, 1.100), Vector(5, 0, -0.400), Vector(6, 0, -0.400), Vector(5.500, 0, -2.400));
+		Global.Click_Area_Size = Array(0.500, 1, 0.300, 1, 1, 5, 0.500, 1, 1, 9, 0.400, 10, 0.500, 38, 0, 14);
+		Global.Click_Area_Color = Array(Color(White), 1, Color(Red), 1, Color(White), 22, Color(Black), 1, Color(White), 54);
+		Global.Click_Area_Hover_Color = Array(Color(Lime Green), 1, Color(Rose), 1, Color(Blue), 2, Color(Green), 1, Color(Red), 1, Color(
+			Lime Green), 17, Custom Color(220, 220, 220, 255), 1, Custom Color(50, 50, 50, 255), 1, Color(Lime Green), 54);
+		Global.Click_Area_Page = Array(Custom String("Default"), 1, Custom String("!Default"), 1, Custom String("Settings"), 4,
+			Custom String("Rules"), 1, Custom String("Default"), 1, Custom String("Edit: Board"), 5, Custom String("Promote"), 4,
+			Custom String("Customise Board"), 10, Custom String("Default"), 1, Custom String("Rules"), 6, Custom String("Game"), 2,
+			Custom String("Game/Crazy"), 7, Custom String("Default"), 1, Custom String("Rules 2"), 7, Custom String("Promote/Giveaway"), 5,
+			Custom String("Game/Setup"), 6, Custom String("Default"), 1, Custom String("Game"), 1, Custom String("Game/Crazy"), 1,
+			Custom String("Pieces"), 14);
+		Global.Click_Area_Text = Array(Custom String("Settings"), Custom String("X"), Custom String("Mouse / Right Joystick"),
+			Custom String("WASD / Left Joystick"), Custom String("Increase Sensitivity"), Custom String("Decrease Sensitivity"),
+			Custom String("Next Page"), Custom String("Board"), Custom String("Normal"), Custom String("Random"), Custom String("960"),
+			Custom String("Hoard"), Custom String("Custom"), Icon String(Club), Icon String(Bolt), Icon String(Moon), Icon String(Spade),
+			Icon String(Arrow: Up), Icon String(Moon), Icon String(Bolt), Icon String(Spade), Icon String(Club), Icon String(Diamond),
+			Custom String("■"), Custom String("■"), Icon String(Plus), Icon String(Trashcan), Custom String("Rules"), Custom String(
+			"White King"), Custom String("Black King"), Custom String("Starting Turn"), Custom String("Fog of War"), Custom String(
+			"Crazyhouse"), Custom String("Pass & Play\n(Local Mode)"), Custom String("Vote Draw"), Custom String("Surrender"),
+			Custom String("Vote Draw"), Custom String("Surrender"), Icon String(Arrow: Up), Icon String(Moon), Icon String(Bolt),
+			Icon String(Spade), Icon String(Club), Custom String("Swap Sides"), Custom String("Toggle Duck"), Custom String("Giveaway"),
+			Custom String("Setup Chess"), Custom String("Atomic"), Custom String("3 Check"), Custom String("King Of The Hill"),
+			Custom String("Previous Page"), Icon String(Club), Icon String(Bolt), Icon String(Moon), Icon String(Spade), Icon String(
+			Diamond), Icon String(Arrow: Up), Icon String(Moon), Icon String(Bolt), Icon String(Spade), Icon String(Diamond), Icon String(
+			Club), Custom String("Start Game"), Custom String("Piece Guide"), Custom String("Piece Guide"), Icon String(Arrow: Up),
+			Icon String(Moon), Icon String(Bolt), Icon String(Spade), Icon String(Diamond), Icon String(Club), Icon String(Dizzy),
+			Custom String("Pawn"), Custom String("Rook"), Custom String("Knight"), Custom String("Bishop"), Custom String("King"),
+			Custom String("Queen"), Custom String("Duck"));
+		Global.Click_Area_Text_Size = Array(3, 1, 2.500, 1, 2, 4, 3, 2, 2, 5, 3, 20, 2, 1, 3, 17, 3, 21, 2, 7);
+		Global.Click_Area_ID = Array(Custom String("Settings"), Custom String("Default Page"), Custom String("Aim"), Custom String(
+			"Throttle"), Custom String("+Sensitivity"), Custom String("-Sensitivity"), Custom String("Rules: More"), Custom String(
+			"Edit: Board"), Custom String("Board: Normal"), Custom String("Board: Random"), Custom String("Board: 960"), Custom String(
+			"Board: Hoard"), Custom String("Customise Board"), Custom String("Promote: Queen"), Custom String("Promote: Knight"),
+			Custom String("Promote: Rook"), Custom String("Promote: Bishop"), Custom String("Custom Piece: Pawn"), Custom String(
+			"Custom Piece: Rook"), Custom String("Custom Piece: Knight"), Custom String("Custom Piece: Bishop"), Custom String(
+			"Custom Piece: Queen"), Custom String("Custom Piece: King"), Custom String("Custom META: White"), Custom String(
+			"Custom META: Black"), Custom String("Custom: Save"), Custom String("Custom: Clear"), Custom String("Rules"), Custom String(
+			"Rules: W-King"), Custom String("Rules: B-King"), Custom String("Rules: Start-Turn"), Custom String("Rules: Fog"),
+			Custom String("Rules: Crazy"), Custom String("Toggle: Local"), Custom String("Vote Draw"), Custom String("Surrender"),
+			Custom String("Vote Draw"), Custom String("Surrender"), Custom String("Crazy: Pawn"), Custom String("Crazy: Rook"),
+			Custom String("Crazy: Knight"), Custom String("Crazy: Bishop"), Custom String("Crazy: Queen"), Custom String("Swap Team"),
+			Custom String("Rules: Duck"), Custom String("Rules: Throw"), Custom String("Rules: Setup"), Custom String("Rules: Atomic"),
+			Custom String("Rules: 3Check"), Custom String("Rules: King-Hill"), Custom String("Rules: Less"), Custom String(
+			"Promote: Queen"), Custom String("Promote: Knight"), Custom String("Promote: Rook"), Custom String("Promote: Bishop"),
+			Custom String("Promote: King"), Custom String("Setup: Pawn"), Custom String("Setup: Rook"), Custom String("Setup: Knight"),
+			Custom String("Setup: Bishop"), Custom String("Setup: King"), Custom String("Setup: Queen"), Custom String("Start"),
+			Custom String("Ref: Piece"), Custom String("Ref: Piece"), Custom String("Dummy1"), Custom String("Dummy2"), Custom String(
+			"Dummy3"), Custom String("Dummy4"), Custom String("Dummy5"), Custom String("Dummy6"), Custom String("Dummy7"), Custom String(
+			"Dummy8"), Custom String("Dummy9"), Custom String("Dummy10"), Custom String("Dummy11"), Custom String("Dummy12"),
+			Custom String("Dummy13"), Custom String("Dummy14"));
+	}
+}
+
+rule("Click Area Value Decoder")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Click_Area_Index = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area), 1);
+			Modify Global Variable(Click_Area_Index, Append To Array, Global.Debug_Dev);
+		End;
+		Global.Temp_Dev_Text_ID = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area_Size), 2);
+			For Global Variable(Temp_Index, 0, Global.Click_Area_Size[Global.Debug_Dev + 1], 1);
+				Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Global.Click_Area_Size[Global.Debug_Dev]);
+			End;
+		End;
+		Global.Click_Area_Size = Global.Temp_Dev_Text_ID;
+		Global.Temp_Dev_Text_ID = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area_Color), 2);
+			For Global Variable(Temp_Index, 0, Global.Click_Area_Color[Global.Debug_Dev + 1], 1);
+				Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Global.Click_Area_Color[Global.Debug_Dev]);
+			End;
+		End;
+		Global.Click_Area_Color = Global.Temp_Dev_Text_ID;
+		Global.Temp_Dev_Text_ID = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area_Hover_Color), 2);
+			For Global Variable(Temp_Index, 0, Global.Click_Area_Hover_Color[Global.Debug_Dev + 1], 1);
+				Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Global.Click_Area_Hover_Color[Global.Debug_Dev]);
+			End;
+		End;
+		Global.Click_Area_Hover_Color = Global.Temp_Dev_Text_ID;
+		Global.Temp_Dev_Text_ID = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area_Page), 2);
+			For Global Variable(Temp_Index, 0, Global.Click_Area_Page[Global.Debug_Dev + 1], 1);
+				Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Global.Click_Area_Page[Global.Debug_Dev]);
+			End;
+		End;
+		Global.Click_Area_Page = Global.Temp_Dev_Text_ID;
+		Global.Temp_Dev_Text_ID = Empty Array;
+		For Global Variable(Debug_Dev, 0, Count Of(Global.Click_Area_Text_Size), 2);
+			For Global Variable(Temp_Index, 0, Global.Click_Area_Text_Size[Global.Debug_Dev + 1], 1);
+				Modify Global Variable(Temp_Dev_Text_ID, Append To Array, Global.Click_Area_Text_Size[Global.Debug_Dev]);
+			End;
+		End;
+		Global.Click_Area_Text_Size = Global.Temp_Dev_Text_ID;
+	}
+}
+
+rule("Setup Click Areas")
+{
+	event
+	{
+		Subroutine;
+		Setup_Click_Areas;
+	}
+
+	actions
+	{
+		Abort If(Is Dummy Bot(Event Player));
+		Skip If(Event Player.Menu_Text_ID_Array == Empty Array, 2);
+		Call Subroutine(Destroy_Click_Areas);
+		Event Player.Menu_Text_ID_Array = Empty Array;
+		Event Player.Display_Hud_Index = Filtered Array(Global.Click_Area_Index,
+			Global.Click_Area_Page[Current Array Element] == Event Player.Page || (Char In String(
+			Global.Click_Area_Page[Current Array Element], 0) == Custom String("!")
+			&& Global.Click_Area_Page[Current Array Element] != Custom String("!{0}", Event Player.Page)));
+		Skip If(!(Event Player.Page == Custom String("Game/Crazy")), 1);
+		Start Rule(Crazy_Hud, Restart Rule);
+		Skip If(!(Event Player.Page == Custom String("Game/Setup")), 1);
+		Start Rule(Setup_Hud, Restart Rule);
+		For Player Variable(Event Player, Index, 0, Count Of(Event Player.Display_Hud_Index), 1);
+			Create In-World Text(Event Player, Global.Click_Area_Text[Evaluate Once(Event Player.Display_Hud_Index[Event Player.Index])],
+				Update Every Frame(Event Player.Camera_Pos + 100 * (X Component Of(Global.Click_Area[Evaluate Once(
+				Event Player.Display_Hud_Index[Event Player.Index])]) * -1 / 2 * Cross Product(Event Player.Facing_Pos, Direction From Angles(
+				Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (
+				Z Component Of(Global.Click_Area[Evaluate Once(Event Player.Display_Hud_Index[Event Player.Index])]) / 2 - 0.200)
+				* Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(
+				Event Player.Facing_Pos) - 90) + 3 * Event Player.Facing_Pos)), Global.Click_Area_Text_Size[Evaluate Once(
+				Event Player.Display_Hud_Index[Event Player.Index])], Do Not Clip, Visible To Position String and Color, Distance Between(
+				Global.Click_Area[Evaluate Once(Event Player.Display_Hud_Index[Event Player.Index])], Vector(Event Player.Mouse_X, 0,
+				Event Player.Mouse_Y)) <= Global.Click_Area_Size[Evaluate Once(Event Player.Display_Hud_Index[Event Player.Index])
+				] ? Global.Click_Area_Hover_Color[Evaluate Once(Event Player.Display_Hud_Index[Event Player.Index])
+				] : Global.Click_Area_Color[Evaluate Once(Event Player.Display_Hud_Index[Event Player.Index])], Default Visibility);
+			Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		End;
+	}
+}
+
+rule("Destroy Click Areas")
+{
+	event
+	{
+		Subroutine;
+		Destroy_Click_Areas;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, Text_ID_Index, Count Of(Event Player.Menu_Text_ID_Array) - 1, -1, -1);
+			Destroy In-World Text(Event Player.Menu_Text_ID_Array[Event Player.Text_ID_Index]);
+		End;
+		Event Player.Menu_Text_ID_Array = Empty Array;
+	}
+}
+
+rule("Disable_Bindings")
+{
+	event
+	{
+		Subroutine;
+		Disable_Bindings;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Disallow Button(Event Player, Button(Ultimate));
+		Set Melee Enabled(Event Player, False);
+		Set Jump Enabled(Event Player, False);
+		Set Reload Enabled(Event Player, False);
+	}
+}
+
+rule("Menu Click")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Enable_Menu == True;
+		Has Spawned(Event Player) == True;
+		(Is Button Held(Event Player, Button(Primary Fire)) || Is Button Held(Event Player, Button(Secondary Fire))) == True;
+	}
+
+	actions
+	{
+		Event Player.Clicked_Area = First Of(Sorted Array(Filtered Array(Global.Click_Area_ID, Distance Between(
+			Global.Click_Area[Current Array Index], Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y))
+			<= Global.Click_Area_Size[Current Array Index] && (Char In String(Global.Click_Area_Page[Current Array Index], 0)
+			== Custom String("!") ? Event Player.Page != String Slice(Global.Click_Area_Page[Current Array Index], 1, String Length(
+			Global.Click_Area_Page[Current Array Index]) - 1) : Event Player.Page == Global.Click_Area_Page[Current Array Index])),
+			Distance Between(Current Array Element, Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y))));
+		If(Is True For All(Global.Click_Area_ID, Event Player.Clicked_Area != Current Array Element));
+			Call Subroutine(Chess_Click);
+		Else;
+			Start Rule(Detect_Click, Restart Rule);
+			Wait(0.250, Ignore Condition);
+			Call Subroutine(Clear_Moves);
+			Event Player.Selected_Piece = Null;
+		End;
+	}
+}
+
+rule("Update Menu Page")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Enable_Menu == True;
+		Event Player.Temp_Page != Event Player.Page;
+	}
+
+	actions
+	{
+		Wait(0.016, Abort When False);
+		Start Rule(Setup_Click_Areas, Restart Rule);
+		If(!(Event Player.Clicked_Area == Custom String("Default Page") || Is True For Any(Array(Custom String("Game"), Custom String(
+			"Game/Crazy"), Custom String("Game/Setup"), Custom String("Promote"), Custom String("Promote/Giveaway"), Custom String(
+			"Rules 2"), Custom String("Pieces")), Event Player.Temp_Page == Current Array Element)));
+			Modify Player Variable(Event Player, Page_Path, Append To Array, Event Player.Temp_Page);
+		End;
+		Event Player.Temp_Page = Event Player.Page;
+		Abort If(Event Player.Spawn_Piece == Null);
+		Event Player.Spawn_Piece = Null;
+		Event Player.Spawn_META = Null;
+		Start Rule(Clear_Allowed, Restart Rule);
+	}
+}
+
+rule("Detect Clicked Area")
+{
+	event
+	{
+		Subroutine;
+		Detect_Click;
+	}
+
+	actions
+	{
+		If(Event Player.Clicked_Area == Custom String("Settings"));
+			Event Player.Page = Custom String("Settings");
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Default Page"));
+			If(Global.Is_Game_In_Progress && !Is True For Any(Array(Custom String("Pieces")), Event Player.Page == Current Array Element));
+				Event Player.Page = Event Player.Page_Path == Empty Array ? Custom String("Default") : Last Of(Event Player.Page_Path);
+				Modify Player Variable(Event Player, Page_Path, Remove From Array By Value, Last Of(Event Player.Page_Path));
+				Small Message(All Players(All Teams), Custom String("Game Aborted"));
+				Global.Match_Final_Result = Custom String("Aborted");
+				Global.Sub_DisplayBoard = True;
+			Else If(Event Player.Page == Custom String("Pieces"));
+				Event Player.Page = Global.Settings[4] ? Custom String("Game/Crazy") : Custom String("Game");
+				Event Player.Page_Path = Empty Array;
+			Else;
+				Event Player.Page = Event Player.Page_Path == Empty Array ? Custom String("Default") : Last Of(Event Player.Page_Path);
+				Modify Player Variable(Event Player, Page_Path, Remove From Array By Value, Last Of(Event Player.Page_Path));
+			End;
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Aim"));
+			Event Player.Mouse_Input = 0;
+			Event Player.Sensitivity = Global.Default_Sensitivity_Aim;
+			Set Aim Speed(Event Player, Event Player.Sensitivity);
+			Stop Facing(Event Player);
+			Chase Player Variable At Rate(Event Player, Mouse_X, Min(Max(Horizontal Facing Angle Of(Event Player) - First Of(
+				Event Player.Init_Direction), Global.Mouse_MinX), Global.Mouse_MaxX), 999, Destination and Rate);
+			Chase Player Variable At Rate(Event Player, Mouse_Y, Min(Max((Vertical Facing Angle Of(Event Player) - Last Of(
+				Event Player.Init_Direction)) * -1, Global.Mouse_MinY), Global.Mouse_MaxY), 99, Destination and Rate);
+			Small Message(All Players(All Teams), Custom String("Mouse Input Set To Mouse / Right Joystick"));
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Throttle"));
+			Event Player.Mouse_Input = 1;
+			Event Player.Sensitivity = Global.Default_Sensitivity_Throttle;
+			Start Facing(Event Player, Facing Direction Of(Event Player), 0, To World, None);
+			Chase Player Variable At Rate(Event Player, Mouse_X, Min(Max(Event Player.Mouse_X + X Component Of(Throttle Of(Event Player)),
+				Global.Mouse_MinX), Global.Mouse_MaxX), Event Player.Sensitivity, Destination and Rate);
+			Chase Player Variable At Rate(Event Player, Mouse_Y, Min(Max(Event Player.Mouse_Y + Z Component Of(Throttle Of(Event Player)),
+				Global.Mouse_MinY), Global.Mouse_MaxY), Event Player.Sensitivity, Destination and Rate);
+			Small Message(All Players(All Teams), Custom String("Mouse Input Set To WASD / Left Joystick"));
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("-Sensitivity"));
+			Event Player.Sensitivity -= 1;
+			Modify Player Variable(Event Player, Sensitivity, Max, 0);
+			Set Aim Speed(Event Player, Event Player.Sensitivity);
+			Small Message(Event Player, Custom String("Mouse Sensitivity Set To {0}{1}", Event Player.Sensitivity,
+				Event Player.Mouse_Input == 0 ? Custom String("%") : Custom String("")));
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("+Sensitivity"));
+			Event Player.Sensitivity += 1;
+			Modify Player Variable(Event Player, Sensitivity, Min, Event Player.Mouse_Input == 0 ? 100 : 20);
+			Set Aim Speed(Event Player, Event Player.Sensitivity);
+			Small Message(Event Player, Custom String("Mouse Sensitivity Set To {0}{1}", Event Player.Sensitivity,
+				Event Player.Mouse_Input == 0 ? Custom String("%") : Custom String("")));
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Edit: Board"));
+			Event Player.Page = Custom String("Edit: Board");
+			Abort;
+		Else If(String Contains(Event Player.Clicked_Area, Custom String("Board: ")));
+			Start Rule(Load_Board, Restart Rule);
+			Abort;
+		Else If(String Contains(Event Player.Clicked_Area, Custom String("Promote: Queen")));
+			Event Player.Temp_Value[1] = 5;
+			Abort;
+		Else If(String Contains(Event Player.Clicked_Area, Custom String("Promote: Knight")));
+			Event Player.Temp_Value[1] = 3;
+			Abort;
+		Else If(String Contains(Event Player.Clicked_Area, Custom String("Promote: Rook")));
+			Event Player.Temp_Value[1] = 2;
+			Abort;
+		Else If(String Contains(Event Player.Clicked_Area, Custom String("Promote: Bishop")));
+			Event Player.Temp_Value[1] = 4;
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Customise Board"));
+			Event Player.Spawn_Piece = Null;
+			Event Player.Spawn_META = Array(True, False);
+			Event Player.Page = Custom String("Customise Board");
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Custom Piece: Pawn"));
+			Event Player.Spawn_Piece = 1;
+			Small Message(Event Player, Custom String("Selected: Pawn"));
+			Start Rule(Get_Allowed_Spawns, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Custom Piece: Rook"));
+			Event Player.Spawn_Piece = 2;
+			Small Message(Event Player, Custom String("Selected: Rook"));
+			Start Rule(Get_Allowed_Spawns, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Custom Piece: Knight"));
+			Event Player.Spawn_Piece = 3;
+			Small Message(Event Player, Custom String("Selected: Knight"));
+			Start Rule(Get_Allowed_Spawns, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Custom Piece: Bishop"));
+			Event Player.Spawn_Piece = 4;
+			Small Message(Event Player, Custom String("Selected: Bishop"));
+			Start Rule(Get_Allowed_Spawns, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Custom Piece: Queen"));
+			Event Player.Spawn_Piece = 5;
+			Small Message(Event Player, Custom String("Selected: Queen"));
+			Start Rule(Get_Allowed_Spawns, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Custom Piece: King"));
+			Event Player.Spawn_Piece = 6;
+			Small Message(Event Player, Custom String("Selected: King"));
+			Start Rule(Get_Allowed_Spawns, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Custom META: White"));
+			Event Player.Spawn_META[0] = True;
+			Small Message(Event Player, Custom String("Selected: White"));
+			Start Rule(Get_Allowed_Spawns, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Custom META: Black"));
+			Event Player.Spawn_META[0] = False;
+			Small Message(Event Player, Custom String("Selected: Black"));
+			Start Rule(Get_Allowed_Spawns, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Custom: Save"));
+			Start Rule(Save_Board, Restart Rule);
+			Small Message(Event Player, Custom String("Custom Confi: Saved"));
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Custom: Clear"));
+			Global.Board_Current = Empty Array;
+			Global.Board_Current = Empty Array;
+			Small Message(Event Player, Custom String("Board Cleared"));
+			Global.Sub_DisplayBoard = True;
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Toggle: Local"));
+			Global.Settings[0] = Global.Settings[0] ? False : True;
+			Small Message(Event Player, Custom String("Toggled: 'Pass & Play' {0}", Global.Settings[0] ? String("On") : String("Off")));
+			If(Global.Player_White == Event Player && Global.Player_Black == Event Player && Global.Settings[0] != True);
+				Global.Player_Black = Null;
+			Else If((!Entity Exists(Global.Player_White) || !Entity Exists(Global.Player_Black)) && Global.Settings[0] == True);
+				Global.Player_White = Event Player;
+				Global.Player_Black = Event Player;
+			End;
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Rules"));
+			Event Player.Page = Custom String("Rules");
+			Abort;
+		Else If(String Contains(Event Player.Clicked_Area, Custom String("Rules: ")));
+			Start Rule(Change_Rule, Restart Rule);
+			Abort;
+		Else If(String Contains(Event Player.Clicked_Area, Custom String("Crazy: ")));
+			Start Rule(Select_Crazy_Piece, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Swap Team"));
+			If(Global.Settings[0]);
+				Small Message(Event Player, Custom String("Can't Swap During Local Play"));
+			Else;
+				Global.Temp_White = Global.Player_Black;
+				Global.Player_Black = Global.Player_White;
+				Global.Player_White = Global.Temp_White;
+				Small Message(Global.Player_White, Custom String("You Are Now: White"));
+				Small Message(Global.Player_Black, Custom String("You Are Now: Black"));
+			End;
+			Abort;
+		Else If(String Contains(Event Player.Clicked_Area, Custom String("Promote: King")));
+			Event Player.Temp_Value[1] = 6;
+			Abort;
+		Else If(String Contains(Event Player.Clicked_Area, Custom String("Start")));
+			Global.Is_Game_In_Progress = True;
+			All Players(All Teams).Page = Global.Settings[7] ? Custom String("Game/Setup") : (Global.Settings[4] ? Custom String("Game/Crazy")
+				: Custom String("Game"));
+			Abort;
+		Else If(String Contains(Event Player.Clicked_Area, Custom String("Setup: ")));
+			Start Rule(Setup_Select, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Ref: Piece"));
+			Event Player.Page = Custom String("Pieces");
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Surrender"));
+			Event Player.Current_Team = Global.Player_White == Event Player && (
+				Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? Custom String("White") : Custom String(
+				"Black");
+			Big Message(All Players(All Teams), Custom String("{0} Wins", Event Player.Current_Team == Custom String("White") ? Custom String(
+				"Black") : Custom String("White")));
+			Small Message(All Players(All Teams), Custom String("{0} Surrender", Event Player.Current_Team));
+			Wait(1.500, Ignore Condition);
+			Skip If(Global.Settings[0], 5);
+			Global.Temp_White = Global.Player_Black;
+			Global.Player_Black = Global.Player_White;
+			Global.Player_White = Global.Temp_White;
+			Small Message(Global.Player_White, Custom String("You Are Now: White"));
+			Small Message(Global.Player_Black, Custom String("You Are Now: Black"));
+			Start Rule(Load_Board, Restart Rule);
+			Abort;
+		Else If(Event Player.Clicked_Area == Custom String("Vote Draw"));
+			Abort If(Event Player.Voted_Draw == 2);
+			Event Player.Voted_Draw = 2;
+			If(Global.Player_White.Voted_Draw > 0 && Global.Player_Black.Voted_Draw > 0);
+				Big Message(All Players(All Teams), Custom String("Draw", Event Player.Current_Team == Custom String("White") ? Custom String(
+					"Black") : Custom String("White")));
+				Small Message(All Players(All Teams), Custom String("Agreed Vote", Event Player.Current_Team));
+				Wait(1.500, Ignore Condition);
+				Skip If(Global.Settings[0], 5);
+				Global.Temp_White = Global.Player_Black;
+				Global.Player_Black = Global.Player_White;
+				Global.Player_White = Global.Temp_White;
+				Small Message(Global.Player_White, Custom String("You Are Now: White"));
+				Small Message(Global.Player_Black, Custom String("You Are Now: Black"));
+				Start Rule(Load_Board, Restart Rule);
+			Else;
+				Big Message(All Players(All Teams), Custom String("Vote For Draw Started"));
+			End;
+			Abort;
+	}
+}
+
+rule("Reset Mouse Pos")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Set Facing(Event Player, Direction From Angles(90, 0), To World);
+		Event Player.Mouse_X = 0;
+		Event Player.Mouse_Y = 0;
+	}
+}
+
+disabled rule("-------------------------------------------- In-Game Menu ----------------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("-------------------------------------------- Chess ----------------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Decompile Piece Confi")
+{
+	event
+	{
+		Subroutine;
+		Decompile_Piece_Confi;
+	}
+
+	actions
+	{
+		If(Is True For Any(Array(0, 1, 2), Current Array Element == Global.Load_Confi));
+			Global.Load_Confi = 0;
+		End;
+		Global.Piece_META = Empty Array;
+		Global.Temp_Confi = Global.Piece_Confi[Global.Load_Confi];
+		For Global Variable(Board_Index, 0, Count Of(Global.Board_Current), 2);
+			For Global Variable(Temp_Index, 0, Global.Temp_Confi[Global.Board_Index + 1], 1);
+				Modify Global Variable(Piece_META, Append To Array, Array(Global.Temp_Confi[Global.Board_Index]));
+			End;
+		End;
+	}
+}
+
+rule("Re-Enter Page After Game")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.Is_Game_In_Progress != True;
+		Event Player.Page == Custom String("Game");
+	}
+
+	actions
+	{
+		Event Player.Page = Last Of(Event Player.Page_Path);
+		Modify Player Variable(Event Player, Page_Path, Remove From Array By Value, Last Of(Event Player.Page_Path));
+	}
+}
+
+rule("Global")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.White_3_Ranks = Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23);
+		Global.Black_3_Ranks = Array(40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
+		Global.Setup_Chess_Max_Mat = Workshop Setting Integer(Custom String("Setup Chess (Variant)"), Custom String("Alotted Mat Allowed"),
+			39, 0, 207, 0);
+		Global.Board_Confi = Array(Array(2, 3, 4, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, Null, Null, Null, Null, Null, Null, Null, Null,
+			Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null,
+			Null, Null, Null, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 6, 5, 4, 3, 2), Null, Null, Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, Null, 1, 1, Null, Null, 1, 1, Null, Null, Null, Null, Null, Null, Null,
+			Null, Null, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 6, 5, 4, 3, 2));
+		Global.Piece_Confi = Array(Array(Array(True, False), 16, Array(Null), 32, Array(False, False), 16), Null, Null, Array(Array(True,
+			False), 16, Array(True, True), 16, Array(Null), 1, Array(True, True), 2, Array(Null), 2, Array(True, True), 2, Array(Null), 1,
+			Array(False, False), 16));
+		Global.Settings_Confi = Array(Array(Custom String("{Ignore}"), True, True, Custom String("{Ignore}"), Custom String("{Ignore}")),
+			Array(Custom String("{Ignore}"), True, True, Custom String("{Ignore}"), Custom String("{Ignore}")), Array(Custom String(
+			"{Ignore}"), True, True, Custom String("{Ignore}"), Custom String("{Ignore}")), Array(Custom String("{Ignore}"), False, True,
+			Custom String("{Ignore}"), Custom String("{Ignore}")));
+		Create In-World Text(Filtered Array(Local Player, Array Contains(Global.Tile_Click_Pos, Local Player.Tile_Click)
+			&& Local Player.Selected_Piece != Null), Custom String("◆"), Update Every Frame(Local Player.Camera_Pos + 100 * (
+			X Component Of(Local Player.Selected_Piece[2]) * -1 / 2 * Cross Product(Local Player.Facing_Pos, Direction From Angles(
+			Horizontal Angle From Direction(Local Player.Facing_Pos), Vertical Angle From Direction(Local Player.Facing_Pos) - 90)) + (
+			Z Component Of(Local Player.Selected_Piece[2]) / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(
+			Local Player.Facing_Pos), Vertical Angle From Direction(Local Player.Facing_Pos) - 90) + 3 * Local Player.Facing_Pos)), 2,
+			Do Not Clip, Visible To Position and String, Custom Color(110, 180, 50, 100), Default Visibility);
+		Global.Settings = Array(False, True, True);
+		Wait Until(Global.Is_Ready, 99999);
+		Call Subroutine(Load_Board);
+		Create In-World Text(Filtered Array(All Players(All Teams), Entity Exists(Global.Player_Black)), Custom String(
+			"Black: {0}\nMaterial: {1}\n{2}", Global.Player_Black, Global.Black_Mat, Custom String("{0}",
+			Global.Settings[6] ? Custom String("Checked {0} Times", Global.Checks_Black) : Custom String(""))), Update Every Frame(Vector(
+			Global.Starting_X, Global.Camera_Height, Global.Starting_Y) + 100 * (-5.500 * -1 / 2 * Cross Product(Down,
+			Direction From Angles(Horizontal Angle From Direction(Down), Vertical Angle From Direction(Down) - 90)) + (3.500 / 2 - 0.200)
+			* Direction From Angles(Horizontal Angle From Direction(Down), Vertical Angle From Direction(Down) - 90) + 3 * Down)), 2,
+			Do Not Clip, Visible To Position and String, Color(Black), Visible Always);
+		Create In-World Text(Filtered Array(All Players(All Teams), Entity Exists(Global.Player_White)), Custom String(
+			"White: {0}\nMaterial: {1}\n{2}", Global.Player_White, Global.White_Mat, Custom String("{0}",
+			Global.Settings[6] ? Custom String("Checked {0} Times", Global.Checks_White) : Custom String(""))), Update Every Frame(Vector(
+			Global.Starting_X, Global.Camera_Height, Global.Starting_Y) + 100 * (-5.500 * -1 / 2 * Cross Product(Down,
+			Direction From Angles(Horizontal Angle From Direction(Down), Vertical Angle From Direction(Down) - 90)) + (-2.500 / 2 - 0.200)
+			* Direction From Angles(Horizontal Angle From Direction(Down), Vertical Angle From Direction(Down) - 90) + 3 * Down)), 2,
+			Do Not Clip, Visible To Position and String, Color(White), Visible Always);
+		Create In-World Text(All Players(All Teams), Custom String("{0}'s\nTurn", Global.Current_Turn), Update Every Frame(Vector(
+			Global.Starting_X, Global.Camera_Height, Global.Starting_Y) + 100 * (-5.500 * -1 / 2 * Cross Product(Down,
+			Direction From Angles(Horizontal Angle From Direction(Down), Vertical Angle From Direction(Down) - 90)) + (0.500 / 2 - 0.200)
+			* Direction From Angles(Horizontal Angle From Direction(Down), Vertical Angle From Direction(Down) - 90) + 3 * Down)), 2,
+			Do Not Clip, Visible To Position and String, Color(Orange), Visible Always);
+	}
+}
+
+rule("Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		If(!Entity Exists(Global.Player_White));
+			Global.Player_White = Event Player;
+			Skip If(!Global.Settings[0], 1);
+			Global.Player_Black = Event Player;
+		Else;
+			Global.Player_Black = Event Player;
+		End;
+		Global.Sub_DisplayBoard = True;
+		Event Player.Can_Click = True;
+	}
+}
+
+rule("Load Board")
+{
+	event
+	{
+		Subroutine;
+		Load_Board;
+	}
+
+	actions
+	{
+		Global.Match_Final_Result = Null;
+		Global.Is_Game_In_Progress = False;
+		Skip If(!Global.Settings[7], 2);
+		Call Subroutine(Empty_Board);
+		Abort;
+		If(Array Contains(All Players(All Teams), Event Player));
+			Global.Load_Confi = Array(0, 1, 2, 3)[Index Of Array Value(Array(Custom String("Board: Normal"), Custom String("Board: Random"),
+				Custom String("Board: 960"), Custom String("Board: Hoard")), Event Player.Clicked_Area)];
+			Global.Reset_Board_Type = Global.Load_Confi;
+		Else If(Count Of(Global.Reset_Board_Type) <= 1);
+			Global.Load_Confi = Global.Reset_Board_Type;
+		Else;
+			Global.Load_Confi = -1;
+			Global.Board_Current = First Of(Global.Reset_Board_Type);
+			Global.Piece_META = Last Of(Global.Reset_Board_Type);
+		End;
+		Skip If(Global.Load_Confi == -1, 27);
+		If(Is True For Any(Array(0, 3), Current Array Element == Global.Load_Confi));
+			Global.Board_Current = Global.Board_Confi[Global.Load_Confi];
+		Else;
+			Global.Board_Current = Empty Array;
+			If(Global.Load_Confi == 1);
+				For Global Variable(Board_Index, 0, 16, 1);
+					Modify Global Variable(Board_Current, Append To Array, Random Integer(1, 5));
+				End;
+				For Global Variable(Board_Index, 0, 32, 1);
+					Modify Global Variable(Board_Current, Append To Array, 0);
+				End;
+				For Global Variable(Board_Index, 0, 16, 1);
+					Modify Global Variable(Board_Current, Append To Array, Random Integer(1, 5));
+				End;
+				Global.Board_Current[3] = 6;
+				Global.Board_Current[59] = 6;
+			Else If(Global.Load_Confi == 2);
+				Global.Randomise_Board = Randomized Array(Array(2, 3, 4, 6, 5, 4, 3, 2));
+				Global.Board_Current = Append To Array(Append To Array(Global.Randomise_Board, Array(1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1)), Global.Randomise_Board);
+			End;
+		End;
+		Global.Temp_Settings_Confi = Global.Settings_Confi[Global.Load_Confi];
+		For Global Variable(Board_Index, 0, Count Of(Global.Temp_Settings_Confi), 1);
+			Skip If(Global.Temp_Settings_Confi[Global.Board_Index] == Custom String("{Ignore}"), 1);
+			Global.Settings[Global.Board_Index] = Global.Temp_Settings_Confi[Global.Board_Index];
+		End;
+		Call Subroutine(Decompile_Piece_Confi);
+		Global.Sub_DisplayBoard = True;
+		Global.Current_Turn = Custom String("White");
+		Global.White_Bank = Empty Array;
+		Global.Black_Bank = Empty Array;
+		Global.Checks_White = 0;
+		Global.Checks_Black = 0;
+		Global.Hill_Tiles = Global.Settings[10] ? Array(27, 28, 35, 36) : Empty Array;
+		Global.Setup_Phase = False;
+	}
+}
+
+rule("Display Board")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global.Sub_DisplayBoard == True;
+	}
+
+	actions
+	{
+		Global.White_Bank = Filtered Array(Global.White_Bank, Current Array Element > 0);
+		Global.Black_Bank = Filtered Array(Global.Black_Bank, Current Array Element > 0);
+		Global.White_Pieces = Count Of(Filtered Array(Global.Board_Current,
+			Global.Piece_META[Current Array Index][0] == True && Current Array Element > 0));
+		Global.Black_Pieces = Count Of(Filtered Array(Global.Board_Current,
+			Global.Piece_META[Current Array Index][0] == False && Current Array Element > 0));
+		Call Subroutine(Get_Vaild_Moves_White);
+		Call Subroutine(Get_Vaild_Moves_Black);
+		Skip If(Global.Settings[9], 8);
+		Global.White_In_Check = Is True For Any(Global.Vaild_Moves_Black, Array Contains(Current Array Element,
+			Global.Tile_Click_Pos[Global.White_King_Index])) == True;
+		Global.Black_In_Check = Is True For Any(Global.Vaild_Moves_White, Array Contains(Current Array Element,
+			Global.Tile_Click_Pos[Global.Black_King_Index])) == True;
+		Skip If(Global.White_In_Check != True, 1);
+		Global.Checks_White += 1;
+		Skip If(Global.Black_In_Check != True, 1);
+		Global.Checks_Black += 1;
+		Call Subroutine(King_Moves_White);
+		Call Subroutine(King_Moves_Black);
+		Call Subroutine(Calc_Mat);
+		Skip If(!Global.Is_Game_In_Progress || Global.Match_Final_Result != Null, 1);
+		Call Subroutine(Get_Match_Final);
+		Destroy All Icons;
+		For Global Variable(Board_Index, 0, Count Of(Global.Board_Current), 1);
+			If(Array Contains(Global.Hill_Tiles, Global.Board_Index) && (
+				Global.Board_Current[Global.Board_Index] == Null || Global.Board_Current[Global.Board_Index] == -2));
+				Global.Board_Current[Global.Board_Index] = -2;
+				Global.Piece_META[Global.Board_Index] = Array(Null);
+			Else If(Global.Board_Current[Global.Board_Index] == -2);
+				Global.Board_Current[Global.Board_Index] = Null;
+				Global.Piece_META[Global.Board_Index] = Null;
+			End;
+			Global.Temp_META = Global.Piece_META[Global.Board_Index];
+			If(Global.Board_Current[Global.Board_Index] == -1);
+				If(Last Of(Global.Temp_META) > 0);
+					Global.Temp_META[2] -= 1;
+					Global.Piece_META[Global.Board_Index] = Global.Temp_META;
+				Else;
+					Global.Piece_META[Global.Board_Index] = Null;
+					Global.Board_Current[Global.Board_Index] = Null;
+				End;
+			End;
+			Skip If(Is True For Any(Array(-2, 1, 2, 3, 4, 5, 6, 7), Global.Board_Current[Global.Board_Index] == Current Array Element), 1);
+			Continue;
+			If(Global.Settings[3] == True && Global.Settings[0] != True);
+				Global.Temp_Visable = Empty Array;
+				Skip If(Global.Temp_META[0] == True, 1);
+				Skip If(!Array Contains(Global.Defended_White, Global.Tile_Click_Pos[Global.Board_Index]), 1);
+				Modify Global Variable(Temp_Visable, Append To Array, Global.Player_White);
+				Skip If(Global.Temp_META[0] == False, 1);
+				Skip If(!Array Contains(Global.Defended_Black, Global.Tile_Click_Pos[Global.Board_Index]), 1);
+				Modify Global Variable(Temp_Visable, Append To Array, Global.Player_Black);
+			Else;
+				Global.Temp_Visable = All Players(All Teams);
+			End;
+			Global.Temp_Tile = Vector(X Component Of(Global.Grid_Array[Global.Board_Index]), 0, Z Component Of(
+				Global.Grid_Array[Global.Board_Index]) + (Global.Starting_Y - Z Component Of(Global.Grid_Array[Global.Board_Index])) * Array(
+				-0.100, -0.140, -0.240, -0.700, 0.700, 0.240, 0.140, 0.100)[Index Of Array Value(Array(-14, -10, -6, -2, 2, 6, 10, 14),
+				Z Component Of(Global.Grid_Array[Global.Board_Index]))]);
+			If(Global.Board_Current[Global.Board_Index] == 1);
+				Create Icon(Evaluate Once(Global.Temp_Visable), Global.Temp_Tile, Arrow: Up, Visible To,
+					Global.Piece_META[Global.Board_Index] == True ? Color(White) : Color(Black), False);
+			Else If(Global.Board_Current[Global.Board_Index] == 2);
+				Create Icon(Evaluate Once(Global.Temp_Visable), Global.Temp_Tile, Moon, Visible To,
+					Global.Piece_META[Global.Board_Index] == True ? Color(White) : Color(Black), False);
+			Else If(Global.Board_Current[Global.Board_Index] == 3);
+				Create Icon(Evaluate Once(Global.Temp_Visable), Global.Temp_Tile, Bolt, Visible To,
+					Global.Piece_META[Global.Board_Index] == True ? Color(White) : Color(Black), False);
+			Else If(Global.Board_Current[Global.Board_Index] == 4);
+				Create Icon(Evaluate Once(Global.Temp_Visable), Global.Temp_Tile, Spade, Visible To,
+					Global.Piece_META[Global.Board_Index] == True ? Color(White) : Color(Black), False);
+			Else If(Global.Board_Current[Global.Board_Index] == 5);
+				Create Icon(Evaluate Once(Global.Temp_Visable), Global.Temp_Tile, Club, Visible To,
+					Global.Piece_META[Global.Board_Index] == True ? Color(White) : Color(Black), False);
+			Else If(Global.Board_Current[Global.Board_Index] == 6);
+				If(Global.Piece_META[Global.Board_Index] == True ? Global.White_In_Check : Global.Black_In_Check);
+					Create Icon(Evaluate Once(Global.Temp_Visable), Global.Temp_Tile, Circle, Visible To, Color(Red), False);
+				End;
+				Create Icon(Evaluate Once(Global.Temp_Visable), Global.Temp_Tile, Diamond, Visible To,
+					Global.Piece_META[Global.Board_Index] == True ? Color(White) : Color(Black), False);
+			Else If(Global.Board_Current[Global.Board_Index] == -2);
+				Create Icon(All Players(All Teams), Global.Temp_Tile, Flag, Visible To, Custom Color(0, 255, 0, 40), False);
+			Else If(Global.Board_Current[Global.Board_Index] == 7);
+				Create Icon(Evaluate Once(Global.Temp_Visable), Global.Temp_Tile, Dizzy, Visible To, Color(Yellow), False);
+			End;
+		End;
+		Global.Sub_DisplayBoard = False;
+		If(Global.Match_Final_Result != Null);
+			Wait(1.500, Ignore Condition);
+			Skip If(Global.Settings[0], 5);
+			Global.Temp_White = Global.Player_Black;
+			Global.Player_Black = Global.Player_White;
+			Global.Player_White = Global.Temp_White;
+			Small Message(Global.Player_White, Custom String("You Are Now: White"));
+			Small Message(Global.Player_Black, Custom String("You Are Now: Black"));
+			Start Rule(Load_Board, Restart Rule);
+		End;
+	}
+}
+
+rule("Mouse Click")
+{
+	event
+	{
+		Subroutine;
+		Chess_Click;
+	}
+
+	actions
+	{
+		Abort If(Event Player.Can_Click != True);
+		If(Event Player.Page == Custom String("Customise Board"));
+			If(Is Button Held(Event Player, Button(Primary Fire)));
+				Abort If(!Array Contains(Global.Tile_Click_Pos, Event Player.Tile_Click));
+				Abort If(Array Contains(Event Player.Allowed_Spawns, Event Player.Tile_Click) != Event Player.Allowed_Type);
+				Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] = Event Player.Spawn_Piece;
+				Global.Piece_META[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] = Event Player.Spawn_META;
+			Else;
+				Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] = Null;
+				Global.Piece_META[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] = Empty Array;
+			End;
+			Global.Sub_DisplayBoard = True;
+		Else If(Event Player.Spawn_Piece > 0);
+			Start Rule(Spawn_Piece, Restart Rule);
+		Else;
+			If(Is Button Held(Event Player, Button(Primary Fire)));
+				If(Event Player.Selected_Piece != Null && Array Contains(Event Player.Vaild_Moves, Event Player.Tile_Click));
+					Abort If(Global.Setup_Phase);
+					Start Rule(Move_Piece, Restart Rule);
+				Else If(Is True For Any(Array(1, 2, 3, 4, 5, 6), Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos,
+						Event Player.Tile_Click)] == Current Array Element) && (Global.Piece_META[Index Of Array Value(Global.Tile_Click_Pos,
+						Event Player.Tile_Click)][0] == (Global.Player_White == Event Player && (
+						Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False)
+						|| Global.Settings[0] == True));
+					If(Global.Current_Turn == (First Of(Global.Piece_META[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)])
+						? Custom String("White") : Custom String("Black")));
+						Abort If(Global.Setup_Phase);
+						Call Subroutine(Clear_Moves);
+						Event Player.Selected_Piece = Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click);
+						Event Player.Selected_Piece = Array(Event Player.Selected_Piece, Global.Grid_Array[Event Player.Selected_Piece],
+							Global.Tile_Click_Pos[Event Player.Selected_Piece], Global.Board_Current[Event Player.Selected_Piece],
+							Global.Piece_META[Event Player.Selected_Piece]);
+						Modify Player Variable(Event Player, Selected_Piece, Append To Array, First Of(Event Player.Selected_Piece[4]) == True ? 1 : -1);
+						Modify Player Variable(Event Player, Selected_Piece, Append To Array, First Of(Event Player.Selected_Piece[4]));
+						Event Player.Vaild_Moves = (Event Player.Selected_Piece[6] == True ? Global.Vaild_Moves_White : Global.Vaild_Moves_Black)[First Of(
+							Event Player.Selected_Piece)];
+						Call Subroutine(Display_Moves);
+						Wait Until(!Is Button Held(Event Player, Button(Primary Fire)) || Index Of Array Value(Global.Tile_Click_Pos,
+							Event Player.Tile_Click) != First Of(Event Player.Selected_Piece), 0.250);
+						Skip If(!Is Button Held(Event Player, Button(Primary Fire)), 2);
+						Wait Until(!Is Button Held(Event Player, Button(Primary Fire)) || Index Of Array Value(Global.Tile_Click_Pos,
+							Event Player.Tile_Click) != First Of(Event Player.Selected_Piece), 9999);
+						Start Rule(Drag_Piece, Restart Rule);
+					Else;
+						Abort If(Global.Setup_Phase);
+						Small Message(All Players(All Teams), Custom String("Wait for your turn"));
+					End;
+				Else;
+					Call Subroutine(Clear_Moves);
+					Event Player.Selected_Piece = Null;
+				End;
+			Else;
+				Call Subroutine(Clear_Moves);
+				Event Player.Selected_Piece = Null;
+			End;
+		End;
+	}
+}
+
+rule("Get Vaild Moves")
+{
+	event
+	{
+		Subroutine;
+		Get_Vaild_Moves;
+	}
+
+	actions
+	{
+		If(Array Contains(All Players(All Teams), Event Player));
+			Event Player.Vaild_Moves = Empty Array;
+			If(Event Player.Selected_Piece[3] == 1);
+				Call Subroutine(Pawn_Moves);
+			Else If(Event Player.Selected_Piece[3] == 3);
+				Call Subroutine(Knight_Moves);
+			Else If(Event Player.Selected_Piece[3] == 6);
+				Call Subroutine(King_Moves);
+			Else If(Event Player.Selected_Piece[3] == 2);
+				Call Subroutine(Horizontal_Moves);
+			Else If(Event Player.Selected_Piece[3] == 4);
+				Call Subroutine(Diagonal_Moves);
+			Else If(Event Player.Selected_Piece[3] == 5);
+				Call Subroutine(Horizontal_Moves);
+				Call Subroutine(Diagonal_Moves);
+			End;
+			Event Player.Vaild_Moves = Remove From Array(Event Player.Vaild_Moves, Null);
+		Else;
+			Global.Vaild_Moves = Empty Array;
+			If(Global.Selected_Piece[3] == 1);
+				Call Subroutine(Pawn_Moves);
+			Else If(Global.Selected_Piece[3] == 3);
+				Call Subroutine(Knight_Moves);
+			Else If(Global.Selected_Piece[3] == 6);
+				Call Subroutine(King_Moves);
+			Else If(Global.Selected_Piece[3] == 2);
+				Call Subroutine(Horizontal_Moves);
+			Else If(Global.Selected_Piece[3] == 4);
+				Call Subroutine(Diagonal_Moves);
+			Else If(Global.Selected_Piece[3] == 5);
+				Call Subroutine(Horizontal_Moves);
+				Call Subroutine(Diagonal_Moves);
+			End;
+			Global.Vaild_Moves = Remove From Array(Global.Vaild_Moves, Null);
+		End;
+	}
+}
+
+rule("Display Moves")
+{
+	event
+	{
+		Subroutine;
+		Display_Moves;
+	}
+
+	actions
+	{
+		Abort If(Sorted Array(Event Player.Drawn_Moves, Current Array Element) == Sorted Array(Event Player.Vaild_Moves,
+			Current Array Element) && Event Player.Moves_ID != Empty Array);
+		Call Subroutine(Clear_Moves);
+		Wait Until(False, 0.001);
+		For Player Variable(Event Player, Index, 0, Count Of(Event Player.Vaild_Moves), 1);
+			Create In-World Text(Event Player, Event Player.Tile_Click == Event Player.Vaild_Moves[Evaluate Once(Event Player.Index)
+				] ? Custom String("◆") : Custom String("●"), Update Every Frame(Event Player.Camera_Pos + 100 * (X Component Of(
+				Event Player.Vaild_Moves[Evaluate Once(Event Player.Index)]) * -1 / 2 * Cross Product(Event Player.Facing_Pos,
+				Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(
+				Event Player.Facing_Pos) - 90)) + (Z Component Of(Event Player.Vaild_Moves[Evaluate Once(Event Player.Index)]) / 2 - 0.200)
+				* Direction From Angles(Horizontal Angle From Direction(Local Player.Facing_Pos), Vertical Angle From Direction(
+				Local Player.Facing_Pos) - 90) + 3 * Local Player.Facing_Pos)), 3, Do Not Clip, Visible To Position and String, Custom Color(0,
+				255, 0, 20), Default Visibility);
+			Modify Player Variable(Event Player, Moves_ID, Append To Array, Last Text ID);
+		End;
+		Event Player.Drawn_Moves = Event Player.Vaild_Moves;
+	}
+}
+
+rule("Clear Moves")
+{
+	event
+	{
+		Subroutine;
+		Clear_Moves;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, Index, 0, Count Of(Event Player.Moves_ID), 1);
+			Destroy In-World Text(Event Player.Moves_ID[Event Player.Index]);
+		End;
+		Event Player.Moves_ID = Empty Array;
+	}
+}
+
+rule("Move Piece")
+{
+	event
+	{
+		Subroutine;
+		Move_Piece;
+	}
+
+	actions
+	{
+		Call Subroutine(Clear_Moves);
+		Event Player.Temp_Value = Empty Array;
+		If(Event Player.Selected_Piece[3] == 1 && Z Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)])
+			+ 4 * Event Player.Selected_Piece[5] == 14 * Event Player.Selected_Piece[5]);
+			Call Subroutine(Promote_Pawn);
+		Else;
+			If(Event Player.Selected_Piece[3] == 1);
+				If(Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click) == First Of(Event Player.Selected_Piece)
+					+ 16 * Event Player.Selected_Piece[5]);
+					Global.Piece_META[First Of(Event Player.Selected_Piece) + 8 * Event Player.Selected_Piece[5]] = Array(
+						Event Player.Selected_Piece[6], Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click), 1);
+					Global.Board_Current[First Of(Event Player.Selected_Piece) + 8 * Event Player.Selected_Piece[5]] = -1;
+				Else If(Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] == -1);
+					Call Subroutine(Piece_Capture);
+					Event Player.Temp_META = Global.Piece_META[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)];
+					Global.Piece_META[Event Player.Temp_META[1]] = Null;
+					Global.Board_Current[Event Player.Temp_META[1]] = Null;
+				End;
+			End;
+			If(Event Player.Selected_Piece[3] == 6 && First Of(Event Player.Selected_Piece) - Index Of Array Value(Global.Tile_Click_Pos,
+				Event Player.Tile_Click) == -2);
+				Event Player.Temp_META = Global.Piece_META[First Of(Event Player.Selected_Piece) + 4];
+				Event Player.Temp_META[1] = True;
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 4] = Null;
+				Global.Board_Current[First Of(Event Player.Selected_Piece) + 4] = Null;
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 1] = Event Player.Temp_META;
+				Global.Board_Current[First Of(Event Player.Selected_Piece) + 1] = 2;
+			Else If(Event Player.Selected_Piece[3] == 6 && First Of(Event Player.Selected_Piece) - Index Of Array Value(Global.Tile_Click_Pos,
+					Event Player.Tile_Click) == 2);
+				Event Player.Temp_META = Global.Piece_META[First Of(Event Player.Selected_Piece) - 3];
+				Event Player.Temp_META[1] = True;
+				Global.Piece_META[First Of(Event Player.Selected_Piece) - 3] = Null;
+				Global.Board_Current[First Of(Event Player.Selected_Piece) - 3] = Null;
+				Global.Piece_META[First Of(Event Player.Selected_Piece) - 1] = Event Player.Temp_META;
+				Global.Board_Current[First Of(Event Player.Selected_Piece) - 1] = 2;
+			End;
+			Event Player.Temp_META = Event Player.Selected_Piece[4];
+			Event Player.Temp_META[1] = True;
+			If(Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] != Null);
+				Call Subroutine(Piece_Capture);
+			End;
+			Global.Piece_META[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] = Event Player.Temp_META;
+			Global.Piece_META[First Of(Event Player.Selected_Piece)] = Null;
+			Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] = Global.Board_Current[First Of(
+				Event Player.Selected_Piece)];
+			Global.Board_Current[First Of(Event Player.Selected_Piece)] = Null;
+			Event Player.Selected_Piece = Null;
+			Call Subroutine(Cycle_Turn);
+		End;
+	}
+}
+
+rule("Moves: Pawn")
+{
+	event
+	{
+		Subroutine;
+		Pawn_Moves;
+	}
+
+	actions
+	{
+		If(Array Contains(All Players(All Teams), Event Player));
+			Abort If(Z Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == 14 * Event Player.Selected_Piece[5]);
+			Skip If(Global.Board_Current[First Of(Event Player.Selected_Piece) + 8 * Event Player.Selected_Piece[5]] > 0, 3);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 8 * Event Player.Selected_Piece[5]]);
+			Skip If(Event Player.Selected_Piece[4][1] == True || Global.Board_Current[First Of(Event Player.Selected_Piece)
+				+ 16 * Event Player.Selected_Piece[5]] > 0, 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 16 * Event Player.Selected_Piece[5]]);
+			Skip If(Global.Board_Current[First Of(Event Player.Selected_Piece) + 7 * Event Player.Selected_Piece[5]] <= Null || First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 7 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6], 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 7 * Event Player.Selected_Piece[5]]);
+			Skip If(Global.Board_Current[First Of(Event Player.Selected_Piece) + 9 * Event Player.Selected_Piece[5]] <= Null || First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 9 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6], 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 9 * Event Player.Selected_Piece[5]]);
+		Else;
+			Abort If(Z Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 14 * Global.Selected_Piece[5]);
+			Skip If(Global.Board_Current[First Of(Global.Selected_Piece) + 8 * Global.Selected_Piece[5]] > 0, 3);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece)
+				+ 8 * Global.Selected_Piece[5]]);
+			Skip If(Global.Selected_Piece[4][1] == True || Global.Board_Current[First Of(Global.Selected_Piece)
+				+ 16 * Global.Selected_Piece[5]] > 0, 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece)
+				+ 16 * Global.Selected_Piece[5]]);
+			Skip If(Global.Board_Current[First Of(Global.Selected_Piece) + 7 * Global.Selected_Piece[5]] <= Null || First Of(
+				Global.Piece_META[First Of(Global.Selected_Piece) + 7 * Global.Selected_Piece[5]]) == Global.Selected_Piece[6], 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece)
+				+ 7 * Global.Selected_Piece[5]]);
+			Skip If(Global.Board_Current[First Of(Global.Selected_Piece) + 9 * Global.Selected_Piece[5]] <= Null || First Of(
+				Global.Piece_META[First Of(Global.Selected_Piece) + 9 * Global.Selected_Piece[5]]) == Global.Selected_Piece[6], 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece)
+				+ 9 * Global.Selected_Piece[5]]);
+		End;
+	}
+}
+
+rule("Moves: King")
+{
+	event
+	{
+		Subroutine;
+		King_Moves;
+	}
+
+	actions
+	{
+		If(Array Contains(All Players(All Teams), Event Player));
+			Skip If(X Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == -14, 6);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + -9 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + -9 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + -9 < 0), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ -9 * Event Player.Selected_Piece[5]]);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + -1 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + -1 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + -1 < 0), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ -1 * Event Player.Selected_Piece[5]]);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + 7 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 7 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + 7 > Count Of(Global.Grid_Array)), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 7 * Event Player.Selected_Piece[5]]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == 14, 6);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + 9 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 9 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + 9 > Count Of(Global.Grid_Array)), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 9 * Event Player.Selected_Piece[5]]);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + 1 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 1 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + 1 > Count Of(Global.Grid_Array)), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 1 * Event Player.Selected_Piece[5]]);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + -7 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + -7 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + -7 < 0), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ -7 * Event Player.Selected_Piece[5]]);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + -8 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + -8 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + -8 < 0), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ -8 * Event Player.Selected_Piece[5]]);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + 8 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 8 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + 8 > Count Of(Global.Grid_Array)), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 8 * Event Player.Selected_Piece[5]]);
+		Else;
+			Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == -14, 6);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + -9] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + -9]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + -9 < 0), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -9]);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + -1] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + -1]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + -1 < 0), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -1]);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + 7] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + 7]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + 7 > Count Of(
+				Global.Grid_Array)), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 7]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 14, 6);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + 9] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + 9]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + 9 > Count Of(
+				Global.Grid_Array)), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 9]);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + 1] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + 1]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + 1 > Count Of(
+				Global.Grid_Array)), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 1]);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + -7] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + -7]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + -7 < 0), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -7]);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + -8] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + -8]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + -8 < 0), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -8]);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + 8] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + 8]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + 8 > Count Of(
+				Global.Grid_Array)), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 8]);
+		End;
+	}
+}
+
+rule("Moves: Knight")
+{
+	event
+	{
+		Subroutine;
+		Knight_Moves;
+	}
+
+	actions
+	{
+		If(Array Contains(All Players(All Teams), Event Player));
+			Skip If(X Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == -14, 5);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + 15 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 15 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + 15 > Count Of(Global.Grid_Array)), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 15 * Event Player.Selected_Piece[5]]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == -10, 2);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + 6 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 6 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + 6 > Count Of(Global.Grid_Array)), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 6 * Event Player.Selected_Piece[5]]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == 14, 5);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + 17 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 17 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + 17 > Count Of(Global.Grid_Array)), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 17 * Event Player.Selected_Piece[5]]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == 10, 2);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + 10 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + 10 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + 10 > Count Of(Global.Grid_Array)), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ 10 * Event Player.Selected_Piece[5]]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == 14, 5);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + -15 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + -15 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + -15 < 0), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ -15 * Event Player.Selected_Piece[5]]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == 10, 2);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + -6 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + -6 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + -6 < 0), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ -6 * Event Player.Selected_Piece[5]]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == -14, 5);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + -17 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + -17 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + -17 < 0), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ -17 * Event Player.Selected_Piece[5]]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Event Player.Selected_Piece)]) == -10, 2);
+			Skip If((Global.Board_Current[First Of(Event Player.Selected_Piece) + -10 * Event Player.Selected_Piece[5]] > Null && First Of(
+				Global.Piece_META[First Of(Event Player.Selected_Piece) + -10 * Event Player.Selected_Piece[5]])
+				== Event Player.Selected_Piece[6]) || (First Of(Event Player.Selected_Piece) + -10 < 0), 1);
+			Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Event Player.Selected_Piece)
+				+ -10 * Event Player.Selected_Piece[5]]);
+		Else;
+			Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == -14, 5);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + 15] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + 15]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + 15 > Count Of(
+				Global.Grid_Array)), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 15]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == -10, 2);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + 6] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + 6]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + 6 > Count Of(
+				Global.Grid_Array)), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 6]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 14, 5);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + 17] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + 17]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + 17 > Count Of(
+				Global.Grid_Array)), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 17]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 10, 2);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + 10] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + 10]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + 10 > Count Of(
+				Global.Grid_Array)), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 10]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 14, 5);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + -15] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + -15]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + -15 < 0), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -15]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 10, 2);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + -6] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + -6]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + -6 < 0), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -6]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == -14, 5);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + -17] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + -17]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + -17 < 0), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -17]);
+			Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == -10, 2);
+			Skip If((Global.Board_Current[First Of(Global.Selected_Piece) + -10] > Null && First Of(Global.Piece_META[First Of(
+				Global.Selected_Piece) + -10]) == Global.Selected_Piece[6]) || (First Of(Global.Selected_Piece) + -10 < 0), 1);
+			Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -10]);
+		End;
+	}
+}
+
+rule("Moves: Horizontal")
+{
+	event
+	{
+		Subroutine;
+		Horizontal_Moves;
+	}
+
+	actions
+	{
+		If(Array Contains(All Players(All Teams), Event Player));
+			Event Player.Start_Vector = Global.Grid_Array[First Of(Event Player.Selected_Piece)];
+			"Left"
+			For Player Variable(Event Player, Index, X Component Of(Event Player.Start_Vector) + 4, 18, 4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(Event Player.Index, 0.500, Z Component Of(
+					Event Player.Start_Vector)))] <= 0);
+					Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Vector(Event Player.Index, 0.500, Z Component Of(Event Player.Start_Vector)))]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Vector(Event Player.Index, 0.500, Z Component Of(
+						Event Player.Start_Vector)))]) == Event Player.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Vector(Event Player.Index, 0.500, Z Component Of(Event Player.Start_Vector)))]);
+						Break;
+					End;
+				End;
+			End;
+			"Right"
+			For Player Variable(Event Player, Index, X Component Of(Event Player.Start_Vector) + -4, -18, -4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(Event Player.Index, 0.500, Z Component Of(
+					Event Player.Start_Vector)))] <= 0);
+					Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Vector(Event Player.Index, 0.500, Z Component Of(Event Player.Start_Vector)))]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Vector(Event Player.Index, 0.500, Z Component Of(
+						Event Player.Start_Vector)))]) == Event Player.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Vector(Event Player.Index, 0.500, Z Component Of(Event Player.Start_Vector)))]);
+						Break;
+					End;
+				End;
+			End;
+			"Up"
+			For Player Variable(Event Player, Index, Z Component Of(Event Player.Start_Vector) + 4, 18, 4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(X Component Of(Event Player.Start_Vector), 0.500,
+					Event Player.Index))] <= 0);
+					Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Vector(X Component Of(Event Player.Start_Vector), 0.500, Event Player.Index))]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Vector(X Component Of(Event Player.Start_Vector), 0.500,
+						Event Player.Index))]) == Event Player.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Vector(X Component Of(Event Player.Start_Vector), 0.500, Event Player.Index))]);
+						Break;
+					End;
+				End;
+			End;
+			"Down"
+			For Player Variable(Event Player, Index, Z Component Of(Event Player.Start_Vector) + -4, -18, -4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(X Component Of(Event Player.Start_Vector), 0.500,
+					Event Player.Index))] <= 0);
+					Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Vector(X Component Of(Event Player.Start_Vector), 0.500, Event Player.Index))]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Vector(X Component Of(Event Player.Start_Vector), 0.500,
+						Event Player.Index))]) == Event Player.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Vector(X Component Of(Event Player.Start_Vector), 0.500, Event Player.Index))]);
+						Break;
+					End;
+				End;
+			End;
+		Else;
+			Global.Check_Value = Global.Grid_Array[First Of(Global.Selected_Piece)];
+			"Left"
+			For Global Variable(Check_SubIndex, X Component Of(Global.Check_Value) + 4, 18, 4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(Global.Check_SubIndex, 0.500, Z Component Of(
+					Global.Check_Value)))] <= 0);
+					Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+						Global.Check_SubIndex, 0.500, Z Component Of(Global.Check_Value)))]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Vector(Global.Check_SubIndex, 0.500, Z Component Of(
+						Global.Check_Value)))]) == Global.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+							Global.Check_SubIndex, 0.500, Z Component Of(Global.Check_Value)))]);
+						Break;
+					End;
+				End;
+			End;
+			"Right"
+			For Global Variable(Check_SubIndex, X Component Of(Global.Check_Value) + -4, -18, -4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(Global.Check_SubIndex, 0.500, Z Component Of(
+					Global.Check_Value)))] <= 0);
+					Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+						Global.Check_SubIndex, 0.500, Z Component Of(Global.Check_Value)))]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Vector(Global.Check_SubIndex, 0.500, Z Component Of(
+						Global.Check_Value)))]) == Global.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+							Global.Check_SubIndex, 0.500, Z Component Of(Global.Check_Value)))]);
+						Break;
+					End;
+				End;
+			End;
+			"Up"
+			For Global Variable(Check_SubIndex, Z Component Of(Global.Check_Value) + 4, 18, 4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(X Component Of(Global.Check_Value), 0.500,
+					Global.Check_SubIndex))] <= 0);
+					Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+						X Component Of(Global.Check_Value), 0.500, Global.Check_SubIndex))]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Vector(X Component Of(Global.Check_Value), 0.500,
+						Global.Check_SubIndex))]) == Global.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+							X Component Of(Global.Check_Value), 0.500, Global.Check_SubIndex))]);
+						Break;
+					End;
+				End;
+			End;
+			"Down"
+			For Global Variable(Check_SubIndex, Z Component Of(Global.Check_Value) + -4, -18, -4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(X Component Of(Global.Check_Value), 0.500,
+					Global.Check_SubIndex))] <= 0);
+					Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+						X Component Of(Global.Check_Value), 0.500, Global.Check_SubIndex))]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Vector(X Component Of(Global.Check_Value), 0.500,
+						Global.Check_SubIndex))]) == Global.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+							X Component Of(Global.Check_Value), 0.500, Global.Check_SubIndex))]);
+						Break;
+					End;
+				End;
+			End;
+		End;
+	}
+}
+
+rule("Moves: Diagonal")
+{
+	event
+	{
+		Subroutine;
+		Diagonal_Moves;
+	}
+
+	actions
+	{
+		If(Array Contains(All Players(All Teams), Event Player));
+			"Upwards Left"
+			Event Player.Start_Vector = Global.Grid_Array[First Of(Event Player.Selected_Piece)];
+			While(X Component Of(Event Player.Start_Vector) < 14 && Z Component Of(Event Player.Start_Vector) < 14);
+				Event Player.Start_Vector += Vector(4, 0, 4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Event Player.Start_Vector)] <= 0);
+					Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Event Player.Start_Vector)]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Event Player.Start_Vector)])
+						== Event Player.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Event Player.Start_Vector)]);
+						Break;
+					End;
+				End;
+			End;
+			"Upwards Right"
+			Event Player.Start_Vector = Global.Grid_Array[First Of(Event Player.Selected_Piece)];
+			While(X Component Of(Event Player.Start_Vector) > -14 && Z Component Of(Event Player.Start_Vector) < 14);
+				Event Player.Start_Vector += Vector(-4, 0, 4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Event Player.Start_Vector)] <= 0);
+					Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Event Player.Start_Vector)]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Event Player.Start_Vector)])
+						== Event Player.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Event Player.Start_Vector)]);
+						Break;
+					End;
+				End;
+			End;
+			"Downwards Left"
+			Event Player.Start_Vector = Global.Grid_Array[First Of(Event Player.Selected_Piece)];
+			While(X Component Of(Event Player.Start_Vector) < 14 && Z Component Of(Event Player.Start_Vector) > -14);
+				Event Player.Start_Vector += Vector(4, 0, -4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Event Player.Start_Vector)] <= 0);
+					Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Event Player.Start_Vector)]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Event Player.Start_Vector)])
+						== Event Player.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Event Player.Start_Vector)]);
+						Break;
+					End;
+				End;
+			End;
+			"Downwards Right"
+			Event Player.Start_Vector = Global.Grid_Array[First Of(Event Player.Selected_Piece)];
+			While(X Component Of(Event Player.Start_Vector) > -14 && Z Component Of(Event Player.Start_Vector) > -14);
+				Event Player.Start_Vector += Vector(-4, 0, -4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Event Player.Start_Vector)] <= 0);
+					Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Event Player.Start_Vector)]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Event Player.Start_Vector)])
+						== Event Player.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Player Variable(Event Player, Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Event Player.Start_Vector)]);
+						Break;
+					End;
+				End;
+			End;
+		Else;
+			"Upwards Left"
+			Global.Check_Value = Global.Grid_Array[First Of(Global.Selected_Piece)];
+			While(X Component Of(Global.Check_Value) < 14 && Z Component Of(Global.Check_Value) < 14);
+				Global.Check_Value += Vector(4, 0, 4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Global.Check_Value)] <= 0);
+					Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Global.Check_Value)]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Global.Check_Value)]) == Global.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Global.Check_Value)]);
+						Break;
+					End;
+				End;
+			End;
+			"Upwards Right"
+			Global.Check_Value = Global.Grid_Array[First Of(Global.Selected_Piece)];
+			While(X Component Of(Global.Check_Value) > -14 && Z Component Of(Global.Check_Value) < 14);
+				Global.Check_Value += Vector(-4, 0, 4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Global.Check_Value)] <= 0);
+					Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Global.Check_Value)]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Global.Check_Value)]) == Global.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Global.Check_Value)]);
+						Break;
+					End;
+				End;
+			End;
+			"Downwards Left"
+			Global.Check_Value = Global.Grid_Array[First Of(Global.Selected_Piece)];
+			While(X Component Of(Global.Check_Value) < 14 && Z Component Of(Global.Check_Value) > -14);
+				Global.Check_Value += Vector(4, 0, -4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Global.Check_Value)] <= 0);
+					Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Global.Check_Value)]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Global.Check_Value)]) == Global.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Global.Check_Value)]);
+						Break;
+					End;
+				End;
+			End;
+			"Downwards Right"
+			Global.Check_Value = Global.Grid_Array[First Of(Global.Selected_Piece)];
+			While(X Component Of(Global.Check_Value) > -14 && Z Component Of(Global.Check_Value) > -14);
+				Global.Check_Value += Vector(-4, 0, -4);
+				If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Global.Check_Value)] <= 0);
+					Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+						Global.Check_Value)]);
+				Else;
+					If(First Of(Global.Piece_META[Index Of Array Value(Global.Grid_Array, Global.Check_Value)]) == Global.Selected_Piece[6]);
+						Break;
+					Else;
+						Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+							Global.Check_Value)]);
+						Break;
+					End;
+				End;
+			End;
+		End;
+	}
+}
+
+rule("Promote Pawn")
+{
+	event
+	{
+		Subroutine;
+		Promote_Pawn;
+	}
+
+	actions
+	{
+		Event Player.Page = Global.Settings[9] ? Custom String("Promote/Giveaway") : Custom String("Promote");
+		Event Player.Temp_Value = Array(Event Player.Tile_Click, Null);
+		Wait Until(Last Of(Event Player.Temp_Value) != Null || Event Player.Moves_ID == Empty Array, 99999);
+		Wait Until(Last Of(Event Player.Temp_Value) != Null || Event Player.Moves_ID != Empty Array, 99999);
+		Event Player.Page = Global.Settings[4] ? Custom String("Game/Crazy") : Custom String("Game");
+		Abort If(Event Player.Moves_ID != Empty Array);
+		Event Player.Temp_META = Event Player.Selected_Piece[4];
+		Event Player.Temp_META[1] = True;
+		If(Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos, First Of(Event Player.Temp_Value))] != Null);
+			Call Subroutine(Piece_Capture);
+		End;
+		Global.Piece_META[Index Of Array Value(Global.Tile_Click_Pos, First Of(Event Player.Temp_Value))] = Event Player.Temp_META;
+		Global.Piece_META[First Of(Event Player.Selected_Piece)] = Null;
+		Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos, First Of(Event Player.Temp_Value))] = Last Of(
+			Event Player.Temp_Value);
+		Global.Board_Current[First Of(Event Player.Selected_Piece)] = Null;
+		Start Rule(Cycle_Turn, Restart Rule);
+		Event Player.Selected_Piece = Null;
+	}
+}
+
+rule("Get Moves (White)")
+{
+	event
+	{
+		Subroutine;
+		Get_Vaild_Moves_White;
+	}
+
+	actions
+	{
+		Global.White_King_Index = -1;
+		Global.Vaild_Moves_White = Empty Array;
+		Global.Defended_White = Empty Array;
+		For Global Variable(Check_Index, 0, Count Of(Global.Board_Current), 1);
+			If(First Of(Global.Piece_META[Global.Check_Index]) == True);
+				Global.Selected_Piece = Global.Check_Index;
+				Global.Selected_Piece = Array(Global.Selected_Piece, Global.Grid_Array[Global.Selected_Piece],
+					Global.Tile_Click_Pos[Global.Selected_Piece], Global.Board_Current[Global.Selected_Piece],
+					Global.Piece_META[Global.Selected_Piece]);
+				Modify Global Variable(Selected_Piece, Append To Array, First Of(Global.Selected_Piece[4]) == True ? 1 : -1);
+				Modify Global Variable(Selected_Piece, Append To Array, First Of(Global.Selected_Piece[4]));
+				If(Global.Selected_Piece[3] == 6);
+					Global.White_King_Index = Global.Check_Index;
+				End;
+				Call Subroutine(Get_All_Moves);
+				Modify Global Variable(Defended_White, Append To Array, Filtered Array(Global.Vaild_Moves, !Array Contains(Global.Defended_White,
+					Current Array Element)));
+				Call Subroutine(Get_Vaild_Moves);
+				Modify Global Variable(Vaild_Moves_White, Append To Array, Array(Global.Vaild_Moves));
+			Else;
+				Modify Global Variable(Vaild_Moves_White, Append To Array, Array(Empty Array));
+			End;
+		End;
+		Abort If(Global.Settings[9]);
+		Abort If(Global.Setup_Phase || !Global.Is_Game_In_Progress);
+		If(Global.White_King_Index == -1 && Global.Settings[1]);
+			Big Message(All Players(All Teams), Custom String("Black Wins"));
+			Small Message(All Players(All Teams), Custom String("Captured Whites King"));
+			Global.Match_Final_Result = Custom String("Winner Black");
+		End;
+	}
+}
+
+rule("Get Moves (Black)")
+{
+	event
+	{
+		Subroutine;
+		Get_Vaild_Moves_Black;
+	}
+
+	actions
+	{
+		Global.Black_King_Index = -1;
+		Global.Vaild_Moves_Black = Empty Array;
+		Global.Defended_Black = Empty Array;
+		For Global Variable(Check_Index, 0, Count Of(Global.Board_Current), 1);
+			If(First Of(Global.Piece_META[Global.Check_Index]) == False);
+				If(Global.Board_Current[Global.Check_Index] == 6);
+					Global.Black_King_Index = Global.Check_Index;
+				End;
+				Global.Selected_Piece = Global.Check_Index;
+				Global.Selected_Piece = Array(Global.Selected_Piece, Global.Grid_Array[Global.Selected_Piece],
+					Global.Tile_Click_Pos[Global.Selected_Piece], Global.Board_Current[Global.Selected_Piece],
+					Global.Piece_META[Global.Selected_Piece]);
+				Modify Global Variable(Selected_Piece, Append To Array, First Of(Global.Selected_Piece[4]) == True ? 1 : -1);
+				Modify Global Variable(Selected_Piece, Append To Array, First Of(Global.Selected_Piece[4]));
+				Call Subroutine(Get_All_Moves);
+				Modify Global Variable(Defended_Black, Append To Array, Filtered Array(Global.Vaild_Moves, !Array Contains(Global.Defended_Black,
+					Current Array Element)));
+				Call Subroutine(Get_Vaild_Moves);
+				Modify Global Variable(Vaild_Moves_Black, Append To Array, Array(Global.Vaild_Moves));
+			Else;
+				Modify Global Variable(Vaild_Moves_Black, Append To Array, Array(Empty Array));
+			End;
+		End;
+		Abort If(Global.Settings[9]);
+		Abort If(Global.Setup_Phase || !Global.Is_Game_In_Progress);
+		If(Global.Black_King_Index == -1 && Global.Settings[2]);
+			Big Message(All Players(All Teams), Custom String("White Wins"));
+			Small Message(All Players(All Teams), Custom String("Captured Blacks King"));
+			Global.Match_Final_Result = Custom String("Winner White");
+		End;
+	}
+}
+
+rule("Get All Vaild Moves")
+{
+	event
+	{
+		Subroutine;
+		Get_All_Moves;
+	}
+
+	actions
+	{
+		Global.Vaild_Moves = Empty Array;
+		If(Global.Selected_Piece[3] == 1);
+			Call Subroutine(Get_Attacks_Pawn);
+		Else If(Global.Selected_Piece[3] == 3);
+			Call Subroutine(Get_All_Knight);
+		Else If(Global.Selected_Piece[3] == 6);
+			Call Subroutine(Get_All_King);
+		Else If(Global.Selected_Piece[3] == 2);
+			Call Subroutine(Get_All_Horizontal);
+		Else If(Global.Selected_Piece[3] == 4);
+			Call Subroutine(Get_All_Diagonal);
+		Else If(Global.Selected_Piece[3] == 5);
+			Call Subroutine(Get_All_Horizontal);
+			Call Subroutine(Get_All_Diagonal);
+		End;
+		Global.Vaild_Moves = Remove From Array(Global.Vaild_Moves, Null);
+	}
+}
+
+rule("Attacks: Pawn")
+{
+	event
+	{
+		Subroutine;
+		Get_Attacks_Pawn;
+	}
+
+	actions
+	{
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece)
+			+ 7 * Global.Selected_Piece[5]]);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece)
+			+ 9 * Global.Selected_Piece[5]]);
+	}
+}
+
+rule("All: King")
+{
+	event
+	{
+		Subroutine;
+		Get_All_King;
+	}
+
+	actions
+	{
+		Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == -14, 3);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -9]);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -1]);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 7]);
+		Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 14, 3);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 9]);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 1]);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -7]);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -8]);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 8]);
+	}
+}
+
+rule("All: Knight")
+{
+	event
+	{
+		Subroutine;
+		Get_All_Knight;
+	}
+
+	actions
+	{
+		Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == -14, 3);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 15]);
+		Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == -10, 1);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 6]);
+		Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 14, 3);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 17]);
+		Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 10, 1);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 10]);
+		Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 14, 3);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -15]);
+		Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == 10, 1);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -6]);
+		Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == -14, 3);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -17]);
+		Skip If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) == -10, 1);
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -10]);
+	}
+}
+
+rule("All: Horizontal")
+{
+	event
+	{
+		Subroutine;
+		Get_All_Horizontal;
+	}
+
+	actions
+	{
+		Global.Check_Value = Global.Grid_Array[First Of(Global.Selected_Piece)];
+		"Left"
+		For Global Variable(Check_SubIndex, X Component Of(Global.Check_Value) + 4, 18, 4);
+			If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(Global.Check_SubIndex, 0.500, Z Component Of(
+				Global.Check_Value)))] <= 0);
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+					Global.Check_SubIndex, 0.500, Z Component Of(Global.Check_Value)))]);
+			Else;
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+					Global.Check_SubIndex, 0.500, Z Component Of(Global.Check_Value)))]);
+				Break;
+			End;
+		End;
+		"Right"
+		For Global Variable(Check_SubIndex, X Component Of(Global.Check_Value) + -4, -18, -4);
+			If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(Global.Check_SubIndex, 0.500, Z Component Of(
+				Global.Check_Value)))] <= 0);
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+					Global.Check_SubIndex, 0.500, Z Component Of(Global.Check_Value)))]);
+			Else;
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+					Global.Check_SubIndex, 0.500, Z Component Of(Global.Check_Value)))]);
+				Break;
+			End;
+		End;
+		"Up"
+		For Global Variable(Check_SubIndex, Z Component Of(Global.Check_Value) + 4, 18, 4);
+			If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(X Component Of(Global.Check_Value), 0.500,
+				Global.Check_SubIndex))] <= 0);
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+					X Component Of(Global.Check_Value), 0.500, Global.Check_SubIndex))]);
+			Else;
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+					X Component Of(Global.Check_Value), 0.500, Global.Check_SubIndex))]);
+				Break;
+			End;
+		End;
+		"Down"
+		For Global Variable(Check_SubIndex, Z Component Of(Global.Check_Value) + -4, -18, -4);
+			If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Vector(X Component Of(Global.Check_Value), 0.500,
+				Global.Check_SubIndex))] <= 0);
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+					X Component Of(Global.Check_Value), 0.500, Global.Check_SubIndex))]);
+			Else;
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array, Vector(
+					X Component Of(Global.Check_Value), 0.500, Global.Check_SubIndex))]);
+				Break;
+			End;
+		End;
+	}
+}
+
+rule("All: Diagonal")
+{
+	event
+	{
+		Subroutine;
+		Get_All_Diagonal;
+	}
+
+	actions
+	{
+		"Upwards Left"
+		Global.Check_Value = Global.Grid_Array[First Of(Global.Selected_Piece)];
+		While(X Component Of(Global.Check_Value) < 14 && Z Component Of(Global.Check_Value) < 14);
+			Global.Check_Value += Vector(4, 0, 4);
+			If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Global.Check_Value)] <= 0);
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+					Global.Check_Value)]);
+			Else;
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+					Global.Check_Value)]);
+				Break;
+			End;
+		End;
+		"Upwards Right"
+		Global.Check_Value = Global.Grid_Array[First Of(Global.Selected_Piece)];
+		While(X Component Of(Global.Check_Value) > -14 && Z Component Of(Global.Check_Value) < 14);
+			Global.Check_Value += Vector(-4, 0, 4);
+			If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Global.Check_Value)] <= 0);
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+					Global.Check_Value)]);
+			Else;
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+					Global.Check_Value)]);
+				Break;
+			End;
+		End;
+		"Downwards Left"
+		Global.Check_Value = Global.Grid_Array[First Of(Global.Selected_Piece)];
+		While(X Component Of(Global.Check_Value) < 14 && Z Component Of(Global.Check_Value) > -14);
+			Global.Check_Value += Vector(4, 0, -4);
+			If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Global.Check_Value)] <= 0);
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+					Global.Check_Value)]);
+			Else;
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+					Global.Check_Value)]);
+				Break;
+			End;
+		End;
+		"Downwards Right"
+		Global.Check_Value = Global.Grid_Array[First Of(Global.Selected_Piece)];
+		While(X Component Of(Global.Check_Value) > -14 && Z Component Of(Global.Check_Value) > -14);
+			Global.Check_Value += Vector(-4, 0, -4);
+			If(Global.Board_Current[Index Of Array Value(Global.Grid_Array, Global.Check_Value)] <= 0);
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+					Global.Check_Value)]);
+			Else;
+				Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[Index Of Array Value(Global.Grid_Array,
+					Global.Check_Value)]);
+				Break;
+			End;
+		End;
+	}
+}
+
+rule("Get Kings Moves: White")
+{
+	event
+	{
+		Subroutine;
+		King_Moves_White;
+	}
+
+	actions
+	{
+		Global.Selected_Piece = Global.White_King_Index;
+		Global.Selected_Piece = Array(Global.Selected_Piece, Global.Grid_Array[Global.Selected_Piece],
+			Global.Tile_Click_Pos[Global.Selected_Piece], Global.Board_Current[Global.Selected_Piece],
+			Global.Piece_META[Global.Selected_Piece]);
+		Modify Global Variable(Selected_Piece, Append To Array, First Of(Global.Selected_Piece[4]) == True ? 1 : -1);
+		Modify Global Variable(Selected_Piece, Append To Array, First Of(Global.Selected_Piece[4]));
+		Call Subroutine(Get_Vaild_Moves);
+		Call Subroutine(Can_Castle_Left);
+		Call Subroutine(Can_Castle_Right);
+		Global.Vaild_Moves_White[Global.White_King_Index] = Remove From Array(Global.Vaild_Moves, Global.Defended_Black);
+	}
+}
+
+rule("Get Kings Moves: Black")
+{
+	event
+	{
+		Subroutine;
+		King_Moves_Black;
+	}
+
+	actions
+	{
+		Global.Selected_Piece = Global.Black_King_Index;
+		Global.Selected_Piece = Array(Global.Selected_Piece, Global.Grid_Array[Global.Selected_Piece],
+			Global.Tile_Click_Pos[Global.Selected_Piece], Global.Board_Current[Global.Selected_Piece],
+			Global.Piece_META[Global.Selected_Piece]);
+		Modify Global Variable(Selected_Piece, Append To Array, First Of(Global.Selected_Piece[4]) == True ? 1 : -1);
+		Modify Global Variable(Selected_Piece, Append To Array, First Of(Global.Selected_Piece[4]));
+		Call Subroutine(Get_Vaild_Moves);
+		Call Subroutine(Can_Castle_Left);
+		Call Subroutine(Can_Castle_Right);
+		Global.Vaild_Moves_Black[Global.Black_King_Index] = Remove From Array(Global.Vaild_Moves, Global.Defended_White);
+	}
+}
+
+rule("Cycle Turn")
+{
+	event
+	{
+		Subroutine;
+		Cycle_Turn;
+	}
+
+	actions
+	{
+		All Players(All Teams).Voted_Draw -= 1;
+		Modify Player Variable(All Players(All Teams), Voted_Draw, Max, 0);
+		Global.Is_Game_In_Progress = True;
+		All Players(All Teams).Page = Global.Settings[7] ? Custom String("Game/Setup") : (Global.Settings[4] ? Custom String("Game/Crazy")
+			: Custom String("Game"));
+		Global.Current_Turn = Custom String("{0}​", Global.Current_Turn);
+		Global.Match_Final_Result = Null;
+		Global.Sub_DisplayBoard = True;
+		If(Global.Setup_Phase);
+			Start Rule(Setup_Cycle, Restart Rule);
+		Else;
+			Skip If(!Global.Settings[5], 1);
+			Call Subroutine(Place_Duck);
+			Wait Until(Global.Sub_DisplayBoard == False, 99999);
+			Global.Current_Turn = Global.Current_Turn == Custom String("White​") ? Custom String("Black") : Custom String("White");
+			If(Global.Match_Final_Result == Null);
+				Small Message(All Players(All Teams), Custom String("{0}'s Turn", Global.Current_Turn == Custom String("White") ? Custom String(
+					"Black") : Custom String("White")));
+				Play Effect(All Players(All Teams), Baptiste Biotic Launcher Explosion Sound, Color(White), Vector(Global.Starting_X,
+					Global.Camera_Height, Global.Starting_Y), 20);
+			End;
+		End;
+	}
+}
+
+rule("Drag Piece")
+{
+	event
+	{
+		Subroutine;
+		Drag_Piece;
+	}
+
+	actions
+	{
+		Skip If(Event Player.Saved_Mouse_Icon == Null, 1);
+		Event Player.Mouse_Icon = Event Player.Saved_Mouse_Icon;
+		Event Player.Saved_Mouse_Icon = Event Player.Mouse_Icon;
+		Event Player.Saved_Mouse_Color = Event Player.Mouse_Color;
+		Event Player.Mouse_Icon = Array(Null, Icon String(Arrow: Up), Icon String(Moon), Icon String(Bolt), Icon String(Spade),
+			Icon String(Club), Icon String(Diamond))[Event Player.Selected_Piece[3]];
+		Event Player.Mouse_Color = Custom Color(255, 255, 255, 40);
+		Wait Until(!Is Button Held(Event Player, Button(Primary Fire)), 99999);
+		Event Player.Mouse_Icon = Event Player.Saved_Mouse_Icon;
+		Event Player.Mouse_Color = Event Player.Saved_Mouse_Color;
+		If(Event Player.Selected_Piece != Null && Array Contains(Event Player.Vaild_Moves, Event Player.Tile_Click));
+			Start Rule(Move_Piece, Restart Rule);
+		Else;
+			Call Subroutine(Clear_Moves);
+			Event Player.Selected_Piece = Null;
+		End;
+	}
+}
+
+rule("Can Castle: Left")
+{
+	event
+	{
+		Subroutine;
+		Can_Castle_Left;
+	}
+
+	actions
+	{
+		Abort If(Global.Settings[9]);
+		Abort If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) != -2);
+		Abort If(Global.Selected_Piece[4][1] == True);
+		Abort If(Is True For Any(Array(1, 2, 3), Global.Board_Current[First Of(Global.Selected_Piece) + Current Array Element] > Null));
+		Abort If(Global.Board_Current[First Of(Global.Selected_Piece) + 4] != 2);
+		Abort If(Global.Piece_META[First Of(Global.Selected_Piece) + 4][1] == True);
+		If(Global.Selected_Piece[6] == True);
+			Abort If(Global.White_In_Check);
+			Abort If(Is True For Any(Array(1, 2, 3, 4), Array Contains(Global.Defended_Black, Global.Tile_Click_Pos[First Of(
+				Global.Selected_Piece) + Current Array Element])));
+		Else;
+			Abort If(Global.Black_In_Check);
+			Abort If(Is True For Any(Array(1, 2, 3, 4), Array Contains(Global.Defended_White, Global.Tile_Click_Pos[First Of(
+				Global.Selected_Piece) + Current Array Element])));
+		End;
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + 2]);
+	}
+}
+
+rule("Can Castle: Right")
+{
+	event
+	{
+		Subroutine;
+		Can_Castle_Right;
+	}
+
+	actions
+	{
+		Abort If(Global.Settings[9]);
+		Abort If(X Component Of(Global.Grid_Array[First Of(Global.Selected_Piece)]) != -2);
+		Abort If(Global.Selected_Piece[4][1] == True);
+		Abort If(Is True For Any(Array(-1, -2), Global.Board_Current[First Of(Global.Selected_Piece) + Current Array Element] > Null));
+		Abort If(Global.Board_Current[First Of(Global.Selected_Piece) + -3] != 2);
+		Abort If(Global.Piece_META[First Of(Global.Selected_Piece) + 4][1] == True);
+		If(Global.Selected_Piece[6] == True);
+			Abort If(Global.White_In_Check);
+			Abort If(Is True For Any(Array(-1, -2, -3), Array Contains(Global.Defended_Black, Global.Tile_Click_Pos[First Of(
+				Global.Selected_Piece) + Current Array Element])));
+		Else;
+			Abort If(Global.Black_In_Check);
+			Abort If(Is True For Any(Array(-1, -2, -3), Array Contains(Global.Defended_White, Global.Tile_Click_Pos[First Of(
+				Global.Selected_Piece) + Current Array Element])));
+		End;
+		Modify Global Variable(Vaild_Moves, Append To Array, Global.Tile_Click_Pos[First Of(Global.Selected_Piece) + -2]);
+	}
+}
+
+rule("Save Custom Board")
+{
+	event
+	{
+		Subroutine;
+		Save_Board;
+	}
+
+	actions
+	{
+		Global.Reset_Board_Type = Array(Global.Board_Current, Global.Piece_META);
+	}
+}
+
+rule("Calculate Mat")
+{
+	event
+	{
+		Subroutine;
+		Calc_Mat;
+	}
+
+	actions
+	{
+		Global.White_Mat = 0;
+		Global.Black_Mat = 0;
+		For Global Variable(Board_Index, 0, Count Of(Global.Board_Current), 1);
+			If(First Of(Global.Piece_META[Global.Board_Index]) == True);
+				Global.White_Mat += Array(Null, 1, 5, 3, 3, 9, 4)[Global.Board_Current[Global.Board_Index]];
+			Else If(First Of(Global.Piece_META[Global.Board_Index]) == False);
+				Global.Black_Mat += Array(Null, 1, 5, 3, 3, 9, 4)[Global.Board_Current[Global.Board_Index]];
+			End;
+		End;
+		Global.White_Mat_Without_King = Global.White_Mat - (Global.White_King_Index == -1 ? 0 : 4);
+		Global.Black_Mat_Without_King = Global.Black_Mat - (Global.Black_King_Index == -1 ? 0 : 4);
+	}
+}
+
+rule("Edit Rules")
+{
+	event
+	{
+		Subroutine;
+		Change_Rule;
+	}
+
+	actions
+	{
+		If(Event Player.Clicked_Area == Custom String("Rules: More"));
+			Event Player.Page = Array(Custom String("Rules 2"))[Index Of Array Value(Array(Custom String("Rules")), Event Player.Page)];
+		Else If(Event Player.Clicked_Area == Custom String("Rules: Less"));
+			Event Player.Page = Array(Custom String("Rules"))[Index Of Array Value(Array(Custom String("Rules 2")), Event Player.Page)];
+		Else If(Event Player.Clicked_Area == Custom String("Rules: W-King"));
+			If(Global.Settings[1]);
+				Small Message(All Players(All Teams), Custom String("White No Longer Loses When King Captured"));
+				Global.Settings[1] = False;
+			Else;
+				Small Message(All Players(All Teams), Custom String("White Now Loses When King Captured"));
+				Global.Settings[1] = True;
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Rules: B-King"));
+			If(Global.Settings[2]);
+				Small Message(All Players(All Teams), Custom String("Black No Longer Loses When King Captured"));
+				Global.Settings[2] = False;
+			Else;
+				Small Message(All Players(All Teams), Custom String("Black Now Loses When King Captured"));
+				Global.Settings[2] = True;
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Rules: Start-Turn"));
+			If(Global.Current_Turn == Custom String("White"));
+				Small Message(All Players(All Teams), Custom String("Black Gets Opening Move"));
+				Global.Current_Turn = Custom String("Black");
+			Else;
+				Small Message(All Players(All Teams), Custom String("White Gets Opening Move"));
+				Global.Current_Turn = Custom String("White");
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Rules: Fog"));
+			If(Global.Settings[3]);
+				Small Message(All Players(All Teams), Custom String("Fog of War: Disabled"));
+				Global.Settings[3] = False;
+			Else;
+				Small Message(All Players(All Teams), Custom String("Fog of War: Enabled"));
+				Global.Settings[3] = True;
+			End;
+			Global.Sub_DisplayBoard = True;
+		Else If(Event Player.Clicked_Area == Custom String("Rules: Crazy"));
+			If(Global.Settings[4]);
+				Small Message(All Players(All Teams), Custom String("Crazyhouse: Disabled"));
+				Global.Settings[4] = False;
+			Else;
+				Small Message(All Players(All Teams), Custom String("Crazyhouse: Enabled"));
+				Global.Settings[4] = True;
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Rules: Duck"));
+			If(Global.Settings[5]);
+				Small Message(All Players(All Teams), Custom String("Duck: Disabled"));
+				Global.Settings[5] = False;
+			Else;
+				Small Message(All Players(All Teams), Custom String("Duck: Enabled"));
+				Global.Settings[5] = True;
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Rules: 3Check"));
+			If(Global.Settings[6]);
+				Small Message(All Players(All Teams), Custom String("3 Check: Disabled"));
+				Global.Settings[6] = False;
+			Else;
+				Small Message(All Players(All Teams), Custom String("3 Check: Enabled"));
+				Global.Settings[6] = True;
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Rules: Setup"));
+			If(Global.Settings[7]);
+				Small Message(All Players(All Teams), Custom String("Setup Chess: Disabled"));
+				Global.Settings[7] = False;
+			Else;
+				Small Message(All Players(All Teams), Custom String("Setup Chess: Enabled"));
+				Global.Settings[7] = True;
+			End;
+			Call Subroutine(Load_Board);
+		Else If(Event Player.Clicked_Area == Custom String("Rules: Atomic"));
+			If(Global.Settings[8]);
+				Small Message(All Players(All Teams), Custom String("Atomic: Disabled"));
+				Global.Settings[8] = False;
+			Else;
+				Small Message(All Players(All Teams), Custom String("Atomic: Enabled"));
+				Global.Settings[8] = True;
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Rules: Throw"));
+			If(Global.Settings[9]);
+				Small Message(All Players(All Teams), Custom String("Giveaway: Disabled"));
+				Global.Settings[9] = False;
+			Else;
+				Small Message(All Players(All Teams), Custom String("Giveaway: Enabled"));
+				Global.Settings[9] = True;
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Rules: King-Hill"));
+			If(Global.Settings[10]);
+				Small Message(All Players(All Teams), Custom String("King of the Hill: Disabled"));
+				Global.Settings[10] = False;
+				Global.Hill_Tiles = Empty Array;
+			Else;
+				Small Message(All Players(All Teams), Custom String("King of the Hill: Enabled"));
+				Global.Settings[10] = True;
+				Global.Hill_Tiles = Array(27, 28, 35, 36);
+			End;
+			Global.Sub_DisplayBoard = True;
+	}
+}
+
+rule("Get Allowed Spawns")
+{
+	event
+	{
+		Subroutine;
+		Get_Allowed_Spawns;
+	}
+
+	actions
+	{
+		Event Player.Temp_Allowed = Event Player.Setup_Chess_Spawns ? Filtered Array(Global.Tile_Click_Pos, Array Contains(
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_3_Ranks : Global.Black_3_Ranks, Current Array Index)) : Global.Tile_Click_Pos;
+		If(Global.Is_Game_In_Progress);
+			Event Player.Temp_Allowed = Remove From Array(Event Player.Temp_Allowed, Filtered Array(Global.Tile_Click_Pos,
+				Global.Board_Current[Current Array Index] > 0));
+		End;
+		If(Event Player.Spawn_Piece == 1);
+			Event Player.Temp_Allowed = Remove From Array(Event Player.Temp_Allowed, Filtered Array(Global.Tile_Click_Pos, Z Component Of(
+				Current Array Element) == ((
+				Event Player.Setup_Chess_Spawns ? Event Player.Spawn_META[0] != True : Event Player.Spawn_META[0] == True) ? 4 : -3)));
+		End;
+		Event Player.Allowed_Type = Count Of(Event Player.Temp_Allowed) < Count Of(Global.Grid_Array) / 2;
+		Event Player.Allowed_Spawns = Event Player.Allowed_Type ? Event Player.Temp_Allowed : Remove From Array(Global.Tile_Click_Pos,
+			Event Player.Temp_Allowed);
+		Call Subroutine(Displayed_Allowed);
+	}
+}
+
+rule("Display Allowed Spawns")
+{
+	event
+	{
+		Subroutine;
+		Displayed_Allowed;
+	}
+
+	actions
+	{
+		Abort If(Sorted Array(Event Player.Drawn_Allowed, Current Array Element) == Sorted Array(Event Player.Allowed_Spawns,
+			Current Array Element) && Event Player.Spawns_ID != Empty Array);
+		Call Subroutine(Clear_Allowed);
+		Wait Until(False, 0.001);
+		For Player Variable(Event Player, Index, 0, Count Of(Event Player.Allowed_Spawns), 1);
+			Create In-World Text(Event Player,
+				Event Player.Allowed_Type && Event Player.Tile_Click == Event Player.Allowed_Spawns[Evaluate Once(Event Player.Index)
+				] ? Custom String("◆") : Custom String("●"), Update Every Frame(Event Player.Camera_Pos + 100 * (X Component Of(
+				Event Player.Allowed_Spawns[Evaluate Once(Event Player.Index)]) * -1 / 2 * Cross Product(Event Player.Facing_Pos,
+				Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(
+				Event Player.Facing_Pos) - 90)) + (Z Component Of(Event Player.Allowed_Spawns[Evaluate Once(Event Player.Index)]) / 2 - 0.200)
+				* Direction From Angles(Horizontal Angle From Direction(Local Player.Facing_Pos), Vertical Angle From Direction(
+				Local Player.Facing_Pos) - 90) + 3 * Local Player.Facing_Pos)), 3, Do Not Clip, Visible To Position and String,
+				Event Player.Allowed_Type ? Custom Color(0, 255, 0, 40) : Custom Color(255, 0, 0, 40), Default Visibility);
+			Modify Player Variable(Event Player, Spawns_ID, Append To Array, Last Text ID);
+		End;
+		Event Player.Drawn_Allowed = Event Player.Allowed_Spawns;
+	}
+}
+
+rule("Clear Allowed Spawns")
+{
+	event
+	{
+		Subroutine;
+		Clear_Allowed;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, Index, 0, Count Of(Event Player.Spawns_ID), 1);
+			Destroy In-World Text(Event Player.Spawns_ID[Event Player.Index]);
+		End;
+		Event Player.Spawns_ID = Empty Array;
+	}
+}
+
+rule("Select Crazy Piece")
+{
+	event
+	{
+		Subroutine;
+		Select_Crazy_Piece;
+	}
+
+	actions
+	{
+		Call Subroutine(Clear_Moves);
+		Event Player.Selected_Piece = Null;
+		Event Player.Bank = Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? Global.White_Bank : Global.Black_Bank;
+		If(Global.Current_Turn != (Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? Custom String("White") : Custom String(
+			"Black")));
+			Small Message(All Players(All Teams), Custom String("Wait for your turn"));
+		Else If(Event Player.Clicked_Area == Custom String("Crazy: Pawn"));
+			If(Array Contains(Event Player.Bank, 1));
+				Event Player.Spawn_Piece = 1;
+				Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+					Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+				Call Subroutine(Get_Allowed_Spawns);
+				Small Message(All Players(All Teams), Custom String("Selected: Pawn"));
+			Else;
+				Small Message(All Players(All Teams), Custom String("No Banked Pawns"));
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Crazy: Rook"));
+			If(Array Contains(Event Player.Bank, 2));
+				Event Player.Spawn_Piece = 2;
+				Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+					Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+				Call Subroutine(Get_Allowed_Spawns);
+				Small Message(All Players(All Teams), Custom String("Selected: Rook"));
+			Else;
+				Small Message(All Players(All Teams), Custom String("No Banked Rooks"));
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Crazy: Knight"));
+			If(Array Contains(Event Player.Bank, 3));
+				Event Player.Spawn_Piece = 3;
+				Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+					Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+				Call Subroutine(Get_Allowed_Spawns);
+				Small Message(All Players(All Teams), Custom String("Selected: Knight"));
+			Else;
+				Small Message(All Players(All Teams), Custom String("No Banked Knights"));
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Crazy: Bishop"));
+			If(Array Contains(Event Player.Bank, 4));
+				Event Player.Spawn_Piece = 4;
+				Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+					Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+				Call Subroutine(Get_Allowed_Spawns);
+				Small Message(All Players(All Teams), Custom String("Selected: Bishop"));
+			Else;
+				Small Message(All Players(All Teams), Custom String("No Banked Bishops"));
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Crazy: Queen"));
+			If(Array Contains(Event Player.Bank, 5));
+				Event Player.Spawn_Piece = 5;
+				Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+					Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+				Call Subroutine(Get_Allowed_Spawns);
+				Small Message(All Players(All Teams), Custom String("Selected: Queen"));
+			Else;
+				Small Message(All Players(All Teams), Custom String("No Banked Queens"));
+			End;
+		End;
+		Abort If(Event Player.Spawn_Piece <= Null);
+		Wait Until(!Is Button Held(Event Player, Button(Primary Fire)) || Distance Between(Vector(Evaluate Once(Event Player.Mouse_X), 0,
+			Evaluate Once(Event Player.Mouse_Y)), Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y)) > 0.500, 0.250);
+		Skip If(Event Player.Spawn_Piece <= Null || !Is Button Held(Event Player, Button(Primary Fire)), 2);
+		Wait Until(!Is Button Held(Event Player, Button(Primary Fire)) || Distance Between(Vector(Evaluate Once(Event Player.Mouse_X), 0,
+			Evaluate Once(Event Player.Mouse_Y)), Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y)) > 0.500, 9999);
+		Start Rule(Setup_Drag, Restart Rule);
+	}
+}
+
+rule("Spawn Piece")
+{
+	event
+	{
+		Subroutine;
+		Spawn_Piece;
+	}
+
+	actions
+	{
+		If(Is Button Held(Event Player, Button(Primary Fire)));
+			If(Event Player.Spawn_Piece != Null && Array Contains(Global.Tile_Click_Pos, Event Player.Tile_Click) && !(Array Contains(
+				Event Player.Allowed_Spawns, Event Player.Tile_Click) != Event Player.Allowed_Type));
+				Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] = Event Player.Spawn_Piece;
+				Global.Piece_META[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] = Event Player.Spawn_META;
+				If(Event Player.Spawn_META[0] == True);
+					Modify Global Variable(White_Bank, Remove From Array By Index, Index Of Array Value(Global.White_Bank, Event Player.Spawn_Piece));
+				Else;
+					Modify Global Variable(Black_Bank, Remove From Array By Index, Index Of Array Value(Global.Black_Bank, Event Player.Spawn_Piece));
+				End;
+				Call Subroutine(Cycle_Turn);
+			End;
+		End;
+		Event Player.Spawn_Piece = Null;
+		Event Player.Spawn_META = Null;
+		Event Player.Mouse_Icon = Event Player.Saved_Mouse_Icon;
+		Call Subroutine(Clear_Allowed);
+	}
+}
+
+rule("Crazyhouse Hud")
+{
+	event
+	{
+		Subroutine;
+		Crazy_Hud;
+	}
+
+	actions
+	{
+		Create In-World Text(Event Player, Count Of(Filtered Array(Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? Global.White_Bank : Global.Black_Bank,
+			Current Array Element == 1)), Update Every Frame(Event Player.Camera_Pos + 100 * (5 * -1 / 2 * Cross Product(
+			Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (1.200 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)
+			+ 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, Count Of(Filtered Array(
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Bank : Global.Black_Bank, Current Array Element == 1)) == 0 ? Color(Red) : Color(Green), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		Create In-World Text(Event Player, Count Of(Filtered Array(Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? Global.White_Bank : Global.Black_Bank,
+			Current Array Element == 2)), Update Every Frame(Event Player.Camera_Pos + 100 * (6 * -1 / 2 * Cross Product(
+			Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (1.200 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)
+			+ 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, Count Of(Filtered Array(
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Bank : Global.Black_Bank, Current Array Element == 2)) == 0 ? Color(Red) : Color(Green), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		Create In-World Text(Event Player, Count Of(Filtered Array(Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? Global.White_Bank : Global.Black_Bank,
+			Current Array Element == 3)), Update Every Frame(Event Player.Camera_Pos + 100 * (5 * -1 / 2 * Cross Product(
+			Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (0.200 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)
+			+ 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, Count Of(Filtered Array(
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Bank : Global.Black_Bank, Current Array Element == 3)) == 0 ? Color(Red) : Color(Green), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		Create In-World Text(Event Player, Count Of(Filtered Array(Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? Global.White_Bank : Global.Black_Bank,
+			Current Array Element == 4)), Update Every Frame(Event Player.Camera_Pos + 100 * (6 * -1 / 2 * Cross Product(
+			Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (0.200 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)
+			+ 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, Count Of(Filtered Array(
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Bank : Global.Black_Bank, Current Array Element == 4)) == 0 ? Color(Red) : Color(Green), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		Create In-World Text(Event Player, Count Of(Filtered Array(Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? Global.White_Bank : Global.Black_Bank,
+			Current Array Element == 5)), Update Every Frame(Event Player.Camera_Pos + 100 * (5.500 * -1 / 2 * Cross Product(
+			Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (-0.800 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)
+			+ 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, Count Of(Filtered Array(
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Bank : Global.Black_Bank, Current Array Element == 5)) == 0 ? Color(Red) : Color(Green), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+	}
+}
+
+rule("Drag Spawned Piece")
+{
+	event
+	{
+		Subroutine;
+		Setup_Drag;
+	}
+
+	actions
+	{
+		Skip If(Event Player.Saved_Mouse_Icon == Null, 1);
+		Event Player.Mouse_Icon = Event Player.Saved_Mouse_Icon;
+		Event Player.Saved_Mouse_Icon = Event Player.Mouse_Icon;
+		Event Player.Mouse_Icon = Array(Null, Icon String(Arrow: Up), Icon String(Moon), Icon String(Bolt), Icon String(Spade),
+			Icon String(Club), Icon String(Diamond))[Event Player.Spawn_Piece];
+		Wait Until(!Is Button Held(Event Player, Button(Primary Fire)), 99999);
+		Event Player.Mouse_Icon = Event Player.Saved_Mouse_Icon;
+		If(Event Player.Spawn_Piece != Null && Array Contains(Global.Tile_Click_Pos, Event Player.Tile_Click) && !(Array Contains(
+			Event Player.Allowed_Spawns, Event Player.Tile_Click) != Event Player.Allowed_Type));
+			Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] = Event Player.Spawn_Piece;
+			Global.Piece_META[Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click)] = Event Player.Spawn_META;
+			If(Event Player.Spawn_META[0] == True);
+				Modify Global Variable(White_Bank, Remove From Array By Index, Index Of Array Value(Global.White_Bank, Event Player.Spawn_Piece));
+			Else;
+				Modify Global Variable(Black_Bank, Remove From Array By Index, Index Of Array Value(Global.Black_Bank, Event Player.Spawn_Piece));
+			End;
+			Call Subroutine(Cycle_Turn);
+		End;
+		Call Subroutine(Clear_Allowed);
+		Event Player.Spawn_Piece = Null;
+		Event Player.Spawn_META = Null;
+		Event Player.Mouse_Icon = Event Player.Saved_Mouse_Icon;
+	}
+}
+
+rule("Get Match Final")
+{
+	event
+	{
+		Subroutine;
+		Get_Match_Final;
+	}
+
+	actions
+	{
+		Abort If(Global.Setup_Phase);
+		Skip If(Is Game In Progress != True || Global.Settings[6] != True, 5);
+		If(Global.Checks_White >= 3);
+			Big Message(All Players(All Teams), Custom String("Black Wins"));
+			Small Message(All Players(All Teams), Custom String("Checked 3 Times"));
+			Global.Match_Final_Result = Custom String("Black Winner");
+		End;
+		Skip If(Is Game In Progress != True || Global.Settings[6] != True, 5);
+		If(Global.Checks_Black >= 3);
+			Big Message(All Players(All Teams), Custom String("White Wins"));
+			Small Message(All Players(All Teams), Custom String("Checked 3 Times"));
+			Global.Match_Final_Result = Custom String("White Winner");
+		End;
+		Skip If(Global.Match_Final_Result != Null, 11);
+		If(Global.White_Pieces == 0);
+			If(Global.Settings[9]);
+				Big Message(All Players(All Teams), Custom String("White Wins"));
+				Small Message(All Players(All Teams), Custom String("Gave Away All Pieces"));
+				Global.Match_Final_Result = Custom String("White Winner");
+			Else;
+				Big Message(All Players(All Teams), Custom String("Black Wins"));
+				Small Message(All Players(All Teams), Custom String("Captured All Pieces"));
+				Global.Match_Final_Result = Custom String("Black Winner");
+			End;
+		End;
+		Skip If(Global.Match_Final_Result != Null, 11);
+		If(Global.Black_Pieces == 0);
+			If(Global.Settings[9]);
+				Big Message(All Players(All Teams), Custom String("Black Wins"));
+				Small Message(All Players(All Teams), Custom String("Gave Away All Pieces"));
+				Global.Match_Final_Result = Custom String("Black Winner");
+			Else;
+				Big Message(All Players(All Teams), Custom String("White Wins"));
+				Small Message(All Players(All Teams), Custom String("Captured All Pieces"));
+				Global.Match_Final_Result = Custom String("White Winner");
+			End;
+		End;
+		Skip If(Global.Match_Final_Result != Null, 11);
+		If(Is True For All(Global.Current_Turn == Custom String("White​") ? Global.Vaild_Moves_Black : Global.Vaild_Moves_White,
+			Current Array Element == Empty Array) == True);
+			If(Global.Settings[9]);
+				Big Message(All Players(All Teams), Custom String("{0} Wins", !String Contains(Global.Current_Turn, Custom String("White"))
+					? Custom String("White") : Custom String("Black")));
+				Small Message(All Players(All Teams), Custom String("Stalemate"));
+				Global.Match_Final_Result = Custom String("{0} Winner", !String Contains(Global.Current_Turn, Custom String("White"))
+					? Custom String("White") : Custom String("Black"));
+			Else;
+				Big Message(All Players(All Teams), Custom String("Draw"));
+				Small Message(All Players(All Teams), Custom String("Stalemate"));
+				Global.Match_Final_Result = Custom String("Draw");
+			End;
+		End;
+		Skip If(Global.Match_Final_Result != Null, 5);
+		If(Is True For Any(Global.Board_Current, Array Contains(Global.Hill_Tiles, Current Array Index)
+			&& Current Array Element == 6 && First Of(Global.Piece_META[Current Array Index]) == True));
+			Big Message(All Players(All Teams), Custom String("White Wins"));
+			Small Message(All Players(All Teams), Custom String("Reached Hill"));
+			Global.Match_Final_Result = Custom String("White Winner");
+		End;
+		Skip If(Global.Match_Final_Result != Null, 5);
+		If(Is True For Any(Global.Board_Current, Array Contains(Global.Hill_Tiles, Current Array Index)
+			&& Current Array Element == 6 && First Of(Global.Piece_META[Current Array Index]) == False));
+			Big Message(All Players(All Teams), Custom String("Black Wins"));
+			Small Message(All Players(All Teams), Custom String("Reached Hill"));
+			Global.Match_Final_Result = Custom String("Black Winner");
+		End;
+	}
+}
+
+rule("Failsafe: Restore Mouse")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Event Player.Mouse_Icon == Null || Event Player.Mouse_Color == Null) == True;
+	}
+
+	actions
+	{
+		Skip If(Event Player.Mouse_Icon != Null, 1);
+		Event Player.Mouse_Icon = Event Player.Saved_Mouse_Icon == Null ? Custom String("▲") : Event Player.Mouse_Icon;
+		Skip If(Event Player.Mouse_Color != Null, 1);
+		Event Player.Mouse_Color = Event Player.Saved_Mouse_Color == Null ? Color(Orange) : Event Player.Mouse_Color;
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Failsafe: Fix Board Stuck")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global.Sub_DisplayBoard == True;
+	}
+
+	actions
+	{
+		Wait(3, Abort When False);
+		Global.Sub_DisplayBoard = False;
+	}
+}
+
+rule("Piece Capture")
+{
+	event
+	{
+		Subroutine;
+		Piece_Capture;
+	}
+
+	actions
+	{
+		If(Event Player.Selected_Piece[6] == True);
+			Modify Global Variable(White_Bank, Append To Array, Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos,
+				Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value))]);
+		Else;
+			Modify Global Variable(Black_Bank, Append To Array, Global.Board_Current[Index Of Array Value(Global.Tile_Click_Pos,
+				Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value))]);
+		End;
+		Skip If(!Global.Settings[8], 1);
+		Call Subroutine(Atomic_Capture);
+	}
+}
+
+rule("Atomic Capture")
+{
+	event
+	{
+		Subroutine;
+		Atomic_Capture;
+	}
+
+	actions
+	{
+		Event Player.Blast_Tiles = Empty Array;
+		Modify Player Variable(Event Player, Blast_Tiles, Append To Array, First Of(Event Player.Selected_Piece));
+		Skip If(X Component Of(Global.Grid_Array[Index Of Array Value(Global.Tile_Click_Pos,
+			Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value))]) == -14, 3);
+		Modify Player Variable(Event Player, Blast_Tiles, Append To Array, Index Of Array Value(Global.Tile_Click_Pos,
+			Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value)));
+		Modify Player Variable(Event Player, Blast_Tiles, Append To Array, Index Of Array Value(Global.Tile_Click_Pos,
+			Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value)) + -1);
+		Modify Player Variable(Event Player, Blast_Tiles, Append To Array, Index Of Array Value(Global.Tile_Click_Pos,
+			Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value)) + 7);
+		Skip If(X Component Of(Global.Grid_Array[Index Of Array Value(Global.Tile_Click_Pos,
+			Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value))]) == 14, 3);
+		Modify Player Variable(Event Player, Blast_Tiles, Append To Array, Index Of Array Value(Global.Tile_Click_Pos,
+			Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value)) + 9);
+		Modify Player Variable(Event Player, Blast_Tiles, Append To Array, Index Of Array Value(Global.Tile_Click_Pos,
+			Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value)) + 1);
+		Modify Player Variable(Event Player, Blast_Tiles, Append To Array, Index Of Array Value(Global.Tile_Click_Pos,
+			Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value)) + -7);
+		Modify Player Variable(Event Player, Blast_Tiles, Append To Array, Index Of Array Value(Global.Tile_Click_Pos,
+			Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value)) + -8);
+		Modify Player Variable(Event Player, Blast_Tiles, Append To Array, Index Of Array Value(Global.Tile_Click_Pos,
+			Event Player.Temp_Value == Empty Array ? Event Player.Tile_Click : First Of(Event Player.Temp_Value)) + 8);
+		Event Player.Blast_Tiles = Remove From Array(Event Player.Blast_Tiles, 0);
+		For Player Variable(Event Player, Index, 0, Count Of(Event Player.Blast_Tiles), 1);
+			Skip If(Global.Board_Current[Event Player.Blast_Tiles[Event Player.Index]] > 1, 1);
+			Continue;
+			Global.Board_Current[Event Player.Blast_Tiles[Event Player.Index]] = 0;
+			Global.Piece_META[Event Player.Blast_Tiles[Event Player.Index]] = 0;
+		End;
+	}
+}
+
+rule("Place Duck")
+{
+	event
+	{
+		Subroutine;
+		Place_Duck;
+	}
+
+	actions
+	{
+		Event Player.Can_Click = False;
+		Small Message(Event Player, Custom String("Place Duck"));
+		Wait(0.100, Ignore Condition);
+		Event Player.Spawn_Piece = 7;
+		Event Player.Spawn_META = Array(String Contains(Global.Current_Turn, Custom String("White")) ? False : True);
+		Call Subroutine(Get_Allowed_Spawns);
+		Wait Until(Array Contains(Event Player.Allowed_Spawns, Event Player.Tile_Click) == Event Player.Allowed_Type && Is Button Held(
+			Event Player, Button(Primary Fire)), 99999);
+		Global.Board_Current[Global.Duck_Index] = 0;
+		Global.Piece_META[Global.Duck_Index] = 0;
+		Global.Duck_Index = Index Of Array Value(Global.Tile_Click_Pos, Event Player.Tile_Click);
+		Global.Board_Current[Global.Duck_Index] = 7;
+		Global.Piece_META[Global.Duck_Index] = Event Player.Spawn_META;
+		Start Rule(Clear_Allowed, Restart Rule);
+		Event Player.Spawn_Piece = Null;
+		Event Player.Spawn_META = Null;
+		Event Player.Can_Click = True;
+		Global.Sub_DisplayBoard = True;
+	}
+}
+
+rule("Setup Chess: Empty Board")
+{
+	event
+	{
+		Subroutine;
+		Empty_Board;
+	}
+
+	actions
+	{
+		Global.Board_Current = Empty Array;
+		Global.Piece_META = Empty Array;
+		Global.Board_Current[63] = 0;
+		Global.Piece_META[63] = 0;
+		Global.Sub_DisplayBoard = True;
+		Global.White_Bank = Empty Array;
+		Global.Black_Bank = Empty Array;
+		Global.Checks_White = 0;
+		Global.Checks_Black = 0;
+		Global.Hill_Tiles = Global.Settings[10] ? Array(27, 28, 35, 36) : Empty Array;
+		Global.Setup_Phase = True;
+		Global.Black_Setup_Done = False;
+		Global.White_Setup_Done = False;
+	}
+}
+
+rule("Setup Chess: Hud")
+{
+	event
+	{
+		Subroutine;
+		Setup_Hud;
+	}
+
+	actions
+	{
+		Create In-World Text(Event Player, 1, Update Every Frame(Event Player.Camera_Pos + 100 * (5 * -1 / 2 * Cross Product(
+			Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (1.200 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)
+			+ 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, Global.Setup_Chess_Max_Mat - (
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Mat_Without_King : Global.Black_Mat_Without_King) >= 1 ? Color(Green) : Color(Red), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		Create In-World Text(Event Player, 5, Update Every Frame(Event Player.Camera_Pos + 100 * (6 * -1 / 2 * Cross Product(
+			Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (1.200 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)
+			+ 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, Global.Setup_Chess_Max_Mat - (
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Mat_Without_King : Global.Black_Mat_Without_King) >= 5 ? Color(Green) : Color(Red), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		Create In-World Text(Event Player, 3, Update Every Frame(Event Player.Camera_Pos + 100 * (5 * -1 / 2 * Cross Product(
+			Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (0.200 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)
+			+ 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, Global.Setup_Chess_Max_Mat - (
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Mat_Without_King : Global.Black_Mat_Without_King) >= 3 ? Color(Green) : Color(Red), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		Create In-World Text(Event Player, 3, Update Every Frame(Event Player.Camera_Pos + 100 * (6 * -1 / 2 * Cross Product(
+			Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (0.200 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)
+			+ 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, Global.Setup_Chess_Max_Mat - (
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Mat_Without_King : Global.Black_Mat_Without_King) >= 3 ? Color(Green) : Color(Red), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		Create In-World Text(Event Player, 9, Update Every Frame(Event Player.Camera_Pos + 100 * (6 * -1 / 2 * Cross Product(
+			Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (-0.800 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)
+			+ 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, Global.Setup_Chess_Max_Mat - (
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Mat_Without_King : Global.Black_Mat_Without_King) >= 9 ? Color(Green) : Color(Red), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		Create In-World Text(Event Player, Custom String("{0}/1", (Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_King_Index : Global.Black_King_Index) == -1 ? 0 : 1), Update Every Frame(Event Player.Camera_Pos + 100 * (
+			5 * -1 / 2 * Cross Product(Event Player.Facing_Pos, Direction From Angles(Horizontal Angle From Direction(
+			Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (-0.800 / 2 - 0.200)
+			* Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(
+			Event Player.Facing_Pos) - 90) + 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String and Color, (
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_King_Index : Global.Black_King_Index) == -1 ? Color(Green) : Color(Red), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+		Create In-World Text(Event Player, Custom String("{0}/{1} Materials", Global.Setup_Chess_Max_Mat - (
+			Global.Player_White == Event Player && (Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Mat_Without_King : Global.Black_Mat_Without_King), Global.Setup_Chess_Max_Mat), Update Every Frame(
+			Event Player.Camera_Pos + 100 * (5.500 * -1 / 2 * Cross Product(Event Player.Facing_Pos, Direction From Angles(
+			Horizontal Angle From Direction(Event Player.Facing_Pos), Vertical Angle From Direction(Event Player.Facing_Pos) - 90)) + (
+			-1.500 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Event Player.Facing_Pos),
+			Vertical Angle From Direction(Event Player.Facing_Pos) - 90) + 3 * Event Player.Facing_Pos)), 2, Do Not Clip, String, Color(
+			White), Default Visibility);
+		Modify Player Variable(Event Player, Menu_Text_ID_Array, Append To Array, Last Text ID);
+	}
+}
+
+rule("Setup Chess: Select Piece")
+{
+	event
+	{
+		Subroutine;
+		Setup_Select;
+	}
+
+	actions
+	{
+		Call Subroutine(Clear_Moves);
+		Event Player.Setup_Chess_Spawns = True;
+		Event Player.Has_King = (Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_King_Index : Global.Black_King_Index) != -1;
+		Event Player.Current_Mat = Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+			? Global.White_Mat_Without_King : Global.Black_Mat_Without_King;
+		Event Player.Current_Mat = Global.Setup_Chess_Max_Mat - Event Player.Current_Mat;
+		Event Player.Selected_Piece = Null;
+		If(Global.Current_Turn != (Global.Player_White == Event Player && (
+			Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? Custom String("White") : Custom String(
+			"Black")));
+			Small Message(Event Player, Custom String("Wait for your turn"));
+		Else If(Event Player.Clicked_Area == Custom String("Setup: Pawn"));
+			If(Count Of(Filtered Array(Global.Player_White == Event Player && (
+				Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+				? Global.White_3_Ranks : Global.Black_3_Ranks, Global.Board_Current[Current Array Element] == Null))
+				> 1 || Event Player.Has_King == True);
+				If(Event Player.Current_Mat >= 1);
+					Event Player.Spawn_Piece = 1;
+					Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+						Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+					Call Subroutine(Get_Allowed_Spawns);
+					Small Message(Event Player, Custom String("Selected: Pawn"));
+				Else;
+					Small Message(Event Player, Custom String("Not Enough Materials"));
+				End;
+			Else;
+				Small Message(Event Player, Custom String("Last Location Required For King"));
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Setup: Rook"));
+			If(Count Of(Filtered Array(Global.Player_White == Event Player && (
+				Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+				? Global.White_3_Ranks : Global.Black_3_Ranks, Global.Board_Current[Current Array Element] == Null))
+				> 1 || Event Player.Has_King == True);
+				If(Event Player.Current_Mat >= 5);
+					Event Player.Spawn_Piece = 2;
+					Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+						Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+					Call Subroutine(Get_Allowed_Spawns);
+					Small Message(Event Player, Custom String("Selected: Rook"));
+				Else;
+					Small Message(Event Player, Custom String("Not Enough Materials"));
+				End;
+			Else;
+				Small Message(Event Player, Custom String("Last Location Required For King"));
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Setup: Knight"));
+			If(Count Of(Filtered Array(Global.Player_White == Event Player && (
+				Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+				? Global.White_3_Ranks : Global.Black_3_Ranks, Global.Board_Current[Current Array Element] == Null))
+				> 1 || Event Player.Has_King == True);
+				If(Event Player.Current_Mat >= 3);
+					Event Player.Spawn_Piece = 3;
+					Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+						Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+					Call Subroutine(Get_Allowed_Spawns);
+					Small Message(Event Player, Custom String("Selected: Knight"));
+				Else;
+					Small Message(Event Player, Custom String("Not Enough Materials"));
+				End;
+			Else;
+				Small Message(Event Player, Custom String("Last Location Required For King"));
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Setup: Bishop"));
+			If(Count Of(Filtered Array(Global.Player_White == Event Player && (
+				Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+				? Global.White_3_Ranks : Global.Black_3_Ranks, Global.Board_Current[Current Array Element] == Null))
+				> 1 || Event Player.Has_King == True);
+				If(Event Player.Current_Mat >= 3);
+					Event Player.Spawn_Piece = 4;
+					Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+						Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+					Call Subroutine(Get_Allowed_Spawns);
+					Small Message(Event Player, Custom String("Selected: Bishop"));
+				Else;
+					Small Message(Event Player, Custom String("Not Enough Materials"));
+				End;
+			Else;
+				Small Message(Event Player, Custom String("Last Location Required For King"));
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Setup: Queen"));
+			If(Count Of(Filtered Array(Global.Player_White == Event Player && (
+				Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black"))
+				? Global.White_3_Ranks : Global.Black_3_Ranks, Global.Board_Current[Current Array Element] == Null))
+				> 1 || Event Player.Has_King == True);
+				If(Event Player.Current_Mat >= 9);
+					Event Player.Spawn_Piece = 5;
+					Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+						Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+					Call Subroutine(Get_Allowed_Spawns);
+					Small Message(Event Player, Custom String("Selected: Queen"));
+				Else;
+					Small Message(Event Player, Custom String("Not Enough Materials"));
+				End;
+			Else;
+				Small Message(Event Player, Custom String("Last Location Required For King"));
+			End;
+		Else If(Event Player.Clicked_Area == Custom String("Setup: King"));
+			If(Event Player.Has_King == False);
+				Event Player.Spawn_Piece = 6;
+				Event Player.Spawn_META = Array(Global.Player_White == Event Player && (
+					Global.Player_Black != Event Player || Global.Current_Turn != Custom String("Black")) ? True : False, True);
+				Call Subroutine(Get_Allowed_Spawns);
+				Small Message(Event Player, Custom String("Selected: King"));
+			Else;
+				Small Message(Event Player, Custom String("Already Placed"));
+			End;
+		End;
+		Event Player.Setup_Chess_Spawns = False;
+		Abort If(Event Player.Spawn_Piece <= Null);
+		Wait Until(!Is Button Held(Event Player, Button(Primary Fire)) || Distance Between(Vector(Evaluate Once(Event Player.Mouse_X), 0,
+			Evaluate Once(Event Player.Mouse_Y)), Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y)) > 0.500, 0.250);
+		Skip If(Event Player.Spawn_Piece <= Null || !Is Button Held(Event Player, Button(Primary Fire)), 2);
+		Wait Until(!Is Button Held(Event Player, Button(Primary Fire)) || Distance Between(Vector(Evaluate Once(Event Player.Mouse_X), 0,
+			Evaluate Once(Event Player.Mouse_Y)), Vector(Event Player.Mouse_X, 0, Event Player.Mouse_Y)) > 0.500, 9999);
+		Start Rule(Setup_Drag, Restart Rule);
+	}
+}
+
+rule("Setup Chess: Cycle Turn")
+{
+	event
+	{
+		Subroutine;
+		Setup_Cycle;
+	}
+
+	actions
+	{
+		Wait Until(Global.Sub_DisplayBoard == False, 99999);
+		Call Subroutine(Is_Done_Calc);
+		If(Global.Black_Setup_Done && Global.White_Setup_Done);
+			All Players(All Teams).Page = Global.Settings[4] ? Custom String("Game/Crazy") : Custom String("Game");
+			Global.Setup_Phase = False;
+			Small Message(All Players(All Teams), Custom String("Setup Phase: Completed!"));
+			Wait(0.250, Ignore Condition);
+			Global.Current_Turn = String Contains(Global.Current_Turn, Custom String("White")) ? Custom String("Black") : Custom String(
+				"White");
+			Small Message(All Players(All Teams), Custom String("{0}'s Turn", Global.Current_Turn == Custom String("White") ? Custom String(
+				"Black") : Custom String("White")));
+		Else;
+			If(Global.Current_Turn == Custom String("White​") ? !Global.Black_Setup_Done : !Global.White_Setup_Done);
+				Global.Current_Turn = String Contains(Global.Current_Turn, Custom String("White")) ? Custom String("Black") : Custom String(
+					"White");
+				Small Message(All Players(All Teams), Custom String("{0}'s Turn", Global.Current_Turn == Custom String("White") ? Custom String(
+					"Black") : Custom String("White")));
+			Else;
+				Global.Current_Turn = String Contains(Global.Current_Turn, Custom String("White")) ? Custom String("White") : Custom String(
+					"Black");
+				Small Message(All Players(All Teams), Custom String("{0}'s Turn, Still", Global.Current_Turn));
+			End;
+		End;
+		Play Effect(All Players(All Teams), Baptiste Biotic Launcher Explosion Sound, Color(White), Vector(Global.Starting_X,
+			Global.Camera_Height, Global.Starting_Y), 20);
+	}
+}
+
+rule("Setup Chess: Calc Is Done")
+{
+	event
+	{
+		Subroutine;
+		Is_Done_Calc;
+	}
+
+	actions
+	{
+		If(String Contains(Global.Current_Turn, Custom String("White")));
+			Global.Current_Mat = Global.Setup_Chess_Max_Mat - Global.White_Mat_Without_King;
+			Global.White_Setup_Done = True;
+			Skip If(Global.White_King_Index == -1, 2);
+			Abort If(Global.Current_Mat <= 0);
+			Abort If(Is True For All(Array Slice(Global.White_3_Ranks, 7, 16), Global.Board_Current[Current Array Element] != 0)
+				&& Global.Current_Mat < 3);
+			Global.White_Setup_Done = False;
+		Else;
+			Global.Current_Mat = Global.Setup_Chess_Max_Mat - Global.Black_Mat_Without_King;
+			Global.Black_Setup_Done = True;
+			Skip If(Global.Black_King_Index == -1, 2);
+			Abort If(Global.Current_Mat <= 0);
+			Abort If(Is True For All(Array Slice(Global.Black_3_Ranks, 0, 16), Global.Board_Current[Current Array Element] != 0)
+				&& Global.Current_Mat < 3);
+			Global.Black_Setup_Done = False;
+		End;
+	}
+}
