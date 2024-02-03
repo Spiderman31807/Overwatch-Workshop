@@ -2,4 +2,5 @@
 
 These are Path Made for my pathfinder and can be used to swap out maps for other maps in my AI codes
 
-They are all just copy paste into either actions or rules
+All Individual Maps are Copy Paste Actions and All Bundle Maps are Copy Paste Rules
+(Control Points Are always Bundled into 3 maps for the 3 points)
