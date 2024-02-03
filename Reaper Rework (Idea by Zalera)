@@ -1,0 +1,719 @@
+settings
+{
+	main
+	{
+		Description: "Scripts made by \"Spiderman318\"\nKit made by 850h Reaper main \"Zalera\"\n\nWraith Form triggers twice on start for players\nthat have it on hold mode in their settings."
+		Mode Name: "Reaper Rework - A7XNC"
+	}
+
+	modes
+	{
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+
+			disabled maps
+			{
+				Rialto
+			}
+		}
+
+		Flashpoint
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Reaper
+			{
+				Shadow Step Cooldown Time: 0%
+				Wraith Form Cooldown Time: 10%
+			}
+		}
+	}
+
+	workshop
+	{
+		Area of effect: 6.000
+		Cooldown: 19.000
+		Phased out extention: 0.400
+		Recharge time: 13.000
+		Shadow Step: Off
+		Smoke recharge multiplier: 2.000
+		Speed buff: 10.000
+		Stealth Mechanic: [1]
+		Usage time: 6.500
+		Wraith Form: Off
+	}
+
+	extensions
+	{
+		Buff Status Effects
+		Explosion Sounds
+		Projectiles
+	}
+}
+
+variables
+{
+	global:
+		0: Settings
+
+	player:
+		0: Wraith_Form_Meter
+		1: Using_Wraith_Form
+		2: Display_Wraith_Resource
+		3: Smoke_Grenade_Pos
+		4: Smoke_Grenade_Dir
+		5: Smoke_Grenade_Speed
+		6: Smoke_Grenade_Gravity
+		7: Smoke_Grenade_Angle
+		8: Smoke_Grenade_CD
+		9: In_Smoke
+		10: Shadow_Step_CD
+		11: Show_Huds
+		12: Wraith_Form_Bind_Type
+		13: Ammo
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Settings = Array(Workshop Setting Combo(Custom String("Wraith Form"), Custom String("Binding type (default)"), 0, Array(
+			Custom String("Hold"), Custom String("Toggle")), 0), Workshop Setting Real(Custom String("Wraith Form"), Custom String(
+			"Recharge time"), 13, 0, 30, 1), Workshop Setting Real(Custom String("Wraith Form"), Custom String("Usage time"), 6.500, 1, 30,
+			2), Workshop Setting Real(Custom String("Shadow Step"), Custom String("Phased out extention"), 0.400, 0, 3, 0),
+			Workshop Setting Real(Custom String("Shadow Step"), Custom String("Smoke, recharge multiplier"), 2, 1, 5, 1),
+			Workshop Setting Combo(Custom String("Smoke Grenade"), Custom String("Stealth Mechanic"), 0, Array(Custom String(
+			"Team and enemies"), Custom String("Enemies (Bugged, As Like Above Option)"), Custom String("Off")), 3),
+			Workshop Setting Combo(Custom String("Smoke Grenade"), Custom String("Start cooldown on"), 0, Array(Custom String(
+			"Cast (Grenade Fired)"), Custom String("Smoke cloud creation"), Custom String("Smoke cloud dissipation")), 0),
+			Workshop Setting Real(Custom String("Smoke Grenade"), Custom String("Cooldown"), 19, 0, 30, 1), Workshop Setting Real(
+			Custom String("Smoke Grenade"), Custom String("Area of effect"), 6, 1, 30, 2), Workshop Setting Toggle(Custom String(
+			"Wraith Form"), Custom String("Thrid person"), False, 4), Workshop Setting Real(Custom String("Wraith Form"), Custom String(
+			"Speed buff"), 10, 0, 100, 3), Workshop Setting Toggle(Custom String("Reaper Rework"), Custom String("Wraith Form"), True, 0),
+			Workshop Setting Toggle(Custom String("Reaper Rework"), Custom String("Shadow Step"), True, 1), Workshop Setting Toggle(
+			Custom String("Reaper Rework"), Custom String("Smoke Grenade"), True, 2));
+	}
+}
+
+rule("Player Setup")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Show_Huds = False;
+		Skip If(Global.Settings[11] == False, 3);
+		Event Player.Wraith_Form_Bind_Type = Global.Settings[0];
+		Event Player.Wraith_Form_Meter = 100;
+		Event Player.Using_Wraith_Form = False;
+		Skip If(Global.Settings[12] == False, 1);
+		Event Player.Shadow_Step_CD = 0;
+		Abort If(Global.Settings[13] == False);
+		Event Player.Smoke_Grenade_CD = 0;
+		Create Projectile Effect(Filtered Array(All Players(All Teams), Event Player.Smoke_Grenade_Speed != Null),
+			Baptiste Biotic Launcher, All Players(Team Of(Event Player)), Event Player.Smoke_Grenade_Pos, Event Player.Smoke_Grenade_Dir,
+			0, Visible To Friendly To Position Direction and Size);
+		Create Effect(Filtered Array(All Players(All Teams), Event Player.Smoke_Grenade_Speed != Null), Decal Sound, Color(White),
+			Event Player.Smoke_Grenade_Pos, 100, Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams),
+			Event Player.Smoke_Grenade_Pos != Null && Event Player.Smoke_Grenade_Speed == Null), Cloud, Color(Gray),
+			Event Player.Smoke_Grenade_Pos + Vector(0, 0.500, 0), Global.Settings[8], Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams),
+			Event Player.Smoke_Grenade_Pos != Null && Event Player.Smoke_Grenade_Speed == Null), Cloud, Color(Gray),
+			Event Player.Smoke_Grenade_Pos + Vector(0, 1, 0), Global.Settings[8], Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams),
+			Event Player.Smoke_Grenade_Pos != Null && Event Player.Smoke_Grenade_Speed == Null), Cloud, Color(Gray),
+			Event Player.Smoke_Grenade_Pos + Vector(0, 1.500, 0), Global.Settings[8], Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams),
+			Event Player.Smoke_Grenade_Pos != Null && Event Player.Smoke_Grenade_Speed == Null), Cloud, Color(Gray),
+			Event Player.Smoke_Grenade_Pos + Vector(0, 2, 0), Global.Settings[8], Visible To Position and Radius);
+		Create Effect(Filtered Array(All Players(All Teams), Event Player.In_Smoke), Bad Aura, Team Of(Event Player) == Team 1 ? Color(
+			Team 1) : Color(Team 2), World Vector Of(Vector(0, Distance Between(Eye Position(Event Player), Position Of(Event Player))
+			/ 1.400, 0), Event Player, Rotation And Translation), 0.100, Visible To Position Radius and Color);
+	}
+}
+
+rule("Effects And Hud Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Skip If(Global.Settings[11] == False, 3);
+		Create HUD Text(Filtered Array(Local Player, Local Player.Show_Huds && Is In Spawn Room(Local Player)), Custom String(
+			"Press {0} To Change Wraith Form To: {1}", Input Binding String(Button(Interact)),
+			Local Player.Wraith_Form_Bind_Type == Null ? Custom String("Toggle") : Custom String("Hold")), Null, Null, Top, 4, Color(
+			White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create Progress Bar In-World Text(Filtered Array(Local Player, (
+			Local Player.Using_Wraith_Form || Local Player.Display_Wraith_Resource) && Local Player.Show_Huds),
+			Local Player.Wraith_Form_Meter, Custom String("{0}: {1}%", Ability Icon String(Hero(Reaper), Button(Ability 1)),
+			Round To Integer(Local Player.Wraith_Form_Meter, Up)), Update Every Frame(Eye Position(Local Player) + 100 * (
+			0 * -1 / 2 * Cross Product(Facing Direction Of(Local Player), Direction From Angles(Horizontal Angle From Direction(
+			Facing Direction Of(Local Player)), Vertical Angle From Direction(Facing Direction Of(Local Player)) - 90)) + (-1 / 2 - 0.200)
+			* Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Local Player)), Vertical Angle From Direction(
+			Facing Direction Of(Local Player)) - 90) + 3 * Facing Direction Of(Local Player))), 1.250, Do Not Clip, Color(White), Color(
+			White), Visible To Position and Values, Default Visibility);
+		Create In-World Text(Filtered Array(Local Player, Local Player.Show_Huds), Custom String("{0}{2}", Ability Icon String(Hero(
+			Reaper), Button(Ability 1)), Null, Input Binding String(Button(Secondary Fire))), Update Every Frame(Eye Position(Local Player)
+			+ 100 * (-4.400 * -1 / 2 * Cross Product(Facing Direction Of(Local Player), Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Local Player)), Vertical Angle From Direction(Facing Direction Of(
+			Local Player)) - 90)) + (-2.400 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(
+			Local Player)), Vertical Angle From Direction(Facing Direction Of(Local Player)) - 90) + 3 * Facing Direction Of(
+			Local Player))), 2, Do Not Clip, Visible To Position and String, Color(White), Default Visibility);
+		Skip If(Global.Settings[13] == False, 2);
+		Create Effect(Filtered Array(Local Player, Local Player.In_Smoke), Baptiste Immortality Field Protected Effect, Color(White),
+			Local Player, 1, Visible To Position and Radius);
+		Create In-World Text(Filtered Array(Local Player, Local Player.Show_Huds), Custom String("  {0}{1}\n", Ability Icon String(Hero(
+			Ana), Button(Ability 2)), Local Player.Smoke_Grenade_CD == Null ? (Global.Settings[11] == True ? Custom String("\n{0}",
+			Input Binding String(Button(Ability 1))) : Input Binding String(Button(Secondary Fire))) : Round To Integer(
+			Local Player.Smoke_Grenade_CD, Up)), Update Every Frame(Eye Position(Local Player) + 100 * (-3.600 * -1 / 2 * Cross Product(
+			Facing Direction Of(Local Player), Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Local Player)),
+			Vertical Angle From Direction(Facing Direction Of(Local Player)) - 90)) + (-3.100 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Local Player)), Vertical Angle From Direction(Facing Direction Of(
+			Local Player)) - 90) + 3 * Facing Direction Of(Local Player))), 2, Do Not Clip, Visible To Position and String, Color(White),
+			Default Visibility);
+		Skip If(Global.Settings[12] == False, 1);
+		Create In-World Text(Filtered Array(Local Player, Local Player.Show_Huds), Custom String("{0}{1}", Ability Icon String(Hero(
+			Reaper), Button(Ability 2)), Local Player.Shadow_Step_CD == Null ? Custom String("") : Round To Integer(
+			Local Player.Shadow_Step_CD, Up)), Update Every Frame(Eye Position(Local Player) + 100 * (-5 * -1 / 2 * Cross Product(
+			Facing Direction Of(Local Player), Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Local Player)),
+			Vertical Angle From Direction(Facing Direction Of(Local Player)) - 90)) + (-2.400 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Local Player)), Vertical Angle From Direction(Facing Direction Of(
+			Local Player)) - 90) + 3 * Facing Direction Of(Local Player))), 2, Do Not Clip, Visible To Position and String, Color(White),
+			Default Visibility);
+	}
+}
+
+rule("Reaper Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Reaper);
+	}
+
+	actions
+	{
+		Skip If(Global.Settings[11] == False, 3);
+		Event Player.Wraith_Form_Meter = 100;
+		Event Player.Using_Wraith_Form = False;
+		Disallow Button(Event Player, Button(Ability 1));
+		Skip If(Global.Settings[12] == False, 2);
+		Event Player.Shadow_Step_CD = 0;
+		Chase Player Variable At Rate(Event Player, Shadow_Step_CD, 0, 1, Destination and Rate);
+		Skip If(Global.Settings[13] == False, 2);
+		Event Player.Smoke_Grenade_CD = 0;
+		Chase Player Variable At Rate(Event Player, Smoke_Grenade_CD, 0, 1, Destination and Rate);
+		Event Player.Show_Huds = True;
+		Wait Until((Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) != Hero(Reaper), 99999);
+		Skip If(Global.Settings[11] == False, 3);
+		Event Player.Wraith_Form_Meter = 100;
+		Event Player.Using_Wraith_Form = False;
+		Disallow Button(Event Player, Button(Ability 1));
+		Skip If(Global.Settings[12] == False, 2);
+		Event Player.Shadow_Step_CD = 0;
+		Stop Chasing Player Variable(Event Player, Shadow_Step_CD);
+		Skip If(Global.Settings[13] == False, 2);
+		Stop Chasing Player Variable(Event Player, Smoke_Grenade_CD);
+		Event Player.Smoke_Grenade_CD = 0;
+		Event Player.Show_Huds = False;
+	}
+}
+
+rule("Display Wraith Resource")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Wraith_Form_Meter < 100;
+		Global.Settings[11] == True;
+	}
+
+	actions
+	{
+		Event Player.Display_Wraith_Resource = True;
+		Wait Until(Event Player.Wraith_Form_Meter == 100, 99999);
+		Wait(1, Restart When True);
+		Event Player.Display_Wraith_Resource = False;
+	}
+}
+
+rule("Start Wraith Form")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Reaper);
+		Is Button Held(Event Player, Button(Secondary Fire)) == True;
+		Is True For All(Array(Has Status(Event Player, Hacked), Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep),
+			Has Status(Event Player, Frozen), Has Status(Event Player, Stunned), Is Dead(Event Player), Is Communicating Any Emote(
+			Event Player)), !Current Array Element) == True;
+		Event Player.Wraith_Form_Meter > 10;
+		Ability Cooldown(Event Player, Button(Ability 1)) == Null;
+		Global.Settings[11] == True;
+	}
+
+	actions
+	{
+		Abort If(Event Player.Using_Wraith_Form);
+		Wait(0.016, Ignore Condition);
+		Event Player.Ammo = Ammo(Event Player, 0);
+		Event Player.Using_Wraith_Form = True;
+		Skip If(!Global.Settings[9], 1);
+		Start Camera(Event Player, Update Every Frame(Ray Cast Hit Position(Eye Position(Event Player), World Vector Of(Vector(-0.800,
+			1.800, -1.400), Event Player, Rotation And Translation) + Direction Towards(Eye Position(Event Player), World Vector Of(Vector(
+			-0.800, 1.800, -0.400), Event Player, Rotation And Translation)) * 0.300, Null, Event Player, False) + Direction Towards(
+			World Vector Of(Vector(-0.800, 1.800, -1.400), Event Player, Rotation And Translation), Eye Position(Event Player)) * 0.300),
+			Update Every Frame(Eye Position(Event Player) + Facing Direction Of(Event Player) * 99), 0);
+		Chase Player Variable At Rate(Event Player, Wraith_Form_Meter, 0, 100 / Global.Settings[2], Destination and Rate);
+		Set Move Speed(Event Player, 0.055 * (100 + Global.Settings[10]) / 0.083);
+		Set Status(Event Player, Null, Phased Out, 9999);
+		Set Primary Fire Enabled(Event Player, False);
+	}
+}
+
+rule("End Wraith Form")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Reaper);
+		(Event Player.Wraith_Form_Meter <= 0 || (Event Player.Wraith_Form_Bind_Type == Null ? !Is Button Held(Event Player, Button(
+			Secondary Fire)) : Is Button Held(Event Player, Button(Secondary Fire)))) == True;
+		Global.Settings[11] == True;
+	}
+
+	actions
+	{
+		Abort If(!Event Player.Using_Wraith_Form);
+		Wait(0.016, Ignore Condition);
+		Event Player.Using_Wraith_Form = False;
+		Stop Camera(Event Player);
+		Stop Holding Button(Event Player, Button(Ability 1));
+		Cancel Primary Action(Event Player);
+		Stop Chasing Player Variable(Event Player, Wraith_Form_Meter);
+		Set Move Speed(Event Player, 100);
+		Clear Status(Event Player, Phased Out);
+		Skip If(Workshop Setting Toggle(Custom String("Wraith Form"), Custom String("Keep Reload Upon Use"), False, 0), 1);
+		Set Ammo(Event Player, 0, Event Player.Ammo);
+		Set Primary Fire Enabled(Event Player, True);
+		Set Ability Cooldown(Event Player, Button(Ability 1), 1);
+	}
+}
+
+rule("Wraith Recharge")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Wraith_Form_Meter < 100;
+		Event Player.Using_Wraith_Form != True;
+		Global.Settings[11] == True;
+	}
+
+	actions
+	{
+		Wait(1, Abort When False);
+		Chase Player Variable At Rate(Event Player, Wraith_Form_Meter, 100, 100 / Global.Settings[1], Destination and Rate);
+	}
+}
+
+rule("Force Wraith")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Using_Wraith_Form == True;
+		Global.Settings[11] == True;
+	}
+
+	actions
+	{
+		Allow Button(Event Player, Button(Ability 1));
+		Cancel Primary Action(Event Player);
+		Set Ability Cooldown(Event Player, Button(Ability 1), 0);
+		Stop Holding Button(Event Player, Button(Ability 1));
+		Start Holding Button(Event Player, Button(Ability 1));
+		Disallow Button(Event Player, Button(Ability 1));
+		Wait(0.100, Ignore Condition);
+		Wait Until(Is True For Any(Array(!Is Using Ability 1(Event Player), !Event Player.Using_Wraith_Form, Is Button Held(Event Player,
+			Button(Primary Fire))), Current Array Element), 2.900);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Shadow Step Immunity")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Reaper);
+		Update Every Frame(Is Using Ability 2(Event Player)) == True;
+		Global.Settings[12] == True;
+	}
+
+	actions
+	{
+		Wait(0.992, Abort When False);
+		Wait(1.008, Abort When False);
+		Set Status(Event Player, Null, Phased Out, Global.Settings[3]);
+		Wait(0.096, Abort When False);
+	}
+}
+
+rule("Fire Smoke Grenade")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Reaper);
+		Is Button Held(Event Player, Global.Settings[11] == True ? Button(Ability 1) : Button(Secondary Fire)) == True;
+		Is True For All(Array(Has Status(Event Player, Hacked), Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep),
+			Has Status(Event Player, Frozen), Has Status(Event Player, Stunned), Is Dead(Event Player), Is Communicating Any Emote(
+			Event Player)), !Current Array Element) == True;
+		Event Player.Smoke_Grenade_CD == Null;
+		Event Player.Smoke_Grenade_Pos == Null;
+		Event Player.Using_Wraith_Form != True;
+		Is Using Ability 2(Event Player) != True;
+		Global.Settings[13] == True;
+	}
+
+	actions
+	{
+		Play Effect(All Players(All Teams), Baptiste Biotic Launcher Explosion Sound, Color(White), Event Player, 50);
+		Event Player.Smoke_Grenade_Pos = Eye Position(Event Player);
+		Event Player.Smoke_Grenade_Dir = Facing Direction Of(Event Player);
+		Event Player.Smoke_Grenade_Speed = 30;
+		Event Player.Smoke_Grenade_Gravity = 0.400;
+		Chase Player Variable At Rate(Event Player, Smoke_Grenade_Pos, Ray Cast Hit Position(Event Player.Smoke_Grenade_Pos,
+			Event Player.Smoke_Grenade_Pos + Event Player.Smoke_Grenade_Dir * 1, Null, Event Player, False)
+			+ Event Player.Smoke_Grenade_Dir * -0.100, Event Player.Smoke_Grenade_Speed, Destination and Rate);
+		Chase Player Variable At Rate(Event Player, Smoke_Grenade_Dir, Direction From Angles(Horizontal Angle From Direction(
+			Event Player.Smoke_Grenade_Dir), Vertical Angle From Direction(Event Player.Smoke_Grenade_Dir)
+			+ Event Player.Smoke_Grenade_Gravity), 1, Destination and Rate);
+		Chase Player Variable At Rate(Event Player, Smoke_Grenade_Angle, Absolute Value(Vertical Angle From Direction(
+			Event Player.Smoke_Grenade_Dir)) / 90, 9999, Destination and Rate);
+		Chase Player Variable At Rate(Event Player, Smoke_Grenade_Gravity, Event Player.Smoke_Grenade_Angle * (
+			Vertical Angle From Direction(Event Player.Smoke_Grenade_Dir) > 0 ? 4 * (Vertical Angle From Direction(
+			Event Player.Smoke_Grenade_Dir) / 90) : (Event Player.Smoke_Grenade_Speed < 5 ? 1 - Event Player.Smoke_Grenade_Speed / 5 : 0))
+			+ 0.400 * (1 - Event Player.Smoke_Grenade_Angle), 9999, Destination and Rate);
+		Chase Player Variable At Rate(Event Player, Smoke_Grenade_Speed, Vertical Angle From Direction(Event Player.Smoke_Grenade_Dir)
+			>= 0 ? 30 : 0.100, 15, Destination and Rate);
+		Skip If(Global.Settings[6] != 0, 1);
+		Event Player.Smoke_Grenade_CD = Global.Settings[7];
+	}
+}
+
+rule("Explode Smoke Grenade")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Reaper);
+		Event Player.Smoke_Grenade_Speed != Null;
+		Ray Cast Hit Position(Event Player.Smoke_Grenade_Pos, Event Player.Smoke_Grenade_Pos + Event Player.Smoke_Grenade_Dir * 0.500,
+			Null, Event Player, False) != Event Player.Smoke_Grenade_Pos + Event Player.Smoke_Grenade_Dir * 0.500;
+		Global.Settings[13] == True;
+	}
+
+	actions
+	{
+		Stop Chasing Player Variable(Event Player, Smoke_Grenade_Pos);
+		Stop Chasing Player Variable(Event Player, Smoke_Grenade_Dir);
+		Stop Chasing Player Variable(Event Player, Smoke_Grenade_Angle);
+		Stop Chasing Player Variable(Event Player, Smoke_Grenade_Gravity);
+		Stop Chasing Player Variable(Event Player, Smoke_Grenade_Speed);
+		Play Effect(All Players(All Teams), Ana Biotic Grenade Explosion Sound, Color(White), Event Player.Smoke_Grenade_Pos, 20);
+		Play Effect(All Players(All Teams), Bad Explosion, Color(Gray), Event Player.Smoke_Grenade_Pos,
+			Global.Settings[8] + Global.Settings[8] * 0.200);
+		Event Player.Smoke_Grenade_Speed = 0;
+		Chase Player Variable At Rate(Event Player, Smoke_Grenade_Pos, Ray Cast Hit Position(Event Player.Smoke_Grenade_Pos,
+			Event Player.Smoke_Grenade_Pos + Down * 1, Null, Event Player, False) + Up * 0.100, 10, Destination and Rate);
+		Skip If(Global.Settings[6] != 1, 1);
+		Event Player.Smoke_Grenade_CD = Global.Settings[7];
+		Wait(5, Ignore Condition);
+		Stop Chasing Player Variable(Event Player, Smoke_Grenade_Pos);
+		Event Player.Smoke_Grenade_Pos = Null;
+		Skip If(Global.Settings[6] != 2, 1);
+		Event Player.Smoke_Grenade_CD = Global.Settings[7];
+	}
+}
+
+rule("Smoke Invisibility")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Players(Team Of(Event Player)),
+			Current Array Element.Smoke_Grenade_Speed == Null && Current Array Element.Smoke_Grenade_Pos != Null && Distance Between(
+			Event Player, Current Array Element.Smoke_Grenade_Pos) <= 6 && Is In Line of Sight(Eye Position(Event Player),
+			Current Array Element.Smoke_Grenade_Pos + Up * 1.500, Barriers Do Not Block LOS)) == True;
+		Global.Settings[13] == True;
+	}
+
+	actions
+	{
+		Event Player.In_Smoke = True;
+		If(Global.Settings[5] == 0);
+			Set Invisible(Event Player, All);
+		Else If(Global.Settings[5] == 1);
+			Set Invisible(Event Player, Enemies);
+		End;
+		Wait Until(Is True For Any(All Players(Team Of(Event Player)),
+			Current Array Element.Smoke_Grenade_Speed == Null && Current Array Element.Smoke_Grenade_Pos != Null && Distance Between(
+			Event Player, Current Array Element.Smoke_Grenade_Pos) <= 6 && Is In Line of Sight(Eye Position(Event Player),
+			Current Array Element.Smoke_Grenade_Pos + Up * 1.500, Barriers Do Not Block LOS)) != True, 99999);
+		Event Player.In_Smoke = False;
+		Set Invisible(Event Player, None);
+	}
+}
+
+rule("Smoke Shadow Step CD")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Reaper);
+		Event Player.Shadow_Step_CD != Null;
+		Event Player.In_Smoke == True;
+		Global.Settings[4] > 1;
+		Global.Settings[12] == True;
+	}
+
+	actions
+	{
+		Event Player.Shadow_Step_CD -= 0.100 * (Global.Settings[4] - 1);
+		Modify Player Variable(Event Player, Shadow_Step_CD, Max, 0);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Shadow Step CD")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Reaper);
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Show_Huds = False;
+		Wait Until(!Is Using Ability 2(Event Player), 3);
+		Event Player.Show_Huds = True;
+		If(Global.Settings[12] == True);
+			Event Player.Shadow_Step_CD = 10;
+			Set Ability 2 Enabled(Event Player, False);
+			Wait Until(Event Player.Shadow_Step_CD == 0, 99999);
+			Set Ability 2 Enabled(Event Player, True);
+		Else;
+			Set Ability Cooldown(Event Player, Button(Ability 2), 10);
+			Set Ability 2 Enabled(Event Player, False);
+			Wait(10, Ignore Condition);
+			Set Ability 2 Enabled(Event Player, True);
+		End;
+	}
+}
+
+rule("Change Wraith From Binding Type")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Reaper);
+		Is In Spawn Room(Event Player) == True;
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Global.Settings[11] == True;
+	}
+
+	actions
+	{
+		Event Player.Wraith_Form_Bind_Type = Event Player.Wraith_Form_Bind_Type == Null ? 1 : Null;
+		Small Message(Event Player, Custom String("{0} Bind Type: {1}", Ability Icon String(Hero(Reaper), Button(Ability 1)),
+			Event Player.Wraith_Form_Bind_Type == Null ? Custom String("Hold") : Custom String("Toggle")));
+	}
+}
+
+rule("Is Emoting")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Communicating Any Emote(Event Player) == True;
+		Event Player.Show_Huds == True;
+	}
+
+	actions
+	{
+		Event Player.Show_Huds = False;
+		Wait Until(!Is Communicating Any Emote(Event Player), 99999);
+		Abort If((Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) != Hero(Reaper));
+		Event Player.Show_Huds = True;
+	}
+}
+
+rule("Is Dead")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dead(Event Player) == True;
+		Event Player.Show_Huds == True;
+	}
+
+	actions
+	{
+		Event Player.Show_Huds = False;
+		Wait Until(Is Alive(Event Player), 99999);
+		Abort If((Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) != Hero(Reaper));
+		Event Player.Show_Huds = True;
+	}
+}
+
+rule("Wraith Form CD Normal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Ability Cooldown(Event Player, Button(Ability 1)) != Null;
+		Global.Settings[11] == False;
+	}
+
+	actions
+	{
+		Set Ability Cooldown(Event Player, Button(Ability 1), 8);
+	}
+}
