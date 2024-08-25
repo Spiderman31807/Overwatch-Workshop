@@ -1,0 +1,527 @@
+settings
+{
+	main
+	{
+		Description: "Shows Most Is Data With A Hud On The Left,\nAnd Logs Whenever They Change From On/Off\nWith Empty Logs As Filler Every Seocnd."
+		Mode Name: "Data Hud - EA2GX"
+	}
+
+	modes
+	{
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Flashpoint
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+}
+
+rule("Huds")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create HUD Text(Local Player, Null, Custom String(
+			"                                                \nIs Firing Primary: {0}\nIs Firing Secondary: {1}\nIs Using Ability 1: {2}",
+			Is Firing Primary(Local Player), Is Firing Secondary(Local Player), Custom String(
+			"{0}\nIs Using Ability 2: {1}\nIs Using Ultimate: {2}", Is Using Ability 1(Local Player), Is Using Ability 2(Local Player),
+			Is Using Ultimate(Local Player))), Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Create HUD Text(Local Player, Null, Custom String(
+			"                                                \nIs In Air: {0}\nIs On Ground: {1}\n\nIs Jumping: {2}", Is In Air(
+			Local Player), Is On Ground(Local Player), Custom String("{0}\nIs Crouching: {1}\nIs Meleeing: {2}", Is Jumping(Local Player),
+			Is Crouching(Local Player), Is Meleeing(Local Player))), Null, Left, 0, Color(White), Color(White), Color(White),
+			Visible To and String, Default Visibility);
+		Create HUD Text(Local Player, Null, Custom String(
+			"                                                \nIs Reloading: {0}\nIs In Alternate Form: {1}\nIs Duplicating: {2}",
+			Is Reloading(Local Player), Is In Alternate Form(Local Player), Custom String("{0}\n\nIs Alive: {1}\nIs Dead: {2}",
+			Is Duplicating(Local Player), Is Alive(Local Player), Is Dead(Local Player))), Null, Left, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Local Player, Null, Custom String(
+			"                                                \nIs Moving: {0}\nIs Standing: {1}\n\nIs On Wall: {2}", Is Moving(
+			Local Player), Is Standing(Local Player), Custom String("{0}\n\nIs On Objective: {1}\nIs Portrait On Fire: {2}", Is On Wall(
+			Local Player), Is On Objective(Local Player), Is Portrait On Fire(Local Player))), Null, Left, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Local Player, Null, Custom String(
+			"                                                \nCooldown Primary: {0}\nCooldown Secondary: {1}\nCooldown Ability 1: {2}",
+			Ability Cooldown(Local Player, Button(Primary Fire)), Ability Cooldown(Local Player, Button(Secondary Fire)), Custom String(
+			"{0}\nCooldown Ability 2: {1}\nCooldown Melee: {2}", Ability Cooldown(Local Player, Button(Ability 1)), Ability Cooldown(
+			Local Player, Button(Ability 2)), Ability Cooldown(Local Player, Button(Melee)))), Null, Right, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Local Player, Null, Custom String(
+			"                                                \nCooldown Jump: {0}\nCooldown Crouch: {1}\n\nCharges Ability 1: {2}",
+			Ability Cooldown(Local Player, Button(Jump)), Ability Cooldown(Local Player, Button(Crouch)), Custom String(
+			"{0}\nCharges Ability 2: {1}\nCharges Secondary: {2}", Ability Charge(Local Player, Button(Ability 1)), Ability Charge(
+			Local Player, Button(Ability 2)), Ability Charge(Local Player, Button(Secondary Fire)))), Null, Right, 0, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Local Player, Null, Custom String(
+			"                                                \nResource Primary: {0}\nResource Secondary: {1}\nResource Ability 1: {2}",
+			Ability Resource(Local Player, Button(Primary Fire)), Ability Resource(Local Player, Button(Secondary Fire)), Custom String(
+			"{0}\nResource Abiltiy 2: {1}\nResource Jump: {2}", Ability Resource(Local Player, Button(Ability 1)), Ability Resource(
+			Local Player, Button(Ability 2)), Ability Resource(Local Player, Button(Jump)))), Null, Right, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Local Player, Null, Custom String(
+			"                                                \nAmmo Primary: {0}\nAmmo Secondary: {1}", Ammo(Local Player, 0), Ammo(
+			Local Player, 1)), Null, Right, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Local Player, Null, Custom String(
+			"                                                \nMax Ammo Primary: {0}\nMax Ammo Secondary: {1}", Max Ammo(Local Player, 0),
+			Max Ammo(Local Player, 1)), Null, Right, 0, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+	}
+}
+
+rule("Update Log Time")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Log To Inspector(Custom String(""));
+		Loop;
+	}
+}
+
+rule("Update Primary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Firing Primary(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Firing Primary", Event Player));
+		Wait Until(!Is Firing Primary(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not Firing Primary", Event Player));
+	}
+}
+
+rule("Update Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Firing Secondary", Event Player));
+		Wait Until(!Is Firing Secondary(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not Firing Secondary", Event Player));
+	}
+}
+
+rule("Update Ability 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Using Ability 1", Event Player));
+		Wait Until(!Is Using Ability 1(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not Using Ability 1", Event Player));
+	}
+}
+
+rule("Update Ability 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Using Ability 2", Event Player));
+		Wait Until(!Is Using Ability 2(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not Using Ability 2", Event Player));
+	}
+}
+
+rule("Update Ultimate")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Using Ultimate", Event Player));
+		Wait Until(!Is Using Ultimate(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not Using Ultimate", Event Player));
+	}
+}
+
+rule("Update Air")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is In Air(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: In Air", Event Player));
+		Wait Until(!Is In Air(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not In Air", Event Player));
+	}
+}
+
+rule("Update Ground")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is On Ground(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: On Ground", Event Player));
+		Wait Until(!Is On Ground(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not On Ground", Event Player));
+	}
+}
+
+rule("Update Jumping")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Jumping(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Jumping", Event Player));
+		Wait Until(!Is Jumping(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not Jumping", Event Player));
+	}
+}
+
+rule("Update Crouching")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Crouching(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Crouching", Event Player));
+		Wait Until(!Is Crouching(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not Crouching", Event Player));
+	}
+}
+
+rule("Update Meleeing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Meleeing(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Meleeing", Event Player));
+		Wait Until(!Is Meleeing(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not Meleeing", Event Player));
+	}
+}
+
+rule("Update Reloading")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Reloading(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Reloading", Event Player));
+		Wait Until(!Is Reloading(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not Reloading", Event Player));
+	}
+}
+
+rule("Update Alternate Form")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is In Alternate Form(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: In Alternate Form", Event Player));
+		Wait Until(!Is In Alternate Form(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Not In Alternate Form", Event Player));
+	}
+}
+
+rule("Update Alive")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Is Alive", Event Player));
+		Wait Until(!Is Alive(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Is Not Alive", Event Player));
+	}
+}
+
+rule("Update Dead")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dead(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Is Dead", Event Player));
+		Wait Until(!Is Dead(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Is Not Dead", Event Player));
+	}
+}
+
+rule("Update Moving")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Moving(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Is Moving", Event Player));
+		Wait Until(!Is Moving(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Is Not Moving", Event Player));
+	}
+}
+
+rule("Update Standing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Standing(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Is Standing", Event Player));
+		Wait Until(!Is Standing(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Is Not Standing", Event Player));
+	}
+}
+
+rule("Update On Wall")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is On Wall(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Is On Wall", Event Player));
+		Wait Until(!Is On Wall(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Is Not On Wall", Event Player));
+	}
+}
+
+rule("Update On Objective")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is On Objective(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Is On Objective", Event Player));
+		Wait Until(!Is On Objective(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Is Not On Objective", Event Player));
+	}
+}
+
+rule("Update Fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Portrait On Fire(Event Player) == True;
+	}
+
+	actions
+	{
+		Log To Inspector(Custom String("{0}: Portrait On Fire", Event Player));
+		Wait Until(!Is Portrait On Fire(Event Player), 99999);
+		Log To Inspector(Custom String("{0}: Portrait Not On Fire", Event Player));
+	}
+}
