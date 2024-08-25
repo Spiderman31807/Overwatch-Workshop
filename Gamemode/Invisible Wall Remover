@@ -1,0 +1,1028 @@
+settings
+{
+	main
+	{
+		Description: "This Mode Give Each Hero A Workshop Made\nBounding Box, And Uses It To Detect Collision\nAnd Dicides When To Enable/Disable It So That\nThe Player Can Ignore Invisible Walls."
+		Mode Name: "Invisible Wall Remover - WWHWP"
+	}
+
+	modes
+	{
+		disabled Assault
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Bounty Hunter
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Capture the Flag
+		{
+			Game Mode Start: Immediately
+		}
+
+		Control
+
+		disabled Deathmatch
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Elimination
+		{
+			Game Mode Start: Immediately
+		}
+
+		Escort
+
+		Flashpoint
+
+		Hybrid
+		{
+			disabled maps
+			{
+				Blizzard World
+			}
+		}
+
+		disabled Lúcioball
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Practice Range
+		{
+			Game Mode Start: Immediately
+		}
+
+		Push
+		{
+			disabled maps
+			{
+				Runasapi
+			}
+		}
+
+		disabled Skirmish
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Team Deathmatch
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Winston's Beach Volleyball
+		{
+			Game Mode Start: Immediately
+		}
+
+		General
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: Big_Heros
+		1: Big_Box
+		2: Normal_Box
+		3: CustomBox
+		4: CustomHeros
+
+	player:
+		0: Dimenions
+		1: Is_Detected
+		2: Box_Hero
+		3: Crouch_Dimenions
+		4: Normal_Dimenions
+		5: Size_Scale
+		6: Index
+		7: Scaled_Crouch_Dimenions
+		8: Scaled_Normal_Dimensions
+}
+
+subroutines
+{
+	0: Update_Scale
+}
+
+rule("Debug Test Scale Support")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Workshop Setting Toggle(Custom String("Debug"), Custom String("Interact For Random Size"), True, 1) == True;
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Event Player.Size_Scale = Random Real(0.100, 10);
+		Start Scaling Player(Event Player, Event Player.Size_Scale, True);
+		Start Rule(Update_Scale, Restart Rule);
+	}
+}
+
+rule("Debug Display")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Workshop Setting Toggle(Custom String("Debug"), Custom String("Display Bounding Box"), False, 0) == True;
+	}
+
+	actions
+	{
+		Create HUD Text(Local Player, Custom String("Is Detected {0}\nScale {1}", Local Player.Is_Detected != Empty Array,
+			Local Player.Size_Scale), Null, Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[0], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[1], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("0-1")) || Array Contains(Local Player.Is_Detected, Custom String("1-0")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[0], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[2], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("0-2")) || Array Contains(Local Player.Is_Detected, Custom String("2-0")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[1], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[3], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("1-3")) || Array Contains(Local Player.Is_Detected, Custom String("3-1")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[2], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[3], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("2-3")) || Array Contains(Local Player.Is_Detected, Custom String("3-2")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[3], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[4], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("3-4")) || Array Contains(Local Player.Is_Detected, Custom String("4-3")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[2], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[5], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("2-5")) || Array Contains(Local Player.Is_Detected, Custom String("5-2")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[4], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[6], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("4-6")) || Array Contains(Local Player.Is_Detected, Custom String("6-4")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[5], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[7], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("5-7")) || Array Contains(Local Player.Is_Detected, Custom String("7-5")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[6], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[7], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("6-7")) || Array Contains(Local Player.Is_Detected, Custom String("7-6")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[6], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[1], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("6-1")) || Array Contains(Local Player.Is_Detected, Custom String("1-6")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[0], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[7], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("0-7")) || Array Contains(Local Player.Is_Detected, Custom String("7-0")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+		Create Beam Effect(Local Player, Good Beam, World Vector Of(Local Player.Dimenions[5], Local Player, Rotation And Translation),
+			World Vector Of(Local Player.Dimenions[4], Local Player, Rotation And Translation), Array Contains(Local Player.Is_Detected,
+			Custom String("5-4")) || Array Contains(Local Player.Is_Detected, Custom String("4-5")) ? Color(Red) : Color(Green),
+			Visible To Position Radius and Color);
+	}
+}
+
+rule("Debug Huds")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Workshop Setting Toggle(Custom String("Debug"), Custom String("Info Huds"), False, 0) == True;
+	}
+
+	actions
+	{
+		Create HUD Text(Local Player, Custom String("Normal Bounding Box: {0}\nCrouched Bounding Box: {1}\n\n{2}",
+			Local Player.Scaled_Normal_Dimensions, Local Player.Scaled_Crouch_Dimenions, Custom String(
+			"Current Bounding Box: {0}\n\nBounding Box From \"{1}\"\nBound Box Scale: {2}", Local Player.Dimenions, Local Player.Box_Hero,
+			Local Player.Size_Scale)), Null, Null, Right, 0, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Create HUD Text(Local Player, Custom String("Current Hero Bounding Box:\n{0}{1}", Array Contains(Global.Big_Heros, Hero Of(
+			Local Player)) ? Global.Big_Box : Global.Normal_Box, Array Contains(Global.Big_Heros, Hero Of(Local Player)) ? Custom String(
+			"\n\n(Big Bounding Box)") : Custom String("\n\n(Normal Bounding Box)")), Null, Null, Top, -1, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+	}
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Big_Heros = Array(Hero(Reinhardt), Hero(Winston), Hero(Bastion), Hero(Roadhog), Hero(D.Va), Hero(Doomfist), Hero(Orisa),
+			Hero(Wrecking Ball), Hero(Sigma), Hero(Ramattra), Hero(Mauga));
+		Global.Big_Box = Array(Vector(0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(-0.800, 0, 0.800), Vector(-0.800, 0, -0.800),
+			Vector(-0.800, 2.550, -0.800), Vector(-0.800, 2.550, 0.800), Vector(0.800, 2.550, -0.800), Vector(0.800, 2.550, 0.800));
+		Global.Normal_Box = Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550),
+			Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550));
+		Global.CustomHeros = Array(Hero(Venture));
+		Global.CustomBox = Array(Array(Vector(0.750, 0, 0.750), Vector(0.750, 0, -0.750), Vector(-0.750, 0, 0.750), Vector(-0.750, 0,
+			-0.750), Vector(-0.750, 2.350, -0.750), Vector(-0.750, 2.350, 0.750), Vector(0.750, 2.350, -0.750), Vector(0.750, 2.350,
+			0.750)));
+	}
+}
+
+rule("Player Setup")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Is_Detected = Empty Array;
+		Event Player.Size_Scale = 1;
+		Event Player.Dimenions = Global.Normal_Box;
+		Event Player.Crouch_Dimenions = Global.Normal_Box;
+		Event Player.Normal_Dimenions = Global.Normal_Box;
+	}
+}
+
+rule("Update Dimensions")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		((Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) != Event Player.Box_Hero || (
+			Event Player.Box_Hero == Hero(D.Va) && Is In Alternate Form(Event Player))) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Box_Hero = Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player);
+		If(Event Player.Box_Hero == Hero(D.Va) && Is In Alternate Form(Event Player));
+			Event Player.Dimenions = Global.Normal_Box;
+			Wait Until((Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) != Hero(D.Va)
+				|| !Is In Alternate Form(Event Player), 99999);
+			Skip If(!Is In Alternate Form(Event Player), 2);
+			Loop;
+		Else If(Array Contains(Global.Big_Heros, Event Player.Box_Hero));
+			Event Player.Dimenions = Global.Big_Box;
+		Else If(Array Contains(Global.CustomHeros, Event Player.Box_Hero));
+			Event Player.Dimenions = Global.CustomBox[Index Of Array Value(Global.CustomHeros, Event Player.Box_Hero)];
+		Else;
+			Event Player.Dimenions = Global.Normal_Box;
+		End;
+		Event Player.Normal_Dimenions = Event Player.Dimenions;
+		Event Player.Crouch_Dimenions = Event Player.Dimenions;
+		Event Player.Crouch_Dimenions[4] -= Vector(0, Y Component Of(Event Player.Crouch_Dimenions[4]) * 0.250, 0);
+		Event Player.Crouch_Dimenions[5] -= Vector(0, Y Component Of(Event Player.Crouch_Dimenions[5]) * 0.250, 0);
+		Event Player.Crouch_Dimenions[6] -= Vector(0, Y Component Of(Event Player.Crouch_Dimenions[6]) * 0.250, 0);
+		Event Player.Crouch_Dimenions[7] -= Vector(0, Y Component Of(Event Player.Crouch_Dimenions[7]) * 0.250, 0);
+		Start Rule(Update_Scale, Restart Rule);
+	}
+}
+
+rule("Update Dimensions Scale")
+{
+	event
+	{
+		Subroutine;
+		Update_Scale;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, Index, 0, 8, 1);
+			Event Player.Scaled_Crouch_Dimenions[Event Player.Index] = Vector(X Component Of(Event Player.Crouch_Dimenions[Event Player.Index])
+				* Last Of(Event Player.Size_Scale), Y Component Of(Event Player.Crouch_Dimenions[Event Player.Index]) * Last Of(
+				Event Player.Size_Scale), Z Component Of(Event Player.Crouch_Dimenions[Event Player.Index]) * Last Of(
+				Event Player.Size_Scale));
+			Event Player.Scaled_Normal_Dimensions[Event Player.Index] = Vector(X Component Of(
+				Event Player.Normal_Dimenions[Event Player.Index]) * Last Of(Event Player.Size_Scale), Y Component Of(
+				Event Player.Normal_Dimenions[Event Player.Index]) * Last Of(Event Player.Size_Scale), Z Component Of(
+				Event Player.Normal_Dimenions[Event Player.Index]) * Last Of(Event Player.Size_Scale));
+		End;
+		If(Is Crouching(Event Player));
+			Event Player.Dimenions = Event Player.Scaled_Crouch_Dimenions;
+		Else;
+			Event Player.Dimenions = Event Player.Scaled_Normal_Dimensions;
+		End;
+	}
+}
+
+rule("Toggle Collisions")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Event Player.Is_Detected) == Empty Array;
+	}
+
+	actions
+	{
+		Disable Movement Collision With Environment(Event Player, False);
+		Wait Until(Update Every Frame(Event Player.Is_Detected) != Empty Array, 99999);
+		Enable Movement Collision With Environment(Event Player);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Toggle Crouch Mode")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Is Crouching(Event Player)) == True;
+		Event Player.Dimenions != Event Player.Scaled_Crouch_Dimenions;
+	}
+
+	actions
+	{
+		Event Player.Dimenions = Event Player.Scaled_Crouch_Dimenions;
+		Wait Until(Update Every Frame(!Is Crouching(Event Player)), 99999);
+		Event Player.Dimenions = Event Player.Scaled_Normal_Dimensions;
+	}
+}
+
+rule("Detecting Collision 0-1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("0-1"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[0], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("0-1")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("0-1"));
+		Wait(0.100, Ignore Condition);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 0-2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("0-2"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[0], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("0-2")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("0-2"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 1-3")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("1-3"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[1], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("1-3")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("1-3"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 2-3")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("2-3"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[2], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("2-3")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("2-3"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 3-4")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("3-4"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[3], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("3-4")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("3-4"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 2-5")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("2-5"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[2], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("2-5")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("2-5"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 4-6")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("4-6"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[4], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("4-6")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("4-6"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 5-7")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("5-7"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[5], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("5-7")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("5-7"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 6-7")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("6-7"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[6], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("6-7")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("6-7"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 6-1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("6-1"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[6], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("6-1")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("6-1"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 0-7")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("0-7"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[0], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("0-7")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("0-7"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 5-4")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("5-4"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[5], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("5-4")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("5-4"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 1-0")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("1-0"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[1], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("1-0")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("1-0"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 3-2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("3-2"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[3], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("3-2")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("3-2"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 4-3")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("4-3"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[4], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("4-3")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("4-3"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 4-2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("4-2"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[4], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("4-2")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("4-2"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 6-4")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("6-4"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[6], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("6-4")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("6-4"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 7-5")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("7-5"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[7], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("7-5")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("7-5"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 7-6")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("7-6"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[7], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("7-6")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("7-6"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 1-6")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("1-6"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[1], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("1-6")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("1-6"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 7-0")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("7-0"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[7], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[0], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("7-0")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("7-0"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detecting Collision 4-5")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation),
+			World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation), Null, Event Player, False))
+			!= Update Every Frame(World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation));
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Is_Detected, Append To Array, Custom String("4-5"));
+		Wait Until(Update Every Frame(Ray Cast Hit Position(World Vector Of(Event Player.Dimenions[4], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation), Null,
+			Event Player, False)) == Update Every Frame(World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation))
+			|| !Array Contains(Event Player.Is_Detected, Custom String("4-5")), 99999);
+		Modify Player Variable(Event Player, Is_Detected, Remove From Array By Value, Custom String("4-5"));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
