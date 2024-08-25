@@ -1,0 +1,135 @@
+settings
+{
+	main
+	{
+		Description: "Default Board Size 9x9 (91 grid tiles)\n\nThe max array size is 1000 in Overwatch,\nThe board will brake if size is set to values\nthat add up to more then 1000.\n\n32x32 is 1024, And 31x31 is 961\n\nAll Left and Right Grid Tiles are saved in an\narray, for gameplay uses.\n\n(Top/Bottom can be obtained with index checks)"
+		Mode Name: "Board Generator - JGTZ9"
+	}
+
+	lobby
+	{
+		Max Spectators: 0
+	}
+
+	modes
+	{
+		Skirmish
+		{
+			enabled maps
+			{
+				Workshop Expanse Night 972777519512064577
+			}
+		}
+
+		General
+		{
+			Game Mode Start: Immediately
+			Respawn As Random Hero: On
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: Starting_X
+		1: Starting_Y
+		2: Board_SizeX
+		3: Board_SizeY
+		4: Grid_Array
+		5: Grid_IndexX
+		6: Grid_IndexY
+		7: Board_Edge_Left
+		8: Board_Edge_Right
+		9: Camera_Height
+		10: Is_Ready
+}
+
+rule("Create Board Grid")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Is_Ready = False;
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Please Wait, Board Generating{0}", Array(Custom String(""),
+			Custom String("."), Custom String(".."), Custom String("..."))[Round To Integer(Total Time Elapsed % 4, Down)]), Top, 0, Color(
+			White), Color(White), Color(Black), Visible To and String, Default Visibility);
+		Global.Board_SizeX = Workshop Setting Integer(Custom String("Board"), Custom String("Size Left/Right"), 9, 1, 40, 1);
+		Global.Board_SizeY = Workshop Setting Integer(Custom String("Board"), Custom String("Size Up/Down"), 9, 1, 40, 0);
+		Global.Starting_X = Global.Board_SizeX % 2 != 0 ? 2 : 0;
+		Global.Starting_Y = Global.Board_SizeY % 2 != 0 ? 2 : 0;
+		Global.Camera_Height = Max(Global.Board_SizeX * 1.750, Global.Board_SizeY * 3);
+		Create Beam Effect(All Players(All Teams), Bad Beam, First Of(Global.Grid_Array) + Vector(-2, -0.500, -2),
+			Global.Grid_Array[Global.Board_SizeX - 1] + Vector(2, -0.500, -2), Color(Green), Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, Last Of(Global.Grid_Array) + Vector(2, -0.500, 2),
+			Global.Grid_Array[Global.Board_SizeX - 1] + Vector(2, -0.500, -2), Color(Green), Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, Last Of(Global.Grid_Array) + Vector(2, -0.500, 2), Global.Grid_Array[(
+			Global.Board_SizeX - 1) * Global.Board_SizeY] + Vector(-2, -0.500, 2), Color(Green), Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, First Of(Global.Grid_Array) + Vector(-2, -0.500, -2), Global.Grid_Array[(
+			Global.Board_SizeX - 1) * Global.Board_SizeY] + Vector(-2, -0.500, 2), Color(Green), Visible To Position and Radius);
+		Global.Grid_Array = Empty Array;
+		Global.Board_Edge_Left = Empty Array;
+		Global.Board_Edge_Right = Empty Array;
+		For Global Variable(Grid_IndexY, Global.Board_SizeY * -0.500, Global.Board_SizeY * 0.500, 1);
+			For Global Variable(Grid_IndexX, Global.Board_SizeX * -0.500, Global.Board_SizeX * 0.500, 1);
+				Modify Global Variable(Grid_Array, Append To Array, Vector(Global.Starting_X + 2 + 4 * Global.Grid_IndexX, 0.500,
+					Global.Starting_Y + 2 + 4 * Global.Grid_IndexY));
+				Wait(0.010, Ignore Condition);
+			End;
+		End;
+		For Global Variable(Grid_IndexX, 0, Global.Board_SizeX * Global.Board_SizeY, Global.Board_SizeX);
+			Modify Global Variable(Board_Edge_Right, Append To Array, Global.Grid_Array[Global.Grid_IndexX]);
+			Wait(0.010, Ignore Condition);
+		End;
+		For Global Variable(Grid_IndexX, 0, Count Of(Global.Board_Edge_Right), 1);
+			Modify Global Variable(Board_Edge_Left, Append To Array, Vector(X Component Of(Global.Board_Edge_Right[Global.Grid_IndexX]) * -1,
+				0.500, Z Component Of(Global.Board_Edge_Right[Global.Grid_IndexX])));
+			Wait(0.010, Ignore Condition);
+		End;
+		Destroy All HUD Text;
+		Play Effect(All Players(All Teams), Buff Impact Sound, Color(White), Vector(0, Global.Camera_Height, 0), 75);
+		Global.Is_Ready = True;
+	}
+}
+
+rule("Setup Global")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Completion;
+		Disable Built-In Game Mode Announcer;
+		Disable Built-In Game Mode Music;
+		Set Match Time(0);
+	}
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Start Forcing Player Position(Event Player, Vector(0, Global.Camera_Height, 0), True);
+		Set Invisible(Event Player, All);
+		Disable Hero HUD(Event Player);
+		Disable Game Mode HUD(Event Player);
+		Disable Scoreboard(Event Player);
+		Start Camera(Event Player, Vector(Global.Starting_X, Global.Camera_Height, Global.Starting_Y), Vector(Global.Starting_X, 0,
+			Global.Starting_Y + 0.010), 0);
+		Wait Until(Global.Is_Ready, 99999);
+	}
+}
