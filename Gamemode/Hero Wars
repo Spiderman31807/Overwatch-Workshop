@@ -1,0 +1,471 @@
+settings
+{
+	main
+	{
+		Mode Name: "Hero Wars - 0PX8C"
+	}
+
+	lobby
+	{
+		Max Team 1 Players: 5
+		Max Team 2 Players: 5
+	}
+
+	modes
+	{
+		Assault
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Bounty Hunter
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		Capture the Flag
+		{
+			Flag Dropped Lock Time: 5.0
+			Flag Return Time: 4.0
+			Flag Score Respawn Time: 15.0
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		Control
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Deathmatch
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Escort
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Hybrid
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Mischief & Magic
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Practice Range
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		Push
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Skirmish
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		Team Deathmatch
+		{
+			Tank Role Passive Health Bonus: Disabled
+
+			disabled maps
+			{
+				Workshop Chamber
+				Workshop Expanse
+				Workshop Expanse Night
+				Workshop Green Screen
+				Workshop Island
+				Workshop Island Night
+			}
+		}
+
+		General
+		{
+			Allow Hero Switching: Off
+			Hero Limit: Off
+			Respawn As Random Hero: On
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Ultimate Generation: 10%
+			Ultimate Generation - Combat: 0%
+			Ultimate Generation - Passive: 0%
+
+			disabled heroes
+			{
+				Illari
+			}
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: HeroT1
+		1: HeroT2
+		2: All_Heros
+		3: Ultimate_Costs
+
+	player:
+		0: Hero
+		1: Ultimate_Cost
+		2: Ultimate_Points
+		3: Stored_Mech_Points
+		4: Valid_Healing
+		5: Stored_Self_Healing_Stat
+		6: Stored_Health
+		7: Is_Bot
+}
+
+rule("Force Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != (Team Of(Event Player) == Team 1 ? Global.HeroT1 : Global.HeroT2);
+	}
+
+	actions
+	{
+		Wait(0.500, Abort When False);
+		If(Event Player.Is_Bot == 0);
+			Set Player Allowed Heroes(Event Player, Team Of(Event Player) == Team 1 ? Global.HeroT1 : Global.HeroT2);
+		Else If(Event Player.Is_Bot == True);
+			Wait Until(Has Spawned(Event Player), 99999);
+			Abort If(Hero Of(Event Player) == (Team Of(Event Player) == Team 1 ? Global.HeroT1 : Global.HeroT2));
+			Remove Player(Event Player);
+			Small Message(Host Player, Custom String("Bot Kicked - Incorrect Hero"));
+		End;
+		Loop If Condition Is True;
+	}
+}
+
+rule("Randomise Hero")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is True For Any(Array(Is Waiting For Players, Is Assembling Heroes, Is Between Rounds), Current Array Element) == True;
+	}
+
+	actions
+	{
+		Destroy All HUD Text;
+		Global.HeroT1 = Random Value In Array(All Heroes);
+		Global.HeroT2 = Random Value In Array(All Heroes);
+		Create HUD Text(All Players(All Teams), Custom String("{0} VS {1}", Hero Icon String(Global.HeroT1), Hero Icon String(
+			Global.HeroT2)), Null, Null, Left, 0, Color(White), Color(White), Color(White), Visible To, Default Visibility);
+		Abort If(!Is Assembling Heroes);
+		Set Match Time(0);
+	}
+}
+
+rule("Setup : Global                            (Based On Update In July 11th, 2023) Works Best When Ultimate Generation Set To Lowest")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.All_Heros = Array(Hero(Ana), Hero(Ashe), Hero(Baptiste), Hero(Bastion), Hero(Brigitte), Hero(Cassidy), Hero(D.Va), Hero(
+			Doomfist), Hero(Echo), Hero(Genji), Hero(Hanzo), Hero(Junker Queen), Hero(Junkrat), Hero(Kiriko), Hero(Lifeweaver), Hero(
+			Lúcio), Hero(Mei), Hero(Mercy), Hero(Moira), Hero(Orisa), Hero(Pharah), Hero(Ramattra), Hero(Reaper), Hero(Reinhardt), Hero(
+			Roadhog), Hero(Sigma), Hero(Soldier: 76), Hero(Sombra), Hero(Sojourn), Hero(Symmetra), Hero(Torbjörn), Hero(Tracer), Hero(
+			Widowmaker), Hero(Winston), Hero(Wrecking Ball), Hero(Zarya), Hero(Zenyatta));
+		Global.Ultimate_Costs = Array(2100, 2240, 2310, 2310, 2550, 1850, 1540, 1680, 1691, 1932, 1680, 2450, 1925, 2300, 2000, 2420, 1750,
+			1820, 2660, 1950, 2000, 1880, 1930, 1650, 2420, 2100, 2100, 2310, 1400, 1680, 2142, 1260, 1540, 1850, 1675, 2270, 2310);
+	}
+}
+
+rule("Setup : Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Ultimate_Points = Null;
+		Event Player.Ultimate_Cost = Null;
+		Chase Player Variable At Rate(Event Player, Ultimate_Points, Is Using Ultimate(Event Player) ? 0 : Event Player.Ultimate_Cost,
+			Is Using Ultimate(Event Player) ? 9999 : 5, Destination and Rate);
+		Event Player.Valid_Healing = 0;
+	}
+}
+
+rule("Swap : Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Has Spawned(Event Player) && (Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)
+			!= Event Player.Hero)) == True;
+	}
+
+	actions
+	{
+		Event Player.Hero = Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player);
+		Event Player.Ultimate_Cost = Global.Ultimate_Costs[Index Of Array Value(Global.All_Heros, Event Player.Hero)];
+		Modify Player Variable(Event Player, Ultimate_Points, Min, Event Player.Ultimate_Cost * 0.300);
+		Skip If(!Is Duplicating(Event Player), 1);
+		Event Player.Ultimate_Cost /= 5;
+	}
+}
+
+rule("Swap : Baby Dva                                  (Dont Try To Use Self Destruct Right After Re-meching, It Will Break Your Hero)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Has Spawned(Event Player) && (Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)
+			== Event Player.Hero)) == True;
+		Event Player.Hero == Hero(D.Va);
+		Is In Alternate Form(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Ultimate_Cost = 280;
+		Event Player.Stored_Mech_Points = Event Player.Ultimate_Points;
+		Event Player.Ultimate_Points = 0;
+		Skip If(!Is Duplicating(Event Player), 1);
+		Event Player.Ultimate_Cost /= 5;
+		Wait Until(Is True For Any(Array(Event Player.Hero != Hero(D.Va), Is In Alternate Form(Event Player) != True),
+			Current Array Element), 99999);
+		Wait(0.100, Ignore Condition);
+		Abort If(Event Player.Hero != Hero(D.Va));
+		Event Player.Ultimate_Cost = Global.Ultimate_Costs[Index Of Array Value(Global.All_Heros, Hero(D.Va))];
+		Event Player.Ultimate_Points = Event Player.Stored_Mech_Points;
+		Skip If(!Is Duplicating(Event Player), 1);
+		Event Player.Ultimate_Cost /= 5;
+	}
+}
+
+rule("Charge : Update")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Ultimate Charge Percent(Event Player) != Event Player.Ultimate_Points / (Event Player.Ultimate_Cost / 100);
+	}
+
+	actions
+	{
+		Set Ultimate Charge(Event Player, Event Player.Ultimate_Points / (Event Player.Ultimate_Cost / 100));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Charge : Damage")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Attacker.Ultimate_Points < Attacker.Ultimate_Cost;
+		Is Using Ultimate(Attacker) != True;
+		Team Of(Attacker) != Team Of(Victim);
+		Event Ability != Button(Ultimate);
+	}
+
+	actions
+	{
+		Abort If(Victim.Stored_Health - Max Health(Victim) * Normalized Health(Victim) <= 0);
+		Attacker.Ultimate_Points += Min(Victim.Stored_Health - Max Health(Victim) * Normalized Health(Victim),
+			Attacker.Ultimate_Cost - Attacker.Ultimate_Points);
+		Victim.Valid_Healing += Event Damage;
+	}
+}
+
+rule("Charge : Healing (Others)")
+{
+	event
+	{
+		Player Dealt Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Healer.Ultimate_Points < Healer.Ultimate_Cost;
+		Is Using Ultimate(Healer) != True;
+		Event Ability != Null;
+		Event Ability != Button(Ultimate);
+		Healee != Healer;
+		Event Was Health Pack != True;
+		Healee.Valid_Healing > 0;
+	}
+
+	actions
+	{
+		Healer.Ultimate_Points += Min(Min(Event Healing * (Array Contains(All Tank Heroes, Healee.Hero) ? 0.700 : 1),
+			Healee.Valid_Healing), Healer.Ultimate_Cost - Healer.Ultimate_Points);
+	}
+}
+
+rule("Charge : Healing (Self)")
+{
+	event
+	{
+		Player Dealt Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Healer.Ultimate_Points < Healer.Ultimate_Cost;
+		Is Using Ultimate(Healer) != True;
+		Event Ability != Null;
+		Event Ability != Button(Ultimate);
+		Healee == Healer;
+		Event Was Health Pack != True;
+		Healee.Valid_Healing > 0;
+	}
+
+	actions
+	{
+		Abort If(Player Hero Stat(Event Player, Hero Of(Event Player), Self Healing) == Event Player.Stored_Self_Healing_Stat);
+		Healer.Ultimate_Points += Min(Min((Player Hero Stat(Event Player, Hero Of(Event Player), Self Healing)
+			- Event Player.Stored_Self_Healing_Stat) * (Array Contains(All Tank Heroes, Healee.Hero) ? 0.700 : 1), Healee.Valid_Healing),
+			Healer.Ultimate_Cost - Healer.Ultimate_Points);
+		Event Player.Stored_Self_Healing_Stat = Player Hero Stat(Event Player, Hero Of(Event Player), Self Healing);
+	}
+}
+
+rule("Subtract : Vaild Healing")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Healee.Valid_Healing -= Min(Event Healing, Event Player.Valid_Healing);
+	}
+}
+
+rule("Reset : Vaild Healing")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Valid_Healing = 0;
+	}
+}
+
+rule("Store Health")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+		Event Player.Stored_Health != Health(Event Player);
+	}
+
+	actions
+	{
+		Wait(0.010, Ignore Condition);
+		Event Player.Stored_Health = Max Health(Event Player) * Normalized Health(Event Player);
+	}
+}
+
+rule("Check If Bot")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(Append To Array(All Heroes, Array(Custom String("DAMAGE"), Custom String("SUPPORT"), Custom String("TANK"))),
+			String Contains(Custom String("{0}", Event Player), Current Array Element)) == True;
+		disabled Is True For Any(Array(Is Waiting For Players, Is In Setup, Is Game In Progress), Current Array Element) == True;
+		disabled Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Is_Bot = Hero Of(Event Player);
+		Start Forcing Player To Be Hero(Event Player, Random Value In Array(Remove From Array(All Heroes, Hero Of(Event Player))));
+		Wait(0.100, Ignore Condition);
+		If(Hero Of(Event Player) == Event Player.Is_Bot);
+			Event Player.Is_Bot = True;
+		Else;
+			Start Forcing Player To Be Hero(Event Player, Event Player.Is_Bot);
+			Event Player.Is_Bot = False;
+		End;
+		Stop Forcing Player To Be Hero(Event Player);
+		disabled Wait Until(Is Match Complete, 99999);
+	}
+}
