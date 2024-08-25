@@ -1,0 +1,487 @@
+settings
+{
+	main
+	{
+		Description: "Limited Supplies And There Is Fall Damage"
+		Mode Name: "Realism Mode - BNDC7"
+	}
+
+	modes
+	{
+		disabled Assault
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Bounty Hunter
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Capture the Flag
+		{
+			Game Mode Start: Immediately
+		}
+
+		Control
+
+		disabled Deathmatch
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Elimination
+		{
+			Game Mode Start: Immediately
+		}
+
+		Escort
+
+		Flashpoint
+
+		Hybrid
+
+		disabled Lúcioball
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Practice Range
+		{
+			Game Mode Start: Immediately
+		}
+
+		Push
+
+		disabled Skirmish
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Team Deathmatch
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Winston's Beach Volleyball
+		{
+			Game Mode Start: Immediately
+		}
+
+		General
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+}
+
+variables
+{
+	player:
+		0: Ammo
+		1: Fall_Damage
+		2: Abilitys
+		3: Hero
+		4: Fuel
+		5: Hud_ID_Array
+}
+
+rule("Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Hero != (Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player));
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, True);
+		Set Secondary Fire Enabled(Event Player, True);
+		Set Ability 1 Enabled(Event Player, True);
+		Set Ability 2 Enabled(Event Player, True);
+		Set Reload Enabled(Event Player, True);
+		Event Player.Hero = Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player);
+		If(Event Player.Hero == Hero(Hanzo));
+			Event Player.Ammo = Array(Random Integer(0, 20), Player Hero Stat(Event Player, Hero(Hanzo), Shots Fired), Null, Null, Null, Null);
+		Else If(Event Player.Hero == Hero(D.Va));
+			Event Player.Ammo = Array(Random Integer(0, 50), Player Hero Stat(Event Player, Hero(D.Va), Shots Fired), Null, Null, Null, Null);
+		Else;
+			Event Player.Ammo = Array(Random Integer(0, Max Ammo(Event Player, 0) * 3), Random Integer(0, Max Ammo(Event Player, 1) * 3), Ammo(
+				Event Player, 0), Ammo(Event Player, 1), Max Ammo(Event Player, 0), Max Ammo(Event Player, 1));
+		End;
+		Destroy In-World Text(Event Player.Hud_ID_Array[0]);
+		Destroy Progress Bar In-World Text(Event Player.Hud_ID_Array[1]);
+		Destroy In-World Text(Event Player.Hud_ID_Array[2]);
+		Destroy In-World Text(Event Player.Hud_ID_Array[3]);
+		Destroy In-World Text(Event Player.Hud_ID_Array[4]);
+		Destroy In-World Text(Event Player.Hud_ID_Array[68]);
+		If(Event Player.Hero == Hero(Baptiste));
+			Create In-World Text(Event Player, Custom String("{0}: {1}\n{2}", Ability Icon String(Event Player.Hero, Button(Primary Fire)),
+				Round To Integer(Event Player.Ammo[0], Up), Custom String("{0}: {1}", Ability Icon String(Event Player.Hero, Button(
+				Secondary Fire)), Round To Integer(Event Player.Ammo[1], Up))), Update Every Frame(Eye Position(Event Player) + 100 * (
+				-6 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(
+				Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (-2 / 2 - 0.200)
+				* Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(
+				Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 2, Do Not Clip,
+				Visible To Position and String, Color(White), Default Visibility);
+			Event Player.Hud_ID_Array[0] = Last Text ID;
+		Else If(Is True For All(Array(Hero(Brigitte), Hero(Reinhardt), Hero(Orisa), Hero(Sigma), Hero(Tracer), Hero(Zenyatta), Hero(Moira),
+				Hero(Kiriko), Hero(Lifeweaver), Hero(Ramattra)), Event Player.Hero != Current Array Element));
+			Create In-World Text(Event Player, Custom String("{0}: {1}", Ability Icon String(Event Player.Hero, Button(Primary Fire)),
+				Round To Integer(Event Player.Ammo[0], Up)), Update Every Frame(Eye Position(Event Player) + 100 * (
+				-6 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(
+				Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (-2 / 2 - 0.200)
+				* Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(
+				Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 2, Do Not Clip,
+				Visible To Position and String, Color(White), Default Visibility);
+			Event Player.Hud_ID_Array[0] = Last Text ID;
+		End;
+		Event Player.Abilitys = Is True For Any(Array(Hero(Junkrat), Hero(Symmetra), Hero(Tracer), Hero(Zarya)),
+			Event Player.Hero == Current Array Element) ? Custom String("Charge") : (Is True For Any(Array(),
+			Event Player.Hero == Current Array Element) ? Custom String("Resource") : Custom String("Cooldown"));
+		Modify Player Variable(Event Player, Abilitys, Append To Array, Is True For Any(Array(Hero(Brigitte), Hero(Reinhardt), Hero(
+			Zarya)), Event Player.Hero == Current Array Element) ? Custom String("Charge") : (Is True For Any(Array(),
+			Event Player.Hero == Current Array Element) ? Custom String("Resource") : Custom String("Cooldown")));
+		Modify Player Variable(Event Player, Abilitys, Append To Array, Is True For Any(Array(),
+			Event Player.Hero == Current Array Element) ? Custom String("Charge") : (Is True For Any(Array(Hero(D.Va)),
+			Event Player.Hero == Current Array Element) ? Custom String("Resource") : Custom String("Cooldown")));
+		Modify Player Variable(Event Player, Abilitys, Append To Array, Is True For Any(Array(Hero(Junkrat), Hero(Symmetra), Hero(Zarya)),
+			Event Player.Hero == Current Array Element) ? Custom String("Charge") : (Is True For Any(Array(Hero(D.Va), Hero(Echo), Hero(
+			Reinhardt)), Event Player.Hero == Current Array Element) ? Custom String("Resource") : (Is True For Any(Array(Hero(Bastion),
+			Hero(Brigitte), Hero(Cassidy), Hero(Doomfist), Hero(Genji), Hero(Junker Queen), Hero(Kiriko), Hero(Lúcio), Hero(Mercy), Hero(
+			Moira), Hero(Ramattra), Hero(Reaper), Hero(Roadhog), Hero(Sigma), Hero(Sojourn), Hero(Soldier: 76), Hero(Tracer), Hero(
+			Widowmaker), Hero(Winston), Hero(Wrecking Ball), Hero(Zenyatta)), Event Player.Hero == Current Array Element) ? Custom String(
+			"None") : Custom String("Cooldown"))));
+		Modify Player Variable(Event Player, Abilitys, Append To Array, Is True For Any(Array(Hero(Brigitte), Hero(Zarya)),
+			Event Player.Hero == Current Array Element) ? Custom String("Charge") : (Is True For Any(Array(),
+			Event Player.Hero == Current Array Element) ? Custom String("Resource") : (Is True For Any(Array(Hero(Bastion), Hero(Doomfist),
+			Hero(Genji), Hero(Junker Queen), Hero(Lúcio), Hero(Mercy), Hero(Moira), Hero(Orisa), Hero(Reaper), Hero(Reinhardt), Hero(
+			Sigma), Hero(Tracer), Hero(Zenyatta)), Event Player.Hero == Current Array Element) ? Custom String("None") : Custom String(
+			"Cooldown"))));
+		Modify Player Variable(Event Player, Abilitys, Append To Array, Is True For Any(Array(),
+			Event Player.Hero == Current Array Element) ? Custom String("Charge") : (Is True For Any(Array(Hero(D.Va)),
+			Event Player.Hero == Current Array Element) ? Custom String("Resource") : (Is True For Any(Array(Hero(Bastion), Hero(Echo),
+			Hero(Orisa), Hero(Soldier: 76)), Event Player.Hero == Current Array Element) ? Custom String("Cooldown") : Custom String(
+			"None"))));
+		Modify Player Variable(Event Player, Abilitys, Append To Array, Array(Random Integer(0, 10), Random Integer(0, 10), Random Integer(
+			0, 10)));
+		Event Player.Fuel = Random Integer(0, 100);
+		If(Event Player.Abilitys[3] == Custom String("Resource"));
+			Create Progress Bar In-World Text(Event Player, Event Player.Fuel, Null, Update Every Frame(Eye Position(Event Player) + 100 * (
+				0 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(
+				Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (-1 / 2 - 0.200)
+				* Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(
+				Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 0.800, Do Not Clip, Color(White), Color(
+				White), Visible To Position and Values, Default Visibility);
+			Event Player.Hud_ID_Array[1] = Last Text ID;
+			Create In-World Text(Event Player, Custom String("{0} Fuel: {1}%", Ability Icon String(Event Player.Hero, Button(Ability 1)),
+				Round To Integer(Event Player.Fuel, Up)), Update Every Frame(Eye Position(Event Player) + 100 * (0 * -1 / 2 * Cross Product(
+				Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+				Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (-0.900 / 2 - 0.200) * Direction From Angles(
+				Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(
+				Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 1.500, Do Not Clip, Visible To Position and String, Color(
+				White), Default Visibility);
+			Event Player.Hud_ID_Array[2] = Last Text ID;
+		Else If(Event Player.Abilitys[3] != Custom String("None"));
+			Create In-World Text(Event Player, Custom String("{0}: {1}", Ability Icon String(Event Player.Hero, Button(Ability 1)),
+				Round To Integer(Event Player.Abilitys[6], Up)), Update Every Frame(Eye Position(Event Player) + 100 * (
+				-6 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(
+				Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (0 / 2 - 0.200)
+				* Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(
+				Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 2, Do Not Clip,
+				Visible To Position and String, Color(White), Default Visibility);
+			Event Player.Hud_ID_Array[3] = Last Text ID;
+		End;
+		Skip If(Event Player.Abilitys[4] == Custom String("None"), 2);
+		Create In-World Text(Event Player, Custom String("{0}: {1}", Ability Icon String(Event Player.Hero, Button(Ability 2)),
+			Round To Integer(Event Player.Abilitys[7], Up)), Update Every Frame(Eye Position(Event Player) + 100 * (
+			-6 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(
+			Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (
+			-0.750 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+			Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 2,
+			Do Not Clip, Visible To Position and String, Color(White), Default Visibility);
+		Event Player.Hud_ID_Array[4] = Last Text ID;
+		If(Is True For Any(Array(Hero(Bastion), Hero(Echo), Hero(Orisa), Hero(Soldier: 76)), Event Player.Hero == Current Array Element));
+			Create In-World Text(Event Player, Custom String("{0}: {1}", Ability Icon String(Event Player.Hero, Button(Secondary Fire)),
+				Round To Integer(Event Player.Abilitys[8], Up)), Update Every Frame(Eye Position(Event Player) + 100 * (
+				-6 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(
+				Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (
+				-1.500 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+				Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 2,
+				Do Not Clip, Visible To Position and String, Color(White), Default Visibility);
+			Event Player.Hud_ID_Array[5] = Last Text ID;
+		End;
+	}
+}
+
+rule("Fall Damage")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is In Air(Event Player) == True;
+		Speed Of In Direction(Event Player, Down) > 0;
+	}
+
+	actions
+	{
+		While(!Is On Ground(Event Player));
+			Event Player.Fall_Damage = 0;
+			Chase Player Variable At Rate(Event Player, Fall_Damage, Max(Event Player.Fall_Damage, Speed Of In Direction(Event Player, Down)),
+				9999, Destination and Rate);
+			Wait Until(Speed Of In Direction(Event Player, Down) <= 0 || Is On Ground(Event Player), 99999);
+			Chase Player Variable At Rate(Event Player, Fall_Damage, Speed Of In Direction(Event Player, Down), 9999, Destination and Rate);
+			Wait Until(Speed Of In Direction(Event Player, Down) > 0 || Is On Ground(Event Player), 99999);
+		End;
+		Stop Chasing Player Variable(Event Player, Fall_Damage);
+		Event Player.Fall_Damage = Max((Event Player.Fall_Damage - 8) * 15, 0);
+		Abort If(Event Player.Fall_Damage <= 0);
+		Damage(Event Player, Null, Event Player.Fall_Damage);
+	}
+}
+
+rule("Ammo")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Event Player.Ammo[2] != Ammo(Event Player, 0) || Event Player.Ammo[3] != Ammo(Event Player, 1)) == True;
+		Is True For All(Array(Hero(Brigitte), Hero(Hanzo), Hero(Orisa), Hero(Reinhardt), Hero(Tracer), Hero(Zenyatta), Hero(Moira), Hero(
+			Kiriko), Hero(Lifeweaver), Hero(Ramattra)), Event Player.Hero != Current Array Element) == True;
+		(Hero Of(Event Player) != Hero(D.Va) || Is In Alternate Form(Event Player)) == True;
+	}
+
+	actions
+	{
+		If(Event Player.Ammo[2] < Ammo(Event Player, 0));
+			Set Ammo(Event Player, 0, Min(Ammo(Event Player, 0), Event Player.Ammo[0] + Event Player.Ammo[2]));
+			Event Player.Ammo[0] -= Ammo(Event Player, 0) - Event Player.Ammo[2];
+		End;
+		If(Event Player.Ammo[3] < Ammo(Event Player, 1));
+			Set Ammo(Event Player, 1, Min(Ammo(Event Player, 1), Event Player.Ammo[1] + Event Player.Ammo[3]));
+			Event Player.Ammo[1] -= Ammo(Event Player, 1) - Event Player.Ammo[3];
+		End;
+		Event Player.Ammo[2] = Ammo(Event Player, 0);
+		Event Player.Ammo[3] = Ammo(Event Player, 1);
+		Skip If(Event Player.Ammo[0] > 0, 1);
+		Set Max Ammo(Event Player, 0, Ammo(Event Player, 0));
+		Skip If(Event Player.Ammo[1] > 0, 1);
+		Set Max Ammo(Event Player, 1, Ammo(Event Player, 1));
+		If(Event Player.Ammo[0] == 0 && Event Player.Ammo[1] == 0);
+			Set Reload Enabled(Event Player, False);
+		Else;
+			Set Reload Enabled(Event Player, True);
+		End;
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Ammo (Hanzo)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Hero == Hero(Hanzo);
+		Player Hero Stat(Event Player, Hero(Hanzo), Shots Fired) != Event Player.Ammo[1];
+	}
+
+	actions
+	{
+		Event Player.Ammo[1] = Player Hero Stat(Event Player, Hero(Hanzo), Shots Fired);
+		Event Player.Ammo[0] -= 1;
+		If(Event Player.Ammo[0] == 0);
+			Set Primary Fire Enabled(Event Player, False);
+		Else;
+			Set Primary Fire Enabled(Event Player, True);
+		End;
+	}
+}
+
+rule("Ammo (D.Va)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Hero == Hero(D.Va);
+		Player Hero Stat(Event Player, Hero(D.Va), Shots Fired) != Event Player.Ammo[1];
+		Is In Alternate Form(Event Player) != True;
+	}
+
+	actions
+	{
+		Event Player.Ammo[1] = Player Hero Stat(Event Player, Hero(D.Va), Shots Fired);
+		Event Player.Ammo[0] -= Min(4, Event Player.Ammo[0]);
+		If(Event Player.Ammo[0] == 0);
+			Set Primary Fire Enabled(Event Player, False);
+		Else;
+			Set Primary Fire Enabled(Event Player, True);
+		End;
+	}
+}
+
+rule("Ability 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Event Player.Abilitys[0] == Custom String("Charge") ? Ability Charge(Event Player, Button(Ability 1)) < 1 : Ability Cooldown(
+			Event Player, Button(Ability 1)) != Null) == True;
+		(Event Player.Abilitys[3] != Custom String("Resource")) == True;
+	}
+
+	actions
+	{
+		Wait(0.500, Ignore Condition);
+		If(Event Player.Abilitys[3] == Custom String("None"));
+			Set Ability Cooldown(Event Player, Button(Ability 1), 0);
+			Set Ability Charge(Event Player, Button(Ability 1), 1);
+		Else;
+			Skip If(Event Player.Abilitys[6] == 0, 2);
+			Event Player.Abilitys[6] -= 1;
+			Skip(1);
+			Set Ability 1 Enabled(Event Player, False);
+			Set Ability Cooldown(Event Player, Button(Ability 1), 0);
+			Set Ability Charge(Event Player, Button(Ability 1), 1);
+		End;
+		Loop If Condition Is True;
+	}
+}
+
+rule("Ability 1 (Resource)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ability 1(Event Player) == True;
+		(Event Player.Abilitys[3] == Custom String("Resource")) == True;
+	}
+
+	actions
+	{
+		Chase Player Variable At Rate(Event Player, Fuel, 0, 6.500, Destination and Rate);
+		Wait Until(Event Player.Fuel == 0 || !Is Using Ability 1(Event Player), 99999);
+		Stop Chasing Player Variable(Event Player, Fuel);
+		Skip If(!Is Using Ability 1(Event Player), 2);
+		Set Ability 1 Enabled(Event Player, False);
+		Cancel Primary Action(Event Player);
+		Wait Until(Ability Cooldown(Event Player, Button(Ability 1)) != Null, 5);
+		Set Ability Cooldown(Event Player, Button(Ability 1), 0);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Ability 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Event Player.Abilitys[1] == Custom String("Charge") ? Ability Charge(Event Player, Button(Ability 2)) < 1 : Ability Cooldown(
+			Event Player, Button(Ability 2)) != Null) == True;
+		(Event Player.Abilitys[4] != Custom String("Resource")) == True;
+	}
+
+	actions
+	{
+		Wait(0.500, Ignore Condition);
+		If(Event Player.Abilitys[4] == Custom String("None"));
+			Set Ability Cooldown(Event Player, Button(Ability 2), 0);
+			Set Ability Charge(Event Player, Button(Ability 2), 1);
+		Else;
+			Skip If(Event Player.Abilitys[7] == 0, 2);
+			Event Player.Abilitys[7] -= 1;
+			Skip(1);
+			Set Ability 2 Enabled(Event Player, False);
+			Set Ability Cooldown(Event Player, Button(Ability 2), 0);
+			Set Ability Charge(Event Player, Button(Ability 2), 1);
+		End;
+		Loop If Condition Is True;
+	}
+}
+
+rule("Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Event Player.Abilitys[2] == Custom String("Charge") ? Ability Charge(Event Player, Button(Secondary Fire)) < 1 : Ability Cooldown(
+			Event Player, Button(Secondary Fire)) != Null) == True;
+		(Event Player.Abilitys[5] != Custom String("Resource")) == True;
+	}
+
+	actions
+	{
+		Wait(0.500, Ignore Condition);
+		If(Event Player.Abilitys[5] == Custom String("None"));
+			Set Ability Cooldown(Event Player, Button(Secondary Fire), 0);
+			Set Ability Charge(Event Player, Button(Secondary Fire), 1);
+		Else;
+			Skip If(Event Player.Abilitys[8] == 0, 2);
+			Event Player.Abilitys[8] -= 1;
+			Skip(3);
+			Set Secondary Fire Enabled(Event Player, False);
+			Skip If(Event Player.Hero != Hero(Orisa), 1);
+			Set Ability 2 Enabled(Event Player, False);
+			Set Ability Cooldown(Event Player, Button(Secondary Fire), 0);
+			Set Ability Charge(Event Player, Button(Secondary Fire), 1);
+		End;
+		Loop If Condition Is True;
+	}
+}
