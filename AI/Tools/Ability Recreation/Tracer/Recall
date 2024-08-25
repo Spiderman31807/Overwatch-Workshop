@@ -1,0 +1,135 @@
+settings
+{
+	main
+	{
+		Mode Name: "Tracer Recall - H8GTF"
+	}
+
+	modes
+	{
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	extensions
+	{
+		Energy Explosion Effects
+		Explosion Sounds
+	}
+}
+
+variables
+{
+	player:
+		0: Recall_Stats
+		1: Recall_Index
+}
+
+rule("Track Recall Stats")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Recall_Stats = Empty Array;
+		Wait Until(Has Spawned(Event Player) && Is Alive(Event Player), 99999);
+		While(Is Alive(Event Player) && Has Spawned(Event Player));
+			While(Event Player.Recall_Index == 0 && Has Spawned(Event Player) && Is Alive(Event Player));
+				Modify Player Variable(Event Player, Recall_Stats, Append To Array, Array(Array(Position Of(Event Player), Facing Direction Of(
+					Event Player), Health(Event Player))));
+				Skip If(Count Of(Event Player.Recall_Stats) - 1 < 60, 1);
+				Modify Player Variable(Event Player, Recall_Stats, Remove From Array By Index, 0);
+				Wait(1 / 20, Ignore Condition);
+			End;
+			Wait Until(Event Player.Recall_Index == 0, 99999);
+		End;
+		Loop;
+	}
+}
+
+rule("Use Recall")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Play Effect(All Players(All Teams), Tracer Recall Disappear Effect, Team Of(Event Player) == Team 1 ? Color(Team 1) : Color(
+			Team 2), Evaluate Once(World Vector Of(Vector(0, Distance Between(Eye Position(Event Player), Position Of(Event Player))
+			/ 1.600, 0), Event Player, Rotation And Translation)), 1);
+		Play Effect(All Players(All Teams), Tracer Recall Disappear Sound, Color(White), Evaluate Once(Eye Position(Event Player)), 100);
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Disallow Button(Event Player, Button(Ultimate));
+		Disallow Button(Event Player, Button(Interact));
+		Set Jump Enabled(Event Player, False);
+		Set Crouch Enabled(Event Player, False);
+		Set Melee Enabled(Event Player, False);
+		Set Reload Enabled(Event Player, False);
+		Cancel Primary Action(Event Player);
+		Set Invisible(Event Player, All);
+		Set Status(Event Player, Null, Phased Out, 1.250);
+		Start Forcing Player Position(Event Player, Event Player.Recall_Stats[Event Player.Recall_Index][0], True);
+		Start Facing(Event Player, Event Player.Recall_Stats[Event Player.Recall_Index][1], 9999, To World, Direction and Turn Rate);
+		For Player Variable(Event Player, Recall_Index, Count Of(Event Player.Recall_Stats) - 1, 0, -1);
+			Set Player Health(Event Player, Max(Health(Event Player), Event Player.Recall_Stats[Event Player.Recall_Index][2]));
+			Wait(0.910 / Count Of(Event Player.Recall_Stats), Ignore Condition);
+		End;
+		Event Player.Recall_Index = 0;
+		Wait(0.050, Ignore Condition);
+		Set Invisible(Event Player, None);
+		Stop Forcing Player Position(Event Player);
+		Stop Facing(Event Player);
+		Set Ammo(Event Player, 0, Max Ammo(Event Player, 0));
+		Set Ammo(Event Player, 1, Max Ammo(Event Player, 1));
+		Play Effect(All Players(All Teams), Tracer Recall Reappear Effect, Team Of(Event Player) == Team 1 ? Color(Team 1) : Color(Team 2),
+			Evaluate Once(World Vector Of(Vector(0, Distance Between(Eye Position(Event Player), Position Of(Event Player)) / 1.600, 0),
+			Event Player, Rotation And Translation)), 1);
+		Play Effect(All Players(All Teams), Tracer Recall Reappear Sound, Color(White), Evaluate Once(Eye Position(Event Player)), 100);
+		Set Primary Fire Enabled(Event Player, True);
+		Set Secondary Fire Enabled(Event Player, True);
+		Set Ability 1 Enabled(Event Player, True);
+		Set Ability 2 Enabled(Event Player, True);
+		Allow Button(Event Player, Button(Ultimate));
+		Allow Button(Event Player, Button(Interact));
+		Set Jump Enabled(Event Player, True);
+		Set Crouch Enabled(Event Player, True);
+		Set Melee Enabled(Event Player, True);
+		Set Reload Enabled(Event Player, True);
+		"Cooldown"
+		Wait(12, Ignore Condition);
+	}
+}
