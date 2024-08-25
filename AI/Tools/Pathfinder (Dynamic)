@@ -1,0 +1,532 @@
+settings
+{
+	main
+	{
+		Mode Name: "Pathfinder 1.0 - 3CZ1R"
+	}
+
+	lobby
+	{
+		Map Rotation: After A Game
+		Match Voice Chat: Enabled
+		Max Team 1 Players: 4
+		Max Team 2 Players: 4
+		Return To Lobby: Never
+	}
+
+	modes
+	{
+		Assault
+		{
+			enabled maps
+			{
+				Hanamura 972777519512068154
+			}
+		}
+
+		Control
+		{
+			enabled maps
+			{
+			}
+		}
+
+		Escort
+		{
+			enabled maps
+			{
+			}
+		}
+
+		Hybrid
+		{
+			enabled maps
+			{
+			}
+		}
+
+		Push
+		{
+			enabled maps
+			{
+			}
+		}
+
+		General
+		{
+			Game Mode Start: Manual
+			Limit Roles: 1 Tank 2 Offense 2 Support
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			disabled heroes
+			{
+				Illari
+			}
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: Path_Nodes
+		1: Healthkits
+		5: ObjectiveA_Nodes
+		6: ObjectiveB_Nodes
+		8: Chokepoint
+		9: Staircase_Top
+		10: Staircase_Bottom
+		11: Healthkits_Small
+		12: Healthkits_Large
+		13: Staircase_Middle
+		14: Jump_Start
+		15: Jump_End
+		16: Jump_Index
+
+	player:
+		0: Walk_To_Position
+		1: Current_Node
+		2: Using_Stairs
+		3: Stairs_Index
+		4: Node_Options
+		5: Player_Test
+		6: Last_Stair_Type
+		7: Jump_From
+		10: Node_DePrioritze
+		25: Vist_Count
+		66: Known_Nodes
+		127: Ignore_Lower_Nodes
+}
+
+rule("Pathfind Melee/Jump")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Dummy Bot(Event Player) || Event Player.Player_Test) == True;
+		Is Alive(Event Player) == True;
+		Magnitude Of(Throttle Of(Event Player)) > 0;
+		Horizontal Speed Of(Event Player) < 2;
+	}
+
+	actions
+	{
+		Wait(Max(Server Load / 1000, 0.250), Abort When False);
+		Press Button(Event Player, Button(Jump));
+		Wait(Max(Server Load / 1000, 0.250), Abort When False);
+		Press Button(Event Player, Button(Melee));
+		Loop If Condition Is True;
+	}
+}
+
+rule("Current Node")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Dummy Bot(Event Player) || Event Player.Player_Test) == True;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Event Player.Walk_To_Position == Vector(X Component Of(Event Player.Walk_To_Position), Y Component Of(
+			Event Player.Walk_To_Position), Z Component Of(Event Player.Walk_To_Position));
+	}
+
+	actions
+	{
+		Event Player.Using_Stairs = Array Contains(Append To Array(Append To Array(Global.Staircase_Bottom, Filtered Array(
+			Global.Staircase_Middle, Current Array Element != Null)), Global.Staircase_Top), Event Player.Current_Node) ? True : False;
+		Skip If(Y Component Of(Position Of(Event Player)) + 2.750 >= Y Component Of(Event Player.Walk_To_Position), 2);
+		Event Player.Ignore_Lower_Nodes = 5;
+		Chase Player Variable Over Time(Event Player, Ignore_Lower_Nodes, 0, 5, Destination and Duration);
+		If(Distance Between(Position Of(Event Player), Event Player.Current_Node) < 3);
+			If(Event Player.Using_Stairs);
+				If(Array Contains(Global.Staircase_Bottom, Event Player.Current_Node));
+					Event Player.Last_Stair_Type = Custom String("Bottom");
+				Else If(Array Contains(Filtered Array(Global.Staircase_Middle, Current Array Element != Null), Event Player.Current_Node));
+					Event Player.Last_Stair_Type = Custom String("Middle");
+				Else If(Array Contains(Filtered Array(Global.Staircase_Top, Current Array Element != Null), Event Player.Current_Node));
+					Event Player.Last_Stair_Type = Custom String("Top");
+				End;
+			End;
+			If(Array Contains(Event Player.Known_Nodes, Event Player.Current_Node) != True);
+				Modify Player Variable(Event Player, Known_Nodes, Append To Array, Event Player.Current_Node);
+				Modify Player Variable(Event Player, Vist_Count, Append To Array, 1);
+			Else;
+				Event Player.Vist_Count[Index Of Array Value(Event Player.Known_Nodes, Event Player.Current_Node)] += 1;
+			End;
+			Event Player.Node_DePrioritze[Index Of Array Value(Event Player.Known_Nodes, Event Player.Current_Node)] += 10;
+		End;
+		Event Player.Node_Options = Filtered Array(Append To Array(Append To Array(Append To Array(Global.Path_Nodes, Global.Jump_Start),
+			Append To Array(Append To Array(Global.ObjectiveA_Nodes, Global.ObjectiveB_Nodes), Global.Chokepoint)), Append To Array(
+			Append To Array(Global.Staircase_Bottom, Filtered Array(Global.Staircase_Middle, Current Array Element != Null)),
+			Global.Staircase_Top)), Event Player.Node_DePrioritze[Index Of Array Value(Event Player.Known_Nodes, Current Array Element)
+			] <= 9999);
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Event Player, Current Array Element) <= 30);
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Y Component Of(Position Of(Event Player))
+			+ 2.750 > Y Component Of(Current Array Element));
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 1.200), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 1.200) + Vector(0, -99, 0),
+			Null, All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 1.200)) < Max(Y Component Of(
+			Position Of(Event Player)) + 1 - Y Component Of(Current Array Element), 8));
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 2), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 2) + Vector(0, -99, 0), Null,
+			All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 2)) < Max(Y Component Of(
+			Position Of(Event Player)) + 1 - Y Component Of(Current Array Element), 8));
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 4), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 4) + Vector(0, -99, 0), Null,
+			All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 4)) < Max(Y Component Of(
+			Position Of(Event Player)) + 1 - Y Component Of(Current Array Element), 8));
+		If(Event Player.Using_Stairs);
+			If(Array Contains(Global.Staircase_Bottom, Event Player.Current_Node));
+				Event Player.Stairs_Index = Index Of Array Value(Global.Staircase_Bottom, Event Player.Current_Node);
+			Else If(Array Contains(Filtered Array(Global.Staircase_Middle, Current Array Element != Null), Event Player.Current_Node));
+				Event Player.Stairs_Index = Index Of Array Value(Global.Staircase_Middle, Event Player.Current_Node);
+			Else If(Array Contains(Filtered Array(Global.Staircase_Top, Current Array Element != Null), Event Player.Current_Node));
+				Event Player.Stairs_Index = Index Of Array Value(Global.Staircase_Top, Event Player.Current_Node);
+			End;
+			If(Event Player.Last_Stair_Type == Custom String("Bottom"));
+				If(Global.Staircase_Middle[Event Player.Stairs_Index] == Null);
+					Modify Player Variable(Event Player, Node_Options, Append To Array, Global.Staircase_Top[Event Player.Stairs_Index]);
+				Else;
+					Modify Player Variable(Event Player, Node_Options, Append To Array, Global.Staircase_Middle[Event Player.Stairs_Index]);
+				End;
+			Else If(Event Player.Last_Stair_Type == Custom String("Middle"));
+				Modify Player Variable(Event Player, Node_Options, Append To Array, Global.Staircase_Top[Event Player.Stairs_Index]);
+			End;
+		End;
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Is In Line of Sight(Eye Position(Event Player),
+			Current Array Element, Barriers Do Not Block LOS) == True);
+		Event Player.Node_Options = Sorted Array(Event Player.Node_Options, Distance Between(Event Player, Current Array Element) * (
+			Y Component Of(Position Of(Event Player)) + 1 <= Y Component Of(Current Array Element)
+			|| !Event Player.Ignore_Lower_Nodes ? 1 : (Distance Between(Event Player, Event Player.Walk_To_Position) < Distance Between(
+			Current Array Element, Event Player.Walk_To_Position) ? 5 : 2.500)) + Distance Between(Event Player.Walk_To_Position,
+			Current Array Element) + Event Player.Node_DePrioritze[Index Of Array Value(Event Player.Known_Nodes, Current Array Element)]);
+		Skip If(Distance Between(Vector(X Component Of(Position Of(Event Player)), Y Component Of(Event Player.Walk_To_Position),
+			Z Component Of(Position Of(Event Player))), Event Player.Walk_To_Position) > 15, 1);
+		Event Player.Node_Options = Sorted Array(Event Player.Node_Options, Current Array Index * (
+			Event Player.Ignore_Lower_Nodes != 0 && Y Component Of(Position Of(Event Player)) + (Array Contains(Global.Staircase_Bottom,
+			Current Array Element) ? 1.500 : 2.750) <= Y Component Of(Current Array Element) && Array Contains(Append To Array(
+			Append To Array(Global.Staircase_Bottom, Global.Staircase_Middle), Global.Staircase_Top), Current Array Element) ? 1 : 5));
+		Event Player.Current_Node = First Of(Event Player.Node_Options) < 0 ? First Of(Sorted Array(Filtered Array(
+			Event Player.Node_Options, Current Array Index < 0), Absolute Value(Current Array Index))) : First Of(
+			Event Player.Node_Options);
+		If(Count Of(Event Player.Node_Options) == 0);
+			Event Player.Node_DePrioritze = Empty Array;
+			Event Player.Vist_Count = Empty Array;
+			Event Player.Known_Nodes = Empty Array;
+		End;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop;
+	}
+}
+
+rule("Use Jump Node")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Dummy Bot(Event Player) || Event Player.Player_Test) == True;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Array Contains(Global.Jump_Start, Event Player.Current_Node) == True;
+		Distance Between(Event Player, Event Player.Current_Node) <= 3;
+	}
+
+	actions
+	{
+		Event Player.Jump_From = Event Player.Current_Node;
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player, Event Player.Jump_From), Distance Between(Event Player,
+			Event Player.Jump_From) / 2, To World, Replace existing throttle, Direction and Magnitude);
+		Wait Until(Update Every Frame(Distance Between(Event Player, Event Player.Jump_From)) <= 1.600, 99999);
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player.Jump_From, Global.Jump_End[Index Of Array Value(
+			Global.Jump_Start, Event Player.Jump_From)]), 1, To World, Replace existing throttle, None);
+		Wait Until(Update Every Frame(Distance Between(Event Player, Global.Jump_End[Index Of Array Value(Global.Jump_Start,
+			Event Player.Jump_From)])) <= 1.600, 99999);
+		Press Button(Event Player, Button(Jump));
+		Wait Until(Is On Ground(Event Player), 4);
+		Wait(1, Ignore Condition);
+		Start Throttle In Direction(Event Player, Y Component Of(Position Of(Event Player)) + 2.750 >= Y Component Of(
+			Event Player.Walk_To_Position) && Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position,
+			Barriers Do Not Block LOS) ? (Distance Between(Event Player, Event Player.Walk_To_Position) < 2 ? Direction Towards(
+			Event Player.Walk_To_Position, Event Player) : Direction Towards(Event Player, Event Player.Walk_To_Position))
+			: Direction Towards(Position Of(Event Player), Event Player.Current_Node), (Distance Between(Event Player,
+			Event Player.Walk_To_Position) < 2 || Distance Between(Event Player, Event Player.Walk_To_Position) > 2)
+			&& Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 1 : (
+			Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 0 : 1), To World,
+			Replace existing throttle, Direction and Magnitude);
+	}
+}
+
+rule("Test Run")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Destroy All Dummy Bots;
+		Destroy All HUD Text;
+		Destroy All Effects;
+		If(Is Button Held(Event Player, Button(Melee)));
+			Event Player.Walk_To_Position = Evaluate Once(World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation));
+			Respawn(Event Player);
+			Event Player.Player_Test = True;
+			Wait Until(Distance Between(Event Player, Event Player.Walk_To_Position) <= 2, 99999);
+			Event Player.Player_Test = False;
+			Stop Throttle In Direction(Event Player);
+		Else;
+			Create Dummy Bot(Hero Of(Event Player), Team Of(Event Player), 5, Spawn Points(Team Of(Event Player)), Vector(0, 0, 0));
+			Last Created Entity.Walk_To_Position = Evaluate Once(World Vector Of(Vector(0, 1.550, 0), Event Player, Rotation And Translation));
+		End;
+	}
+}
+
+rule("Movement")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Dummy Bot(Event Player) || Event Player.Player_Test) == True;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Y Component Of(Position Of(Event Player)) + 2.750 >= Y Component Of(
+			Event Player.Walk_To_Position) && Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position,
+			Barriers Do Not Block LOS) ? (Distance Between(Event Player, Event Player.Walk_To_Position) < 2 ? Direction Towards(
+			Event Player.Walk_To_Position, Event Player) : Direction Towards(Event Player, Event Player.Walk_To_Position))
+			: Direction Towards(Position Of(Event Player), Event Player.Current_Node), (Distance Between(Event Player,
+			Event Player.Walk_To_Position) < 2 || Distance Between(Event Player, Event Player.Walk_To_Position) > 2)
+			&& Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 1 : (
+			Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 0 : 1), To World,
+			Replace existing throttle, Direction and Magnitude);
+	}
+}
+
+rule("Debug")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Dummy Bot(Event Player) || Event Player.Player_Test) == True;
+		Is Button Held(Host Player, Button(Reload)) == True;
+	}
+
+	actions
+	{
+		Create Effect(All Players(All Teams), Orb, Color(Green), Event Player.Walk_To_Position, 1, Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Color(Green), Event Player.Current_Node, 0.500, Visible To Position and Radius);
+		Create HUD Text(All Players(All Teams), Custom String(
+			"Count Of Nodes On Cooldown {0}\nLower Nodes, Low Priority {1}\nIs Walking To Pathing Location {2}", Count Of(
+			Event Player.Node_DePrioritze), Event Player.Ignore_Lower_Nodes != 0, Y Component Of(Position Of(Event Player))
+			+ 2.750 >= Y Component Of(Event Player.Walk_To_Position) && Is In Line of Sight(Eye Position(Event Player),
+			Event Player.Walk_To_Position, Barriers Do Not Block LOS)), Null, Null, Left, 0, Color(White), Color(White), Color(White),
+			Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Custom String("Using Stairs {0}\nStairs Index {1}\nLast Stair Part Used {2}",
+			Event Player.Using_Stairs, Event Player.Stairs_Index, Event Player.Last_Stair_Type), Null, Null, Left, 0, Color(White), Color(
+			White), Color(White), Visible To and String, Default Visibility);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, Position Of(Event Player), Event Player.Current_Node, Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, Position Of(Event Player), Event Player.Walk_To_Position, Color(Green),
+			Visible To Position and Radius);
+		Wait Until(!Is Dummy Bot(Event Player) && !Event Player.Player_Test, 99999);
+	}
+}
+
+rule("Hanamura")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(23.326, 1.550, -4.398), Vector(22.802, 1.572, -21.227), Vector(20.379, 8.008, -21.078), Vector(
+			12.076, 8.321, -19.733), Vector(7.436, 8.550, -22.362), Vector(-4.010, 8.550, -20.266), Vector(-10.098, 8.550, -22.046),
+			Vector(-10.159, 8.630, -27.940), Vector(-10.448, 2.550, -22.072), Vector(-3.706, 2.550, -22.648), Vector(-4.502, 2.550,
+			-18.663), Vector(2.903, 1.550, -18.511), Vector(12.677, 1.550, -24.341), Vector(13.540, 1.550, -18.551), Vector(17.102, 0.594,
+			-4.198), Vector(13.787, 0.569, -10.678), Vector(6.207, 0.651, -7.531), Vector(10.580, 0.550, 0.575), Vector(8.623, 1.525,
+			0.772), Vector(4.805, 1.550, 0.009), Vector(2.516, 2.463, 0.083), Vector(-4.158, 2.550, -8.863), Vector(-11.794, 2.550, 0.321),
+			Vector(-19.305, 0.292, -18.511), Vector(-18.804, 0.367, -21.806), Vector(-4.273, 5.550, 18.894), Vector(-3.979, 5.522, 22.171),
+			Vector(-14.486, 5.508, 21.405), Vector(-14.642, 5.461, 11.854), Vector(10.242, 5.550, 22.690), Vector(10.454, 5.550, 17.067),
+			Vector(12.812, 5.550, 22.339), Vector(14.063, 5.615, 17.081), Vector(14.846, 5.550, 13.098), Vector(8.320, 5.573, 7.338),
+			Vector(16.042, 5.576, 7.381), Vector(20.338, 5.710, 8.857), Vector(24.107, 1.550, 3.920), Vector(8.611, 0.480, 32.047), Vector(
+			-44.941, 2.550, -113.131), Vector(-23.513, 2.550, -111.756), Vector(-13.984, 2.550, -101.881), Vector(-33.613, 2.550, -81.852),
+			Vector(-43.687, 2.550, -92.405), Vector(-28.019, 2.550, -87.786), Vector(-22.425, 2.550, -89.371), Vector(-15.520, 2.550,
+			-96.790), Vector(0.972, 8.560, -90.118), Vector(7.405, 8.550, -83.355), Vector(7.679, 8.560, -88.683), Vector(30.693, 4.550,
+			-73.233), Vector(30.324, 4.550, -79.620), Vector(36.638, 4.550, -74.064), Vector(39.791, 4.550, -79.534), Vector(36.336, 4.550,
+			-84.995), Vector(13.544, 5.550, -78.057), Vector(7.500, 5.550, -76.473), Vector(15.270, 5.550, -73.499), Vector(2.112, 6.560,
+			-71.530), Vector(-2.505, 5.550, -66.774), Vector(0.288, 5.550, -58.229), Vector(-3.119, 5.550, -60.522), Vector(-4.678, 4.708,
+			-58.827), Vector(-10.212, 4.550, -53.249), Vector(-20.232, 2.550, -63.176), Vector(-17.562, 2.550, -65.719), Vector(-7.489,
+			-3.550, -64.417), Vector(-13.447, -3.550, -69.901), Vector(-3.520, -3.550, -71.075), Vector(2.337, -3.550, -77.819), Vector(
+			11.152, -3.550, -85.529), Vector(14.924, -3.450, -86.900), Vector(16.193, -3.450, -90.854), Vector(9.584, 0.550, -73.161),
+			Vector(5.617, 0.550, -68.609), Vector(0.845, 0.550, -66.721), Vector(1.980, 0.919, -72.070), Vector(-0.694, 1.412, -74.516),
+			Vector(-2.950, 0.722, -77.181), Vector(-5.583, 0.556, -75.642), Vector(-1.978, 0.625, -80.740), Vector(-9.561, 0.625, -74.101),
+			Vector(-0.194, 0.625, -83.874), Vector(2.613, 0.625, -93.657), Vector(-2.068, 0.625, -90.092), Vector(-10.959, 0.625, -84.734),
+			Vector(8.078, 0.025, -65.919), Vector(22.556, -0.366, -64.746), Vector(25.035, -0.326, -70.248), Vector(35.254, -0.334,
+			-61.302), Vector(37.784, -0.422, -61.434), Vector(37.025, -0.293, -38.859), Vector(25.313, -0.101, -39.620), Vector(30.891,
+			3.905, -63.560), Vector(30.003, 4.426, -68.520), Vector(30.840, 3.297, -53.564), Vector(30.830, 3.390, -42.570), Vector(30.717,
+			3.550, -32.612), Vector(38.142, 3.550, -34.735), Vector(18.872, 1.550, -27.956), Vector(12.711, 1.550, -26.516), Vector(12.558,
+			-0.201, -39.817), Vector(21.491, -0.121, -48.008), Vector(12.915, 0.326, -49.034), Vector(6.676, 0.080, -49.253), Vector(1.875,
+			-0.325, -45.146), Vector(12.865, -0.178, -61.159), Vector(-8.050, 2.550, -32.381), Vector(-4.343, 2.550, -29.667), Vector(
+			5.460, 1.981, -29.559), Vector(11.122, 1.550, -29.824), Vector(-10.145, 2.610, -27.910), Vector(101.717, 3.550, 7.038), Vector(
+			103.830, 2.647, 7.075), Vector(108.438, 2.550, 3), Vector(106.256, 2.550, -0.829), Vector(82.457, -1.450, -0.031), Vector(
+			78.571, -0.739, 0.167), Vector(72.788, -0.420, -0.517), Vector(82.051, -1.450, 9.591), Vector(81.864, -1.450, 18.213), Vector(
+			76.415, -0.451, 23.038), Vector(94.332, 3.550, 7.176), Vector(90.657, 3.550, 0.558), Vector(87.567, 3.550, 6.918), Vector(
+			73.874, -0.452, 25.297), Vector(66.355, -0.455, 26.897), Vector(63.156, -0.511, 19.953), Vector(62.007, -0.214, 1.812), Vector(
+			68.239, -0.345, 5.141), Vector(60.646, -0.447, 12.381), Vector(65.826, -0.321, -6.317), Vector(44.272, 1.419, -11.591), Vector(
+			43.744, 2.322, -8.778), Vector(44.928, 2.549, -5.859), Vector(48.171, 1.603, -5.974), Vector(49.877, 0.738, -5.933), Vector(
+			54.116, 0.550, -5.108), Vector(53.974, 0.550, 3.989), Vector(53.768, 0.026, 9.502), Vector(49.439, 0.467, 13.473), Vector(
+			49.236, 0.608, 6.765), Vector(43.397, 1.424, 10.119), Vector(41.121, 2.550, 1.999), Vector(36.364, 1.747, 1.946), Vector(
+			36.712, 1.716, 9.701), Vector(40.608, 1.795, 18.869), Vector(40.690, 1.865, 32.050), Vector(47.836, 7.550, 17.403), Vector(
+			48.101, 7.550, 1.772), Vector(42.910, 7.550, 1.794), Vector(40.179, 7.550, -2.464), Vector(40.230, 7.550, -6.177), Vector(
+			42.999, 7.550, -3.567), Vector(57.528, 7.550, -12.180), Vector(57.784, 7.550, -14.903), Vector(61.827, 7.550, -12.727), Vector(
+			61.801, 7.550, -6.126), Vector(45.933, 7.550, -10.997), Vector(45.846, 7.550, 8.578), Vector(41.647, 7.550, 15.876), Vector(
+			58.109, 3.550, -25.378), Vector(38.746, 1.572, -23.554), Vector(38.976, 1.501, -14.289), Vector(38.984, 1.499, -11.432),
+			Vector(33.204, 1.649, -12.868), Vector(31.508, 1.640, -2.649), Vector(35.075, 1.755, 5.929), Vector(1.910, 0.550, 17.312),
+			Vector(14.321, 0.550, 18.889), Vector(-13.861, 0.550, 18.621), Vector(6.323, 1.551, 8.883), Vector(13.904, 1.551, 8.651),
+			Vector(13.843, 0.896, 12.593), Vector(-34.591, 2.550, -101.898), Vector(20.761, 5.550, -82.739), Vector(24.715, 5.073,
+			-80.266), Vector(37.793, -0.303, -50.779), Vector(-2.594, 2.550, -36.363), Vector(5.115, 5.532, 28.542), Vector(3.215, 6.188,
+			-66.369), Vector(8.019, 5.868, -71.019), Vector(-27.203, 2.550, -61.468));
+		Global.Healthkits = Array(Vector(40.843, 1.857, 34.410), Vector(45.064, 2.556, -0.793), Vector(51.987, 3.550, -27.967), Vector(
+			35.901, 1.904, 17.370), Vector(25.713, 1.570, -23.574), Vector(7.328, 5.550, 16.563), Vector(7.997, 0.387, 35.636), Vector(
+			-14.681, 5.424, 12.924), Vector(1.953, 2.550, -22.043), Vector(0.587, 2.550, -36.584), Vector(12.802, 0.326, -48.955), Vector(
+			38.584, -0.327, -38.603), Vector(29.960, -0.329, -65.198), Vector(14.711, -3.450, -96.160), Vector(-0.467, -3.550, -74.113),
+			Vector(-1.002, 0.550, -97.590), Vector(-13.066, 2.550, -61.262), Vector(29.870, 4.550, -89.663));
+		Global.ObjectiveA_Nodes = Array(Vector(1.229, 2.551, 8.770), Vector(1.173, 2.551, 5.163), Vector(1.210, 2.551, 1.202), Vector(
+			1.210, 2.551, -2.319), Vector(1.210, 2.551, -6.102), Vector(-1.536, 2.551, -6.153), Vector(-1.561, 2.551, -2.367), Vector(
+			-1.425, 2.551, 1.315), Vector(-1.452, 2.551, 5.101), Vector(-3.732, 2.550, 5.157), Vector(-4.056, 2.550, -2.341), Vector(
+			-4.014, 2.550, -6.299), Vector(-6.608, 2.550, -6.298), Vector(-6.563, 2.550, -2.249), Vector(-6.448, 2.550, 0.134), Vector(
+			-6.631, 2.550, 5.149), Vector(-9.541, 2.550, -6.500), Vector(-9.618, 2.550, -2.539), Vector(-9.676, 2.550, 0.098), Vector(
+			-9.848, 2.550, 5.172), Vector(-9.981, 2.550, 9.133), Vector(-9.861, 2.550, 2.538), Vector(-4.328, 2.550, 2.651), Vector(0.072,
+			2.550, 2.702));
+		Global.ObjectiveB_Nodes = Array(Vector(-21.182, 0.625, -86.458), Vector(-19.057, 0.625, -88.496), Vector(-17.015, 0.800, -90.692),
+			Vector(-15.043, 0.675, -92.204), Vector(-12.440, 0.625, -94.445), Vector(-10.310, 0.625, -92.211), Vector(-12.696, 0.625,
+			-89.867), Vector(-14.521, 0.625, -88.070), Vector(-16.669, 0.625, -85.947), Vector(-18.729, 0.625, -83.919), Vector(-16.137,
+			0.625, -81.284), Vector(-14.068, 0.625, -83.370), Vector(-11.895, 0.625, -85.464), Vector(-10.028, 0.625, -87.302), Vector(
+			-7.724, 0.625, -89.687), Vector(-5.492, 0.625, -87.415), Vector(-7.864, 0.625, -85.083), Vector(-9.666, 0.625, -83.313),
+			Vector(-11.855, 0.625, -81.160), Vector(-14.026, 0.625, -79.022), Vector(-11.996, 0.625, -76.922), Vector(-9.783, 0.625,
+			-79.062), Vector(-7.607, 0.625, -81.206), Vector(-5.799, 0.625, -82.956), Vector(-3.323, 0.625, -85.344));
+		Global.Chokepoint = Array(Vector(1.354, 1.320, -72.613), Vector(12.896, 1.550, -23.731), Vector(29.407, 1.810, -3.931));
+		Global.Staircase_Top = Array(Vector(1.485, 8.560, -94.928), Vector(12.239, 8.550, -92.720), Vector(12.940, 1.550, -30.217), Vector(
+			-8.359, 2.550, -37.229), Vector(4.626, 8.550, -25.707), Vector(26.404, 7.550, -17.067), Vector(22.222, 3.548, 15.676), Vector(
+			17.911, 5.549, 13.438), Vector(21.795, 3.550, 22.088), Vector(-3.320, 5.550, 26.877), Vector(-4.120, 5.550, 13.560), Vector(
+			-14.209, 2.550, 4.129), Vector(-9.527, 2.550, -17.871), Vector(-12.611, 2.550, -30.736), Vector(27.872, 3.550, -29.514),
+			Vector(-12.602, 4.550, -55.338), Vector(-27.662, 2.550, -53.900), Vector(-25.911, 2.550, -69.793), Vector(-23.188, 2.550,
+			-83.562), Vector(-9.565, 2.550, -97.634), Vector(16.857, 0.550, -78.027), Vector(26.588, 3.465, -59.778), Vector(36.688, 7.550,
+			19.395), Vector(48.092, 7.550, -14.500), Vector(46.424, 3.550, -26.669), Vector(58.032, 3.550, -22.211), Vector(76.081, 3.550,
+			6.813), Vector(103.054, 2.550, -0.079), Vector(-14.163, 2.551, -2.498), Vector(4.345, 0.550, -93.658));
+		Global.Staircase_Bottom = Array(Vector(-8.654, 2.550, -105.336), Vector(18.346, 5.550, -85.931), Vector(13.125, -0.392, -35.474),
+			Vector(-4.662, -0.450, -44.151), Vector(-9.166, 2.550, -25.514), Vector(26.384, 1.569, -21.243), Vector(22.346, 1.550, 9.923),
+			Vector(18.199, 3.548, 19.492), Vector(15.095, 0.567, 27.782), Vector(-4.576, 0.553, 31.248), Vector(-3.964, 2.550, 6.639),
+			Vector(-13.750, 0.550, 10.165), Vector(-15.202, 0.371, -17.774), Vector(-17.348, 0.308, -30.299), Vector(21.814, 1.550,
+			-29.540), Vector(-16.068, 2.550, -59.050), Vector(-11.031, -3.450, -60.910), Vector(-21.294, 0.625, -74.187), Vector(-19.641,
+			0.625, -79.817), Vector(-5.488, 0.625, -93.446), Vector(17.094, -3.450, -88.167), Vector(25.485, -0.198, -48.878), Vector(
+			37.229, 2.055, 32), Vector(48.122, 3.550, -23.712), Vector(41.607, 1.587, -26.914), Vector(57.735, 0.463, -13.378), Vector(
+			76.038, -0.367, 17.636), Vector(92.502, -1.450, 0.128), Vector(-14.578, 0.509, -7.653), Vector(6.118, -3.550, -82.564));
+		Global.Healthkits_Small = Array(Vector(40.843, 1.857, 34.410), Vector(51.987, 3.550, -27.967), Vector(25.713, 1.570, -23.574),
+			Vector(-14.681, 5.424, 12.924), Vector(1.953, 2.550, -22.043), Vector(0.587, 2.550, -36.584), Vector(38.584, -0.327, -38.603),
+			Vector(29.960, -0.329, -65.198), Vector(-0.467, -3.550, -74.113), Vector(-1.002, 0.550, -97.590));
+		Global.Healthkits_Large = Array(Vector(45.064, 2.556, -0.793), Vector(35.901, 1.904, 17.370), Vector(7.328, 5.550, 16.563), Vector(
+			7.997, 0.387, 35.636), Vector(12.802, 0.326, -48.955), Vector(14.711, -3.450, -96.160), Vector(-13.066, 2.550, -61.262),
+			Vector(29.870, 4.550, -89.663));
+		Global.Staircase_Middle = Array(0, 0, 0, Vector(-8.679, 0.550, -44.166), 0, Vector(35.414, 4.550, -19.065), 0, 0, Vector(21.509,
+			2.550, 26.687), Vector(-12.062, 2.551, 29.122), 0, 0, 0, 0, 0, 0, Vector(-22.568, 0.550, -49.306), 0, 0, 0, Vector(21.901,
+			-1.450, -82.408), 0, Vector(31.652, 4.550, 30.354), 0, 0, 0, 0, 0, 0, Vector(3.003, -1.381, -86.675));
+		Global.Jump_Start = Array(Vector(-14.590, 4.550, -48.956));
+		Global.Jump_End = Array(Vector(-15.196, 4.560, -42.813));
+	}
+}
+
+rule("Setup Values")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Node_DePrioritze = Empty Array;
+		Event Player.Vist_Count = Empty Array;
+		Event Player.Known_Nodes = Empty Array;
+	}
+}
+
+rule("Destroy Fences")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Global.Jump_End) > 0;
+	}
+
+	actions
+	{
+		For Global Variable(Jump_Index, 0, Count Of(Global.Jump_End), 1);
+			Create Projectile(Orb Projectile, Null, Global.Jump_End[Global.Jump_Index], Down, To World, Damage, All Teams, 0, 1, 8,
+				Bad Explosion, Explosion Sound, 0, 50, 1, 0, 0, 0);
+		End;
+	}
+}
