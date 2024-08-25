@@ -1,0 +1,3739 @@
+settings
+{
+	main
+	{
+		Description: "VX9S6 : Assault\n????? : Payload\n????? : Control\n????? : Hybrid\nNSFHN : Deathmatch\nXZG53K : Elimination\nYJ24J : Capture The Flag\nSMY64 : Flashpoint\nHB4CF : Clash"
+		Mode Name: "Clash Universal AI"
+	}
+
+	lobby
+	{
+		Map Rotation: After A Game
+		Match Voice Chat: Enabled
+		Return To Lobby: Never
+	}
+
+	modes
+	{
+		Clash
+		{
+			Capture Speed Modifier: 45%
+		}
+
+		General
+		{
+			Game Mode Start: Immediately
+			Limit Roles: 1 Tank 2 Offense 2 Support
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+	}
+
+	workshop
+	{
+		Assemble Time: 10
+		Memory: Off
+		Player 1: [2]
+		Player 2: [2]
+		Player 3: [3]
+		Player 4: [3]
+		Player 5: [1]
+		Player 6: [1]
+		Random Gamertags: Off
+		Sound Based Detection: Off
+		Targeting Type: [1]
+		Turn Speed: 225
+	}
+
+	extensions
+	{
+		Spawn More Dummy Bots
+	}
+}
+
+variables
+{
+	global:
+		0: Path_Nodes
+		1: Healthkits
+		5: ObjectiveA_Nodes
+		6: ObjectiveB_Nodes
+		7: Hero_Prioritize_Order
+		8: All_Heros
+		9: Primary_Max
+		11: Number_Of_Bots_T1
+		12: Ability1_Max
+		13: Mobility_Distance
+		14: Primary_Min
+		16: Ultimate_Duration
+		17: Secondary_Max
+		18: Secondary_Min
+		19: Charge_Time
+		20: Use_Ultimate_Max
+		21: Ultimate_Health
+		22: Gamertags
+		23: Swap_After_Ult
+		24: ObjectivePos
+		25: T1_Available_Heros
+		26: T2_Available_Heros
+		27: Passive
+		28: Slot1_Role_Lock
+		29: Slot2_Role_Lock
+		30: Slot3_Role_Lock
+		31: Slot4_Role_Lock
+		32: Slot5_Role_Lock
+		33: Slot6_Role_Lock
+		34: Ultimate_Targets
+		35: Ability1_Min
+		36: Ability2_Max
+		37: Ability2_Min
+		38: Ultimate_Target_Team
+		39: Primary_Arc
+		40: Secondary_Arc
+		41: Ultimate_Max
+		42: Ultimate_Min
+		43: Ability1_Arc
+		44: Ability2_Arc
+		45: Ultimate_Arc
+		46: Jump_Start
+		47: Jump_End
+		48: Primary_Sound_Max
+		49: Secondary_Sound_Max
+		50: Ability1_Sound_Max
+		51: Ability2_Sound_Max
+		52: Ultimate_Sound_Max
+		53: Walking_Sound_Max
+		54: Crouch_Walk_Sound_Max
+		55: Melee_Sound_Max
+		56: Aim_Predict_Scale
+		57: AI_Communicate
+		58: AI_Gamertags
+		59: AI_Aim_Type
+		60: AI_Turn_Speed
+		61: Vaild_Heros
+		62: Targeting_Type
+		63: Use_Complex_Abilitys
+		64: Can_Hear
+		65: Team_Based_Targeting
+		66: Jump_Index
+		68: Invisible_Targeting
+		69: Ignore_Abilitys
+		70: Chokepoint
+		71: AI_Difficulty
+		72: Number_Of_Bots_T2
+		75: Staircase_Top
+		76: Staircase_Bottom
+		77: Staircase_Middle
+		78: Healthkits_Small
+		79: Healthkits_Large
+		80: Healthkit_Index
+		81: Healthkit_CD
+		82: Healthkit_Used
+		83: Used_Healthkit_Type
+
+	player:
+		0: Walk_To_Position
+		1: Current_Node
+		2: Primary_Max
+		3: Aim_Predict
+		4: Node_Options
+		5: AI_Username
+		6: Offensive
+		7: Defensive
+		8: Mobility
+		9: Ultimate_Target_Team
+		10: Request
+		11: Healing
+		12: Ability1_Max
+		13: Mobility_Distance
+		14: Hero
+		15: Secondary_Fire
+		16: Secondary_Offensive
+		17: Secondary_Defensive
+		18: Secondary_Healing
+		19: Hold
+		20: Confirm
+		21: Toggle
+		22: Current_Offensive
+		23: Current_Defensive
+		24: Current_Mobility
+		25: Current_Healing
+		26: Targets
+		27: Target_Order
+		28: Primary_Min
+		29: Cooldown
+		30: Charge
+		31: Resource
+		32: Aim_Predict_Scale
+		33: Secondary_Max
+		34: Secondary_Min
+		35: Charging
+		36: Charging_Time
+		37: Use_Ultimate_Max
+		38: Ultimate_Health
+		39: Hero_Pool
+		40: Ultimates_Used
+		41: Ultimate_Targets
+		42: Role_Lock
+		43: Ability1_Min
+		44: Ability2_Max
+		45: Ability2_Min
+		46: Heal_Friendlys
+		47: Current_Heal_Friendlys
+		48: Walk_Max
+		49: Walk_Min
+		50: Invisible_Cooldown
+		51: Using_Stairs
+		52: Passive
+		53: Requested_Hero
+		54: Aim_Arc
+		55: Can_Change_Arc
+		56: Ultimate_Max
+		57: Ultimate_Min
+		58: Ultimate_Duration
+		59: Stairs_Index
+		60: Use_If_Shield
+		61: Alternative_Form
+		62: Zen_Orb_Target
+		63: Zen_Orb_Hero
+		64: Current_Hero
+		65: Seen_By_Memory
+		66: In_Combat_Array
+		67: Is_Visible_Array
+		68: Last_Stair_Type
+		69: Node_DePrioritze
+		70: Vist_Count
+		71: Known_Nodes
+		72: Jump_From
+		73: Stored_Ult_Charge
+		127: Ignore_Lower_Nodes
+}
+
+subroutines
+{
+	0: Hanaoka
+	5: Hero_Values
+	6: Hero_Variables
+	8: Global_Setup
+	9: Node_Setup
+	10: Debugs
+	11: Heros
+	14: AI_Start_Facing
+	15: Gamertags
+	16: AI_Difficulty
+}
+
+rule("------------------------------------------- Made By Spiderman318 | YT Spiderman318 ---------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Call Subroutine(Global_Setup);
+		Wait(3, Ignore Condition);
+		Wait Until(Is Assembling Heroes, 99999);
+		Set Match Time(Workshop Setting Integer(Custom String("Game"), Custom String("Assemble Time"), 5, 0, 30, 0) + 5);
+		Global.AI_Aim_Type = Workshop Setting Combo(Custom String("AI"), Custom String("Aim Type (Use Basic To Avoid Crash)"), 0, Array(
+			Custom String("Basic (Aim At Head With No Leading Or Arc)"), Custom String("Leading (Aim At Head With Leading But No Arc)"),
+			Custom String("Arc (Aim At Head With Arc But No Leading"), Custom String("Advanced (Aim At Head With Leading And Arc)")), 0);
+		Global.AI_Turn_Speed = Workshop Setting Integer(Custom String("AI"), Custom String("Turn Speed"), 320, 10, 500, 11);
+		Global.Ignore_Abilitys = Workshop Setting Toggle(Custom String("AI"), Custom String(
+			"Igore Abilitys (Continues To Fire Into Deflect, Defence Matrix, Etc)"), False, 6);
+		Global.AI_Gamertags = Workshop Setting Toggle(Custom String("AI"), Custom String("Random Gamertags"), True, 8);
+		Global.Invisible_Targeting = Workshop Setting Combo(Custom String("AI"), Custom String("Invisible Targeting"), 0, Array(
+			Custom String("While Hacking Or While 3 Meters or Less Away"), Custom String("While Hacking"), Custom String(
+			"While 3 Meters or Less Away"), Custom String("Never")), 0);
+		Global.AI_Communicate = Workshop Setting Toggle(Custom String("AI"), Custom String(
+			"Can Communicate (Hello, Need Help, Need Healing, Understand, Thanks)"), True, 7);
+		Global.Targeting_Type = Workshop Setting Combo(Custom String("AI"), Custom String("Targeting Type"), 0, Array(Custom String(
+			"Basic (LOS)"), Custom String("Hero Basic (LOS / ABS)"), Custom String("Improved (LOS / SBT)"), Custom String(
+			"Hero Improved (LOS/ ABS / SBT)"), Custom String(
+			"\nLOS - Line Of Sight\r\n\r\nABS - Ability Based Sight\r\n\r\rDoes'nt Include Sonic Arrow"), Custom String(
+			"\nSBT - Sound Based Targeting\r\nOnly Works If SBT Enabled")), 1);
+		Global.Targeting_Type = Min(Global.Targeting_Type, 3);
+		Global.Can_Hear = Workshop Setting Toggle(Custom String("AI"), Custom String("Sound Based Detection"), True, 2);
+		Global.Use_Complex_Abilitys = Workshop Setting Toggle(Custom String("AI"), Custom String(
+			"Use More Complex Abilitys (Zen Orbs, Lucio Crossfade, Etc)"), True, 5);
+		Global.Team_Based_Targeting = Workshop Setting Toggle(Custom String("AI"), Custom String(
+			"Team Based Targeting (Healing, Protection, Etc)"), True, 4);
+		Global.Number_Of_Bots_T1 = Workshop Setting Integer(Custom String("AI"), Custom String("Amount (Team 1)"), 5, 0, 24, 12);
+		Global.Number_Of_Bots_T2 = Workshop Setting Integer(Custom String("AI"), Custom String("Amount (Team 2)"), 5, 0, 24, 12);
+		Call Subroutine(Hero_Values);
+		Skip If(Global.AI_Gamertags == False, 1);
+		Call Subroutine(Gamertags);
+		Call Subroutine(Node_Setup);
+		Call Subroutine(Debugs);
+		Global.AI_Difficulty = Workshop Setting Combo(Custom String("AI"), Custom String(
+			"Difficulty (Overrides Settings Such As Aim Type, Ignore Abilitys, Etc)"), 0, Array(Custom String(
+			"Custom Difficulty (Dont Override)"), Custom String("Easy"), Custom String("Normal"), Custom String("Hard")), -1);
+		Skip If(Global.AI_Difficulty == 0, 1);
+		Call Subroutine(AI_Difficulty);
+	}
+}
+
+rule("Use Healthkit")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Was Health Pack == True;
+		Is In Spawn Room(Event Player) != True;
+		(Hero Of(Healer) == Hero(Sombra) || !Entity Exists(Healer)) == True;
+	}
+
+	actions
+	{
+		If(Count Of(Append To Array(Global.Healthkits_Small, Global.Healthkits_Large)) == 0);
+			Modify Global Variable(Healthkit_Used, Append To Array, First Of(Sorted Array(Global.Healthkits, Distance Between(Event Player,
+				Current Array Element))));
+			Modify Global Variable(Healthkits, Remove From Array By Value, First Of(Sorted Array(Global.Healthkits, Distance Between(
+				Event Player, Current Array Element))));
+			Modify Global Variable(Healthkit_CD, Append To Array, Event Healing > 75 ? 15 : 10);
+			Modify Global Variable(Used_Healthkit_Type, Append To Array, 0);
+		Else;
+			If(Array Contains(Global.Healthkits_Small, First Of(Sorted Array(Append To Array(Global.Healthkits_Small, Global.Healthkits_Large),
+				Distance Between(Event Player, Current Array Element)))));
+				Modify Global Variable(Healthkit_Used, Append To Array, First Of(Sorted Array(Global.Healthkits_Small, Distance Between(
+					Event Player, Current Array Element))));
+				Modify Global Variable(Healthkits_Small, Remove From Array By Value, First Of(Sorted Array(Global.Healthkits_Small,
+					Distance Between(Event Player, Current Array Element))));
+				Modify Global Variable(Healthkit_CD, Append To Array, 10);
+				Modify Global Variable(Used_Healthkit_Type, Append To Array, 1);
+			Else;
+				Modify Global Variable(Healthkit_Used, Append To Array, First Of(Sorted Array(Global.Healthkits_Large, Distance Between(
+					Event Player, Current Array Element))));
+				Modify Global Variable(Healthkits_Large, Remove From Array By Value, First Of(Sorted Array(Global.Healthkits_Large,
+					Distance Between(Event Player, Current Array Element))));
+				Modify Global Variable(Healthkit_CD, Append To Array, 15);
+				Modify Global Variable(Used_Healthkit_Type, Append To Array, 2);
+			End;
+		End;
+	}
+}
+
+rule("Healthkit Cooldown")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Healthkit_Used = Empty Array;
+		Global.Healthkit_CD = Empty Array;
+		Global.Used_Healthkit_Type = Empty Array;
+		While(True);
+			Wait Until(Count Of(Global.Healthkit_Used) > 0, 99999);
+			For Global Variable(Healthkit_Index, Count Of(Global.Healthkit_Used) - 1, -1, -1);
+				If(Global.Healthkit_CD[Global.Healthkit_Index] <= 0);
+					If(Global.Used_Healthkit_Type[Global.Healthkit_Index] == 1);
+						Modify Global Variable(Healthkits_Small, Append To Array, Global.Healthkit_Used[Global.Healthkits]);
+					Else If(Global.Used_Healthkit_Type[Global.Healthkit_Index] == 2);
+						Modify Global Variable(Healthkits_Large, Append To Array, Global.Healthkit_Used[Global.Healthkits]);
+					Else;
+						Modify Global Variable(Healthkits, Append To Array, Global.Healthkit_Used[Global.Healthkits]);
+					End;
+					Modify Global Variable(Healthkit_Used, Remove From Array By Index, Global.Healthkit_Index);
+					Modify Global Variable(Healthkit_CD, Remove From Array By Index, Global.Healthkit_Index);
+					Modify Global Variable(Used_Healthkit_Type, Remove From Array By Index, Global.Healthkit_Index);
+				Else;
+					Global.Healthkit_CD[Global.Healthkit_Index] -= 1;
+				End;
+			End;
+			Wait(1, Ignore Condition);
+		End;
+	}
+}
+
+disabled rule("----------------------------------- AI Communicate ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Bot Say Hello")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.AI_Communicate == True;
+		Is Communicating(Event Player, Hello) == True;
+		Is Dummy Bot(Event Player) != True;
+	}
+
+	actions
+	{
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Communicate(Filtered Array(Remove From Array(All Living Players(Team Of(Event Player)), Event Player), Is In View Angle(
+			Event Player, Eye Position(Current Array Element), 45) == True && Is In Line of Sight(Eye Position(Event Player), Eye Position(
+			Current Array Element), Barriers Do Not Block LOS) == True && Distance Between(Event Player, Current Array Element)
+			< 20 && Is Dummy Bot(Current Array Element)), Hello);
+	}
+}
+
+rule("Bot Say Need Help")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.AI_Communicate == True;
+		Is Communicating(Event Player, Need Help) != True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Communicate(Event Player, Need Help);
+		Wait(8, Ignore Condition);
+	}
+}
+
+rule("Bot Say Need Healing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.AI_Communicate == True;
+		Is Communicating(Event Player, Need Healing) != True;
+		Is Dummy Bot(Event Player) == True;
+		Normalized Health(Event Player) <= 0.800;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Communicate(Event Player, Need Healing);
+		Wait(8, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Bot Say Understood")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.AI_Communicate == True;
+		Is Communicating(Event Player, Ultimate Status) == True;
+		Is Dummy Bot(Event Player) != True;
+		Ultimate Charge Percent(Event Player) == 100;
+	}
+
+	actions
+	{
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Communicate(Filtered Array(Remove From Array(All Living Players(Team Of(Event Player)), Event Player), Is Dummy Bot(
+			Current Array Element)), Acknowledge);
+	}
+}
+
+rule("Bot Say Thanks")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.AI_Communicate == True;
+		Is Communicating(Event Player, Thanks) != True;
+		Is Dummy Bot(Event Player) == True;
+		Healer != Healee;
+		Entity Exists(Healer) == True;
+	}
+
+	actions
+	{
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Communicate(Event Player, Thanks);
+		Wait(8, Ignore Condition);
+	}
+}
+
+disabled rule("----------------------------------- AI Communicate ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- Pathfinder ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Use Jump Node")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Array Contains(Global.Jump_Start, Event Player.Current_Node) == True;
+		Distance Between(Event Player, Event Player.Current_Node) <= 3;
+	}
+
+	actions
+	{
+		Event Player.Jump_From = Event Player.Current_Node;
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player, Event Player.Jump_From), Distance Between(Event Player,
+			Event Player.Jump_From) / 2, To World, Replace existing throttle, Direction and Magnitude);
+		Wait Until(Update Every Frame(Distance Between(Event Player, Event Player.Jump_From)) <= 1.600, 99999);
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player.Jump_From, Global.Jump_End[Index Of Array Value(
+			Global.Jump_Start, Event Player.Jump_From)]), 1, To World, Replace existing throttle, None);
+		Wait Until(Update Every Frame(Distance Between(Event Player, Global.Jump_End[Index Of Array Value(Global.Jump_Start,
+			Event Player.Jump_From)])) <= 1.600, 99999);
+		Press Button(Event Player, Button(Jump));
+		Wait Until(Is On Ground(Event Player), 4);
+		Wait(1, Ignore Condition);
+		Start Throttle In Direction(Event Player, Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position,
+			Barriers Do Not Block LOS) ? (Distance Between(Event Player, Event Player.Walk_To_Position)
+			< Event Player.Walk_Min ? Direction Towards(Event Player.Walk_To_Position, Event Player) : Direction Towards(Event Player,
+			Event Player.Walk_To_Position)) : Direction Towards(Position Of(Event Player), Event Player.Current_Node), (Distance Between(
+			Event Player, Event Player.Walk_To_Position) < Event Player.Walk_Min || Distance Between(Event Player,
+			Event Player.Walk_To_Position) > Event Player.Walk_Max) && Is In Line of Sight(Eye Position(Event Player),
+			Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 1 : (Is In Line of Sight(Eye Position(Event Player),
+			Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 0 : 1), To World, Replace existing throttle,
+			Direction and Magnitude);
+	}
+}
+
+rule("Pathfind Melee/Jump")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Magnitude Of(Throttle Of(Event Player)) > 0;
+		Horizontal Speed Of(Event Player) < 2;
+	}
+
+	actions
+	{
+		Wait(Max(Server Load / 1000, 0.250), Abort When False);
+		Press Button(Event Player, Button(Jump));
+		Skip If((Hero Of(Event Player) == Hero(Sombra) || Hero Being Duplicated(Event Player) == Hero(Sombra))
+			&& Event Player.Invisible_Cooldown == 0 && Event Player.Is_Visible_Array == Empty Array, 3);
+		Skip If(Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player), Eye Position(
+			First Of(Event Player.Target_Order)), Barriers Do Not Block LOS) && Team Of(Event Player) != Team Of(First Of(
+			Event Player.Target_Order)), 2);
+		Wait(Max(Server Load / 1000, 0.250), Abort When False);
+		Press Button(Event Player, Button(Melee));
+		Loop If Condition Is True;
+	}
+}
+
+rule("Current Node")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Using_Stairs = Array Contains(Append To Array(Append To Array(Global.Staircase_Middle, Filtered Array(
+			Global.Staircase_Bottom, Current Array Element != Null)), Global.Staircase_Top), Event Player.Current_Node) ? True : False;
+		Skip If(Y Component Of(Position Of(Event Player)) + 2.750 >= Y Component Of(Event Player.Walk_To_Position), 2);
+		Event Player.Ignore_Lower_Nodes = 5;
+		Chase Player Variable Over Time(Event Player, Ignore_Lower_Nodes, 0, 5, Destination and Duration);
+		If(Distance Between(Position Of(Event Player), Event Player.Current_Node) < 3);
+			If(Event Player.Using_Stairs);
+				If(Array Contains(Global.Staircase_Bottom, Event Player.Current_Node));
+					Event Player.Last_Stair_Type = Custom String("Bottom");
+				Else If(Array Contains(Filtered Array(Global.Staircase_Middle, Current Array Element != Null), Event Player.Current_Node));
+					Event Player.Last_Stair_Type = Custom String("Middle");
+				Else If(Array Contains(Filtered Array(Global.Staircase_Top, Current Array Element != Null), Event Player.Current_Node));
+					Event Player.Last_Stair_Type = Custom String("Top");
+				End;
+			End;
+			If(Array Contains(Event Player.Known_Nodes, Event Player.Current_Node) != True);
+				Modify Player Variable(Event Player, Known_Nodes, Append To Array, Event Player.Current_Node);
+				Modify Player Variable(Event Player, Vist_Count, Append To Array, 1);
+			Else;
+				Event Player.Vist_Count[Index Of Array Value(Event Player.Known_Nodes, Event Player.Current_Node)] += 1;
+			End;
+			Event Player.Node_DePrioritze[Index Of Array Value(Event Player.Known_Nodes, Event Player.Current_Node)] += 10;
+		End;
+		Event Player.Node_Options = Filtered Array(Append To Array(Append To Array(Global.Path_Nodes, Append To Array(Append To Array(
+			Global.ObjectiveA_Nodes, Global.ObjectiveB_Nodes), Global.Chokepoint)), Append To Array(Append To Array(
+			Global.Staircase_Bottom, Filtered Array(Global.Staircase_Middle, Current Array Element != Null)), Global.Staircase_Top)),
+			Event Player.Node_DePrioritze[Index Of Array Value(Event Player.Known_Nodes, Current Array Element)] <= 9999);
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Event Player, Current Array Element) <= 30);
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Y Component Of(Position Of(Event Player))
+			+ 2.750 > Y Component Of(Current Array Element));
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 1.200), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 1.200) + Vector(0, -99, 0),
+			Null, All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 1.200)) < Max(Y Component Of(
+			Position Of(Event Player)) + 1 - Y Component Of(Current Array Element), 8));
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 2), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 2) + Vector(0, -99, 0), Null,
+			All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 2)) < Max(Y Component Of(
+			Position Of(Event Player)) + 1 - Y Component Of(Current Array Element), 8));
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 4), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 4) + Vector(0, -99, 0), Null,
+			All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 4)) < Max(Y Component Of(
+			Position Of(Event Player)) + 1 - Y Component Of(Current Array Element), 8));
+		If(Event Player.Using_Stairs);
+			If(Array Contains(Global.Staircase_Bottom, Event Player.Current_Node));
+				Event Player.Stairs_Index = Index Of Array Value(Global.Staircase_Bottom, Event Player.Current_Node);
+			Else If(Array Contains(Filtered Array(Global.Staircase_Middle, Current Array Element != Null), Event Player.Current_Node));
+				Event Player.Stairs_Index = Index Of Array Value(Global.Staircase_Middle, Event Player.Current_Node);
+			Else If(Array Contains(Filtered Array(Global.Staircase_Top, Current Array Element != Null), Event Player.Current_Node));
+				Event Player.Stairs_Index = Index Of Array Value(Global.Staircase_Top, Event Player.Current_Node);
+			End;
+			If(Event Player.Last_Stair_Type == Custom String("Bottom"));
+				If(Global.Staircase_Middle[Event Player.Stairs_Index] == Null);
+					Modify Player Variable(Event Player, Node_Options, Append To Array, Global.Staircase_Top[Event Player.Stairs_Index]);
+				Else;
+					Modify Player Variable(Event Player, Node_Options, Append To Array, Global.Staircase_Middle[Event Player.Stairs_Index]);
+				End;
+			Else If(Event Player.Last_Stair_Type == Custom String("Middle"));
+				Modify Player Variable(Event Player, Node_Options, Append To Array, Global.Staircase_Top[Event Player.Stairs_Index]);
+			End;
+		End;
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Is In Line of Sight(Eye Position(Event Player),
+			Current Array Element, Barriers Do Not Block LOS) == True);
+		Event Player.Node_Options = Sorted Array(Event Player.Node_Options, Distance Between(Event Player, Current Array Element) * (
+			Y Component Of(Position Of(Event Player)) + 1 <= Y Component Of(Current Array Element)
+			|| !Event Player.Ignore_Lower_Nodes ? 1 : (Distance Between(Event Player, Event Player.Walk_To_Position) < Distance Between(
+			Current Array Element, Event Player.Walk_To_Position) ? 5 : 2.500)) + Distance Between(Event Player.Walk_To_Position,
+			Current Array Element) + Event Player.Node_DePrioritze[Index Of Array Value(Event Player.Known_Nodes, Current Array Element)]);
+		Skip If(Distance Between(Vector(X Component Of(Position Of(Event Player)), Y Component Of(Event Player.Walk_To_Position),
+			Z Component Of(Position Of(Event Player))), Event Player.Walk_To_Position) > 15, 1);
+		Event Player.Node_Options = Sorted Array(Event Player.Node_Options, Current Array Index * (
+			Event Player.Ignore_Lower_Nodes != 0 && Y Component Of(Position Of(Event Player)) + (Array Contains(Global.Staircase_Middle,
+			Current Array Element) ? 1.500 : 2.750) <= Y Component Of(Current Array Element) && Array Contains(Append To Array(
+			Append To Array(Global.Staircase_Middle, Global.Staircase_Bottom), Global.Staircase_Top), Current Array Element) ? 1 : 5));
+		Event Player.Current_Node = First Of(Event Player.Node_Options) < 0 ? First Of(Sorted Array(Filtered Array(
+			Event Player.Node_Options, Current Array Index < 0), Absolute Value(Current Array Index))) : First Of(
+			Event Player.Node_Options);
+		If(Count Of(Event Player.Node_Options) == 0);
+			Event Player.Node_DePrioritze = Empty Array;
+			Event Player.Vist_Count = Empty Array;
+			Event Player.Known_Nodes = Empty Array;
+		End;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop;
+	}
+}
+
+rule("Walk To Target")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Event Player.Requested_Hero == Null;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Number Of Players On Objective(Team Of(Event Player)) >= Number Of Players On Objective(Opposite Team Of(Team Of(Event Player)))
+			+ (Is Team On Defense(Team Of(Event Player)) || (Is Team On Defense(Team Of(Event Player)) && Match Time <= 45) ? 2 : 1);
+		(Normalized Health(Event Player) >= (Entity Exists(First Of(Event Player.Target_Order)) ? 0.500 : 0.750) || Count Of(
+			Append To Array(Global.Healthkits_Small, Global.Healthkits_Large)) == 0) == True;
+	}
+
+	actions
+	{
+		Event Player.Walk_To_Position = Position Of(First Of(Event Player.Target_Order)) + Vector(0, 1.550, 0);
+		If(Team Of(First Of(Event Player.Target_Order)) != Team Of(Event Player));
+			Event Player.Walk_Max = Min(Event Player.Primary_Max - Event Player.Primary_Max / 2,
+				Event Player.Secondary_Max - Event Player.Secondary_Max / 2);
+			Event Player.Walk_Min = Min(Event Player.Primary_Min - Event Player.Primary_Min / 2,
+				Event Player.Secondary_Min - Event Player.Secondary_Min / 2);
+		Else;
+			Event Player.Walk_Max = 8;
+			Event Player.Walk_Min = 4;
+		End;
+		Event Player.Node_DePrioritze = Empty Array;
+		Event Player.Vist_Count = Empty Array;
+		Event Player.Known_Nodes = Empty Array;
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Walk To Objective")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) != True;
+		(Array Contains(Filtered Array(Global.ObjectiveA_Nodes, Distance Between(Current Array Element, Objective Position(
+			Objective Index)) <= 25), Event Player.Walk_To_Position) != True || Distance Between(Event Player,
+			Event Player.Walk_To_Position) <= 2.500) == True;
+		disabled (Normalized Health(Event Player) >= (Entity Exists(First Of(Event Player.Target_Order)) ? 0.500 : 0.750) || Count Of(
+			Append To Array(Global.Healthkits_Small, Global.Healthkits_Large)) == 0) == True;
+		(Event Player.Requested_Hero == Null || (Distance Between(Event Player, Spawn Points(Team Of(Event Player))) >= Distance Between(
+			Event Player, Objective Position(Objective Index)) && Distance Between(Event Player, Spawn Points(Team Of(Event Player)))
+			>= 40)) == True;
+	}
+
+	actions
+	{
+		Event Player.Walk_To_Position = Random Value In Array(Filtered Array(Objective Position(Objective Index), Distance Between(
+			Current Array Element, Global.ObjectivePos) <= 25));
+		Event Player.Walk_Max = 1.800;
+		Event Player.Walk_Min = 0;
+		Wait(Max(Server Load / 1000, Random Real(1, 3)), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("Walk To Healthkit")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Event Player.Requested_Hero == Null;
+		Event Player.Walk_To_Position != First Of(Sorted Array(Append To Array(Global.Healthkits_Small, Global.Healthkits_Large),
+			Distance Between(Event Player, Current Array Element) - (Health(Event Player) <= Max Health(Event Player)
+			- 200 && Array Contains(Global.Healthkits_Large, Current Array Element) ? 0 : 10)));
+		Number Of Players On Objective(Team Of(Event Player)) >= Number Of Players On Objective(Opposite Team Of(Team Of(Event Player)))
+			+ (Is Team On Offense(Team Of(Event Player)) ? (Match Time < 30 ? 2 : 1) : 1);
+		(Normalized Health(Event Player) < (Entity Exists(First Of(Event Player.Target_Order)) ? 0.500 : 0.750) && Count Of(
+			Append To Array(Global.Healthkits_Small, Global.Healthkits_Large)) > 0) == True;
+	}
+
+	actions
+	{
+		Event Player.Walk_To_Position = First Of(Sorted Array(Append To Array(Global.Healthkits_Small, Global.Healthkits_Large),
+			Distance Between(Event Player, Current Array Element) - (Health(Event Player) <= Max Health(Event Player)
+			- 200 && Array Contains(Global.Healthkits_Large, Current Array Element) ? 0 : 10)));
+		Event Player.Walk_Max = 1;
+		Event Player.Walk_Min = 0;
+		Event Player.Node_DePrioritze = Empty Array;
+		Event Player.Vist_Count = Empty Array;
+		Event Player.Known_Nodes = Empty Array;
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Walk To Spawn")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Event Player.Requested_Hero != Null;
+		(Distance Between(Event Player, Spawn Points(Team Of(Event Player))) < Distance Between(Event Player, Objective Position(
+			Objective Index)) || Distance Between(Event Player, Spawn Points(Team Of(Event Player))) < 40) == True;
+		Is True For All(Filtered Array(All Players(Team Of(Event Player)), !Is Dummy Bot(Current Array Element)), Hero Of(
+			Current Array Element) != Event Player.Requested_Hero) == True;
+	}
+
+	actions
+	{
+		Event Player.Node_DePrioritze = Empty Array;
+		Event Player.Vist_Count = Empty Array;
+		Event Player.Known_Nodes = Empty Array;
+		Event Player.Walk_To_Position = Spawn Points(Team Of(Event Player));
+		Event Player.Walk_Max = 1;
+		Event Player.Walk_Min = 0;
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("----------------------------------- Pathfinder ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- AI ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Setup Bot")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		If(Global.AI_Gamertags == True);
+			Event Player.AI_Username = Random Value In Array(Global.Gamertags);
+			Start Forcing Dummy Bot Name(Event Player, Event Player.AI_Username);
+		Else;
+			Event Player.AI_Username = Custom String("Temp Name");
+			Start Forcing Dummy Bot Name(Event Player, Custom String("AI - Team {0} - Slot {1}", Team Of(Event Player), Slot Of(
+				Event Player)));
+		End;
+		Call Subroutine(Heros);
+		Wait(Random Real(0, 2), Ignore Condition);
+		Event Player.Hero = Random Value In Array(Filtered Array(Is Team On Offense(Team Of(Event Player))
+			? Global.T2_Available_Heros : Global.T1_Available_Heros, Array Contains(Event Player.Hero_Pool, Current Array Element)));
+		If(Team Of(Event Player) == Team 1);
+			Modify Global Variable(T1_Available_Heros, Remove From Array By Value, Event Player.Hero);
+		Else;
+			Modify Global Variable(T2_Available_Heros, Remove From Array By Value, Event Player.Hero);
+		End;
+		Set Player Allowed Heroes(Filtered Array(All Players(Team Of(Event Player)), !Is Dummy Bot(Current Array Element)), Team Of(
+			Event Player) == Team 1 ? Global.T1_Available_Heros : Global.T2_Available_Heros);
+		Call Subroutine(AI_Start_Facing);
+		Event Player.Can_Change_Arc = True;
+		Wait Until(Is Game In Progress, 99999);
+		Start Throttle In Direction(Event Player, Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position,
+			Barriers Do Not Block LOS) ? (Distance Between(Event Player, Event Player.Walk_To_Position)
+			< Event Player.Walk_Min ? Direction Towards(Event Player.Walk_To_Position, Event Player) : Direction Towards(Event Player,
+			Event Player.Walk_To_Position)) : Direction Towards(Position Of(Event Player), Event Player.Current_Node), (Distance Between(
+			Event Player, Event Player.Walk_To_Position) < Event Player.Walk_Min || Distance Between(Event Player,
+			Event Player.Walk_To_Position) > Event Player.Walk_Max) && Is In Line of Sight(Eye Position(Event Player),
+			Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 1 : (Is In Line of Sight(Eye Position(Event Player),
+			Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 0 : 1), To World, Replace existing throttle,
+			Direction and Magnitude);
+		Event Player.Node_DePrioritze = Empty Array;
+		Event Player.Vist_Count = Empty Array;
+		Event Player.Known_Nodes = Empty Array;
+	}
+}
+
+rule("Bot Target List")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Skip If(Global.Targeting_Type == (0 || 2), 3);
+		If(Is Hero Being Played(Hero(Widowmaker), Team Of(Event Player)) && Is True For Any(Players On Hero(Hero(Widowmaker), Team Of(
+			Event Player)), Is Using Ultimate(Current Array Element)));
+			Event Player.Targets = All Living Players(Opposite Team Of(Team Of(Event Player)));
+		Else;
+			Skip If(Global.Targeting_Type == (0 || 2), 1);
+			Event Player.Targets = Append To Array(Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))),
+				Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS)),
+				Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))), Event Player.Seen_By_Memory > 0));
+			Skip If(Global.Targeting_Type == (0 || 1), 8);
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Opposite Team Of(Team Of(
+				Event Player))), Has Status(Current Array Element, Hacked)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Opposite Team Of(Team Of(
+				Event Player))), Distance Between(Event Player, Current Array Element) <= Global.Primary_Sound_Max[Index Of Array Value(
+				Global.All_Heros, Hero Of(Current Array Element))] && ((Is Duplicating(Current Array Element) ? Hero Being Duplicated(
+				Current Array Element) : Hero Of(Current Array Element)) == Hero(D.Va) || (Is Duplicating(Current Array Element)
+				? Hero Being Duplicated(Current Array Element) : Hero Of(Current Array Element)) == Hero(Illari) ? Is Button Held(
+				Current Array Element, Button(Primary Fire)) : Is Firing Primary(Current Array Element))));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Opposite Team Of(Team Of(
+				Event Player))), Distance Between(Event Player, Current Array Element) <= Global.Secondary_Sound_Max[Index Of Array Value(
+				Global.All_Heros, Hero Of(Current Array Element))] && Is Firing Secondary(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Opposite Team Of(Team Of(
+				Event Player))), Distance Between(Event Player, Current Array Element) <= Global.Ability1_Sound_Max[Index Of Array Value(
+				Global.All_Heros, Hero Of(Current Array Element))] && Is Using Ability 1(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Opposite Team Of(Team Of(
+				Event Player))), Distance Between(Event Player, Current Array Element) <= Global.Ability2_Sound_Max[Index Of Array Value(
+				Global.All_Heros, Hero Of(Current Array Element))] && Is Using Ability 2(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Opposite Team Of(Team Of(
+				Event Player))), Distance Between(Event Player, Current Array Element) <= Global.Ultimate_Sound_Max[Index Of Array Value(
+				Global.All_Heros, Hero Of(Current Array Element))] && Is Using Ultimate(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Opposite Team Of(Team Of(
+				Event Player))), Distance Between(Event Player, Current Array Element) <= Global.Walking_Sound_Max[Index Of Array Value(
+				Global.All_Heros, Hero Of(Current Array Element))] && !Is Crouching(Current Array Element) && Is Moving(
+				Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Opposite Team Of(Team Of(
+				Event Player))), Distance Between(Event Player, Current Array Element) <= Global.Crouch_Walk_Sound_Max[Index Of Array Value(
+				Global.All_Heros, Hero Of(Current Array Element))] && Is Crouching(Current Array Element) && Is Moving(
+				Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Opposite Team Of(Team Of(
+				Event Player))), Distance Between(Event Player, Current Array Element) <= Global.Melee_Sound_Max[Index Of Array Value(
+				Global.All_Heros, Hero Of(Current Array Element))] && Is Meleeing(Current Array Element)));
+			If(Global.Invisible_Targeting == 0);
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Sombra), Opposite Team Of(
+					Team Of(Event Player))),
+					Current Array Element.Invisible_Cooldown == 0 && Current Array Element.Is_Visible_Array == Empty Array && !Is Firing Secondary(
+					Current Array Element) && Distance Between(Eye Position(Event Player), Position Of(Current Array Element))
+					> 4 && Distance Between(Position Of(Event Player), Position Of(Current Array Element)) > 4));
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Echo), Opposite Team Of(Team Of(
+					Event Player))), Hero Being Duplicated(Current Array Element) == Hero(Sombra) && Is Using Ability 1(Current Array Element)
+					&& !Is Firing Secondary(Current Array Element) && Distance Between(Eye Position(Event Player), Position Of(
+					Current Array Element)) > 4 && Distance Between(Position Of(Event Player), Position Of(Current Array Element)) > 4));
+			Else If(Global.Invisible_Targeting == 3);
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Sombra), Opposite Team Of(
+					Team Of(Event Player))),
+					Current Array Element.Invisible_Cooldown == 0 && Current Array Element.Is_Visible_Array == Empty Array));
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Echo), Opposite Team Of(Team Of(
+					Event Player))), Hero Being Duplicated(Current Array Element) == Hero(Sombra)
+					&& Current Array Element.Invisible_Cooldown == 0 && Current Array Element.Is_Visible_Array == Empty Array));
+			Else If(Global.Invisible_Targeting == 1);
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Sombra), Opposite Team Of(
+					Team Of(Event Player))),
+					Current Array Element.Invisible_Cooldown == 0 && Current Array Element.Is_Visible_Array == Empty Array && !Is Firing Secondary(
+					Current Array Element)));
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Echo), Opposite Team Of(Team Of(
+					Event Player))),
+					Current Array Element.Invisible_Cooldown == 0 && Current Array Element.Is_Visible_Array == Empty Array && !Is Firing Secondary(
+					Current Array Element) && Hero Being Duplicated(Current Array Element) == Hero(Sombra)));
+			Else;
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Sombra), Opposite Team Of(
+					Team Of(Event Player))), Is Using Ability 1(Current Array Element) && Distance Between(Eye Position(Event Player), Position Of(
+					Current Array Element)) > 4 && Distance Between(Position Of(Event Player), Position Of(Current Array Element)) > 4));
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Echo), Opposite Team Of(Team Of(
+					Event Player))), Is Using Ability 1(Current Array Element) && Hero Being Duplicated(Current Array Element) == Hero(Sombra)
+					&& Distance Between(Eye Position(Event Player), Position Of(Current Array Element)) > 4 && Distance Between(Position Of(
+					Event Player), Position Of(Current Array Element)) > 4));
+			End;
+		End;
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(All Players(All Teams), Has Status(
+			Current Array Element, Asleep) || Is In Spawn Room(Current Array Element) || Has Status(Current Array Element, Phased Out)
+			|| !Has Spawned(Current Array Element)));
+		Skip If(Global.Ignore_Abilitys == True, 5);
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(D.Va),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(D.Va)), Is Firing Secondary(Current Array Element) && Is In View Angle(
+			Current Array Element, Eye Position(Event Player), 70)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Zarya),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Zarya)), Is Using Ability 1(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Reaper),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Reaper)), Is Using Ability 1(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Genji),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Genji)), Is Using Ability 2(Current Array Element) && Is In View Angle(
+			Current Array Element, Eye Position(Event Player), 70)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Sigma),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Sigma)), Is Using Ability 1(Current Array Element) && Is In View Angle(
+			Current Array Element, Eye Position(Event Player), 70)));
+		Skip If(Global.Team_Based_Targeting == False, 25);
+		If((Hero Being Duplicated(Event Player) == Hero(Zarya) || Hero Of(Event Player) == Hero(Zarya)) && Ability Cooldown(Event Player,
+			Button(Ability 2)) == Null);
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Team Of(Event Player)),
+				Normalized Health(Current Array Element) < 0.400));
+		Else If((Hero Being Duplicated(Event Player) == Hero(Moira) || Hero Of(Event Player) == Hero(Moira)) && Ability Resource(
+				Event Player, Button(Primary Fire)) > 0);
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Team Of(Event Player)),
+				Normalized Health(Current Array Element) < (Count Of(Event Player.Targets) > 0 ? 0.800 : 1)));
+		Else If(Hero Being Duplicated(Event Player) == Hero(Mercy) || Hero Of(Event Player) == Hero(Mercy));
+			Modify Player Variable(Event Player, Targets, Append To Array, Append To Array(Filtered Array(All Living Players(Team Of(
+				Event Player)), Normalized Health(Current Array Element) < 1), Filtered Array(All Players(Team Of(Event Player)), Is Dead(
+				Current Array Element))));
+		Else If((Hero Being Duplicated(Event Player) == Hero(Brigitte) || Hero Of(Event Player) == Hero(Brigitte)) && Ability Charge(
+				Event Player, Button(Ability 2)) > 0);
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Team Of(Event Player)),
+				Normalized Health(Current Array Element) < 1));
+		Else If(Hero Being Duplicated(Event Player) == Hero(Baptiste) || Hero Of(Event Player) == Hero(Baptiste));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Team Of(Event Player)),
+				Normalized Health(Current Array Element) < (Count Of(Event Player.Targets) > 0 ? 0.800 : 1)));
+		Else If(Hero Being Duplicated(Event Player) == Hero(Ana) || Hero Of(Event Player) == Hero(Ana));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Team Of(Event Player)),
+				Normalized Health(Current Array Element) < (Count Of(Event Player.Targets) > 0 ? 0.800 : 1)));
+		Else If((Hero Being Duplicated(Event Player) == Hero(Lúcio) || Hero Of(Event Player) == Hero(Lúcio)) && !Is In Alternate Form(
+				Event Player));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Team Of(Event Player)),
+				Normalized Health(Current Array Element) < 1));
+		Else If(Hero Being Duplicated(Event Player) == Hero(Kiriko) || Hero Of(Event Player) == Hero(Kiriko));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Team Of(Event Player)),
+				Normalized Health(Current Array Element) < (Count Of(Event Player.Targets) > 0 ? 0.800 : 1)));
+		Else If((Hero Being Duplicated(Event Player) == Hero(Zenyatta) || Hero Of(Event Player) == Hero(Zenyatta))
+				&& !Is In Alternate Form(Event Player));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(Remove From Array(All Living Players(Team Of(
+				Event Player)), Event Player), Normalized Health(Current Array Element) < 1));
+			Skip If(!Entity Exists(First Of(Filtered Array(Event Player.Targets, Team Of(Current Array Element) == Team Of(Event Player)))),
+				1);
+			Event Player.Targets = First Of(Filtered Array(Sorted Array(Event Player.Targets, Distance Between(Event Player,
+				Current Array Element) * Health(Current Array Element)), Team Of(Current Array Element) == Team Of(Event Player)))
+				== Event Player.Zen_Orb_Target ? Filtered Array(Event Player.Targets, Team Of(Current Array Element) != Team Of(Event Player))
+				: Event Player.Targets;
+		Else If(Hero Being Duplicated(Event Player) == Hero(Lifeweaver) || Hero Of(Event Player) == Hero(Lifeweaver));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Team Of(Event Player)),
+				Normalized Health(Current Array Element) < (Count Of(Event Player.Targets) > 0 ? 0.800 : 1)));
+		Else If(Hero Being Duplicated(Event Player) == Hero(Illari) || Hero Of(Event Player) == Hero(Illari));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(Team Of(Event Player)),
+				Normalized Health(Current Array Element) < (Count Of(Event Player.Targets) > 0 ? 0.800 : 1)));
+		End;
+		Modify Player Variable(Event Player, Targets, Remove From Array By Value, Append To Array(Event Player, Filtered Array(All Players(
+			All Teams), !Has Spawned(Current Array Element))));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Doomfist),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Doomfist)), Is Using Ultimate(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Moira),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Moira)), Is Using Ability 1(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Mei),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Mei)), Is Using Ability 1(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Zenyatta),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Zenyatta)), Is Using Ultimate(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Tracer),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Tracer)), Is Using Ability 2(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(All Living Players(Opposite Team Of(Team Of(
+			Event Player))), !Is On Objective(Current Array Element) && Is Communicating Any Emote(Current Array Element)));
+		Event Player.Target_Order = Sorted Array(Event Player.Targets, Distance Between(Event Player, Current Array Element) * Health(
+			Current Array Element) - (Team Of(Current Array Element) == Team Of(Event Player) ? (Is In Line of Sight(Eye Position(
+			Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS) ? 1000 : 0) : 0));
+		If(!Entity Exists(First Of(Event Player.Target_Order)));
+			Press Button(Event Player, Button(Reload));
+		End;
+		Wait(Max(Server Load / 1000, 1.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Heal Target")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Heal_Friendlys != Empty Array;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Team Of(Event Player) == Team Of(First Of(Event Player.Target_Order));
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Is True For Any(Event Player.Heal_Friendlys, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Heal_Friendlys, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Heal_Friendlys, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(
+			Event Player.Heal_Friendlys, Current Array Element))) == True;
+		Hero Of(Event Player) != Hero(Zenyatta);
+		Hero Being Duplicated(Event Player) != Hero(Zenyatta);
+	}
+
+	actions
+	{
+		Event Player.Current_Heal_Friendlys = Random Value In Array(Event Player.Heal_Friendlys);
+		If(Event Player.Current_Heal_Friendlys == Button(Ability 1));
+			Skip If(Distance Between(Event Player, First Of(Event Player.Target_Order)) > Event Player.Ability1_Max || Distance Between(
+				Event Player, First Of(Event Player.Target_Order)) < Event Player.Ability1_Min, 22);
+		Else If(Event Player.Current_Heal_Friendlys == Button(Ability 2));
+			Skip If(Distance Between(Event Player, First Of(Event Player.Target_Order)) > Event Player.Ability2_Max || Distance Between(
+				Event Player, First Of(Event Player.Target_Order)) < Event Player.Ability2_Min, 20);
+		Else If(Event Player.Current_Heal_Friendlys == Button(Primary Fire));
+			Skip If(Distance Between(Event Player, First Of(Event Player.Target_Order)) > Event Player.Primary_Max || Distance Between(
+				Event Player, First Of(Event Player.Target_Order)) < Event Player.Primary_Min, 18);
+		Else If(Event Player.Current_Heal_Friendlys == Button(Secondary Fire));
+			Skip If(Distance Between(Event Player, First Of(Event Player.Target_Order)) > Event Player.Secondary_Max || Distance Between(
+				Event Player, First Of(Event Player.Target_Order)) < Event Player.Secondary_Min, 16);
+		End;
+		If(Array Contains(Event Player.Hold, Event Player.Current_Heal_Friendlys) == True);
+			Start Holding Button(Event Player, Event Player.Current_Heal_Friendlys);
+			Wait Until(Ability Cooldown(Event Player, Event Player.Current_Heal_Friendlys) > 0 || !Entity Exists(First Of(
+				Event Player.Target_Order)) || Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(
+				Event Player.Target_Order)), Barriers Do Not Block LOS), Event Player.Charging_Time == 0 ? 3 : Event Player.Charging_Time);
+			Stop Holding Button(Event Player, Event Player.Current_Heal_Friendlys);
+		Else If(Array Contains(Event Player.Confirm, Event Player.Current_Heal_Friendlys) == True);
+			Press Button(Event Player, Event Player.Current_Heal_Friendlys);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Event Player.Current_Heal_Friendlys) == True);
+			Press Button(Event Player, Event Player.Current_Heal_Friendlys);
+			Wait Until(Ability Cooldown(Event Player, Event Player.Current_Heal_Friendlys) > 0 || !Entity Exists(First Of(
+				Event Player.Target_Order)) || Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(
+				Event Player.Target_Order)), Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Event Player.Current_Heal_Friendlys);
+		Else;
+			Press Button(Event Player, Event Player.Current_Heal_Friendlys);
+		End;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Stop Primary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		((Team Of(First Of(Event Player.Target_Order)) == Team Of(Event Player) && !Array Contains(Event Player.Heal_Friendlys, Button(
+			Primary Fire))) || !Entity Exists(First Of(Event Player.Target_Order)) || Distance Between(Position Of(Event Player), First Of(
+			Event Player.Target_Order)) <= Event Player.Primary_Min || !Is In Line of Sight(Eye Position(Event Player), Eye Position(
+			First Of(Event Player.Target_Order)), Barriers Do Not Block LOS) || Distance Between(Position Of(Event Player), First Of(
+			Event Player.Target_Order)) > Event Player.Primary_Max) == True;
+		(Event Player.Current_Hero == Hero(Lifeweaver) ? !Is Firing Primary(Event Player) && !Is In Alternate Form(Event Player) : (
+			Is True For Any(Array(Hero(D.Va), Hero(Illari)), Event Player.Current_Hero == Current Array Element) ? Is Button Held(
+			Event Player, Button(Primary Fire)) : Is Firing Primary(Event Player))) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Button(Primary Fire));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Fire Primary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Event Player.Heal_Friendlys, Button(Primary Fire)) == False;
+		Event Player.Primary_Max > 0;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Team Of(Event Player) != Team Of(First Of(Event Player.Target_Order));
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Distance Between(Position Of(Event Player), First Of(Event Player.Target_Order)) > Event Player.Primary_Min;
+		Distance Between(Position Of(Event Player), First Of(Event Player.Target_Order)) <= Event Player.Primary_Max;
+		Is Dummy Bot(Event Player) == True;
+		(Is True For Any(Array(Hero(D.Va), Hero(Illari)), (Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(
+			Event Player)) == Current Array Element) ? Is Button Held(Event Player, Button(Primary Fire)) : Is Firing Primary(
+			Event Player)) != True;
+		(Array Contains(Event Player.Confirm, Button(Ultimate)) ? !Is Using Ultimate(Event Player) : Is Alive(Event Player)) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 1);
+		Event Player.Aim_Arc = Global.Primary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Wait(Max(Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))), Null,
+			All Players(All Teams), False), Eye Position(First Of(Event Player.Target_Order))) / 320, 0.250), Abort When False);
+		If(Array Contains(Event Player.Charging, Button(Primary Fire)) == True);
+			While(Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+				&& Entity Exists(First Of(Event Player.Target_Order)) && Is Alive(Event Player) && Distance Between(Position Of(Event Player),
+				First Of(Event Player.Target_Order)) > Event Player.Primary_Min && Distance Between(Position Of(Event Player), First Of(
+				Event Player.Target_Order)) <= Event Player.Primary_Max);
+				If(Array Contains(Event Player.Hold, Button(Primary Fire)) == True);
+					Start Holding Button(Event Player, Button(Primary Fire));
+					Wait(Event Player.Charging_Time, Ignore Condition);
+					Stop Holding Button(Event Player, Button(Primary Fire));
+				Else;
+					Wait(Event Player.Charging_Time, Ignore Condition);
+					Press Button(Event Player, Button(Primary Fire));
+				End;
+			End;
+		Else;
+			Start Holding Button(Event Player, Button(Primary Fire));
+		End;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Stop Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Lifeweaver) || Hero Of(Event Player) == Hero(Lifeweaver) ? Is Firing Primary(
+			Event Player) && Is In Alternate Form(Event Player) : Is Firing Secondary(Event Player)) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		(Team Of(First Of(Event Player.Target_Order)) != (Array Contains(Event Player.Heal_Friendlys, Button(Secondary Fire)) ? Team Of(
+			Event Player) : Opposite Team Of(Team Of(Event Player))) || !Entity Exists(First Of(Event Player.Target_Order))
+			|| Distance Between(Position Of(Event Player), First Of(Event Player.Target_Order))
+			< Event Player.Secondary_Min || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(
+			Event Player.Target_Order)), Barriers Do Not Block LOS) || Distance Between(Position Of(Event Player), First Of(
+			Event Player.Target_Order)) > Event Player.Secondary_Max) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Button(Secondary Fire));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Fire Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Lifeweaver) || Hero Of(Event Player) == Hero(Lifeweaver) ? !Is Firing Primary(
+			Event Player) : !Is Firing Secondary(Event Player)) == True;
+		Event Player.Secondary_Max > 0;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		(Array Contains(Event Player.Heal_Friendlys, Button(Secondary Fire)) ? Team Of(Event Player) : Opposite Team Of(Team Of(
+			Event Player))) == Team Of(First Of(Event Player.Target_Order));
+		Distance Between(Position Of(Event Player), First Of(Event Player.Target_Order)) > Event Player.Secondary_Min;
+		Distance Between(Position Of(Event Player), First Of(Event Player.Target_Order)) < Event Player.Secondary_Max;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Is Dummy Bot(Event Player) == True;
+		(Array Contains(Event Player.Confirm, Button(Ultimate)) ? !Is Using Ultimate(Event Player) : Is Alive(Event Player)) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 1);
+		Event Player.Aim_Arc = Global.Secondary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Wait(Max(Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))), Null,
+			All Players(All Teams), False), Eye Position(First Of(Event Player.Target_Order))) / 320, 0.250), Abort When False);
+		If(Array Contains(Event Player.Charging, Button(Secondary Fire)) == True);
+			While(Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+				&& Entity Exists(First Of(Event Player.Target_Order)) && Is Alive(Event Player) && Distance Between(Position Of(Event Player),
+				First Of(Event Player.Target_Order)) > Event Player.Secondary_Min && Distance Between(Position Of(Event Player), First Of(
+				Event Player.Target_Order)) <= Event Player.Secondary_Max);
+				If(Array Contains(Event Player.Hold, Button(Secondary Fire)) == True);
+					Start Holding Button(Event Player, Button(Secondary Fire));
+					Wait(Event Player.Charging_Time, Ignore Condition);
+					Stop Holding Button(Event Player, Button(Secondary Fire));
+				Else;
+					Wait(Event Player.Charging_Time, Ignore Condition);
+					Press Button(Event Player, Button(Secondary Fire));
+				End;
+			End;
+		Else;
+			Start Holding Button(Event Player, Button(Secondary Fire));
+		End;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Offensive Ability")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Offensive != Empty Array;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Team Of(Event Player) != Team Of(First Of(Event Player.Target_Order));
+		Is Alive(Event Player) == True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Is In View Angle(Event Player, Eye Position(First Of(Event Player.Target_Order)), 15) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is True For Any(Event Player.Offensive, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Offensive, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Offensive, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(Event Player.Offensive,
+			Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Event Player.Current_Offensive = Random Value In Array(Event Player.Offensive);
+		Skip If(!Array Contains(Event Player.Use_If_Shield, Event Player.Current_Offensive) && !Is In Line of Sight(Eye Position(
+			Event Player), Eye Position(First Of(Event Player.Target_Order)), Enemy Barriers Block LOS), 38);
+		If(Event Player.Current_Offensive == Button(Ability 1));
+			Skip If(Distance Between(Event Player, First Of(Event Player.Target_Order)) > Event Player.Ability1_Max || Distance Between(
+				Event Player, First Of(Event Player.Target_Order)) < Event Player.Ability1_Min, 36);
+		Else;
+			Skip If(Distance Between(Event Player, First Of(Event Player.Target_Order)) > Event Player.Ability2_Max || Distance Between(
+				Event Player, First Of(Event Player.Target_Order)) < Event Player.Ability2_Min, 34);
+		End;
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = (Event Player.Current_Mobility == Button(Ability 1) ? Global.Ability1_Arc : Global.Ability2_Arc)
+			[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(
+			Event Player))];
+		Wait(Max(Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))), Null,
+			All Players(All Teams), False), Eye Position(First Of(Event Player.Target_Order))) / 320, 0.250), Abort When False);
+		If(Hero Being Duplicated(Event Player) == Hero(Orisa) || Hero Of(Event Player) == Hero(Orisa));
+			Stop Facing(Event Player);
+			Start Facing(Event Player, Direction From Angles(Horizontal Facing Angle Of(Event Player), 20), Has Status(Event Player,
+				Knocked Down) || Has Status(Event Player, Asleep) || Has Status(Event Player, Frozen) || Has Status(Event Player, Stunned)
+				? 0 : 320, To World, Direction and Turn Rate);
+			Wait(0.100, Ignore Condition);
+		End;
+		If(Array Contains(Event Player.Hold, Event Player.Current_Offensive) == True);
+			Start Holding Button(Event Player, Event Player.Current_Offensive);
+			Wait Until(Ability Cooldown(Event Player, Event Player.Current_Offensive) > 0 || !Entity Exists(First Of(
+				Event Player.Target_Order)) || Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(
+				Event Player.Target_Order)), Barriers Do Not Block LOS),
+				Event Player.Charging_Time != Null ? Event Player.Charging_Time : 999999);
+			Stop Holding Button(Event Player, Event Player.Current_Offensive);
+		Else If(Array Contains(Event Player.Confirm, Event Player.Current_Offensive) == True);
+			Press Button(Event Player, Event Player.Current_Offensive);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Event Player.Current_Offensive) == True);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Offensive) ? Is In Alternate Form(Event Player) : (
+				Event Player.Current_Offensive == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player)), 2);
+			Press Button(Event Player, Event Player.Current_Offensive);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Wait Until((Array Contains(Event Player.Alternative_Form, Event Player.Current_Offensive) ? !Is In Alternate Form(Event Player)
+				: !(Event Player.Current_Offensive == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player)))
+				|| !Entity Exists(First Of(Event Player.Target_Order)) || Is Dead(Event Player) || !Is In Line of Sight(Eye Position(
+				Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS), 9999);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? !Is In Alternate Form(Event Player) : (
+				Event Player.Current_Mobility == Button(Ability 1) ? !Is Using Ability 1(Event Player) : !Is Using Ability 2(Event Player)),
+				1);
+			Press Button(Event Player, Event Player.Current_Offensive);
+		Else;
+			Press Button(Event Player, Event Player.Current_Offensive);
+		End;
+		Event Player.Can_Change_Arc = True;
+		Call Subroutine(AI_Start_Facing);
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Defence Ability")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Defensive != Empty Array;
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is True For Any(Event Player.Defensive, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Defensive, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Defensive, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(Event Player.Defensive,
+			Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = (Event Player.Current_Mobility == Button(Ability 1) ? Global.Ability1_Arc : Global.Ability2_Arc)
+			[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(
+			Event Player))];
+		Event Player.Current_Defensive = Random Value In Array(Event Player.Defensive);
+		If(Hero Being Duplicated(Event Player) == Hero(Baptiste) || Hero Of(Event Player) == Hero(Baptiste));
+			Stop Facing(Event Player);
+			Start Facing(Event Player, Down, Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep),
+				Has Status(Event Player, Frozen), Has Status(Event Player, Stunned)), Current Array Element == True)
+				? 0 : Global.AI_Turn_Speed, To World, Direction and Turn Rate);
+			Wait(0.100, Ignore Condition);
+		Else If(Hero Being Duplicated(Event Player) == Hero(Mei) || Hero Of(Event Player) == Hero(Mei));
+			Stop Facing(Event Player);
+			Start Facing(Event Player, Direction From Angles(Horizontal Facing Angle Of(Event Player), 10), Is True For Any(Array(Has Status(
+				Event Player, Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player, Frozen), Has Status(Event Player,
+				Stunned)), Current Array Element == True) ? 0 : Global.AI_Turn_Speed, To World, Direction and Turn Rate);
+			Wait(0.100, Ignore Condition);
+		End;
+		If(Array Contains(Event Player.Hold, Event Player.Current_Defensive) == True);
+			Start Holding Button(Event Player, Event Player.Current_Defensive);
+			Wait Until(Ability Cooldown(Event Player, Event Player.Current_Defensive) > 0 || !Entity Exists(First Of(
+				Event Player.Target_Order)) || Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(
+				Event Player.Target_Order)), Barriers Do Not Block LOS), 2.500);
+			Stop Holding Button(Event Player, Event Player.Current_Defensive);
+		Else If(Array Contains(Event Player.Confirm, Event Player.Current_Defensive) == True);
+			Press Button(Event Player, Event Player.Current_Defensive);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Event Player.Current_Defensive) == True);
+			Press Button(Event Player, Event Player.Current_Defensive);
+			Wait Until(Ability Cooldown(Event Player, Event Player.Current_Defensive) > 0 || !Entity Exists(First Of(
+				Event Player.Target_Order)) || Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(
+				Event Player.Target_Order)), Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Event Player.Current_Defensive);
+		Else;
+			Press Button(Event Player, Event Player.Current_Defensive);
+		End;
+		If(Hero Being Duplicated(Event Player) == Hero(Mei) || Hero Of(Event Player) == Hero(Mei) || Hero Being Duplicated(Event Player)
+			== Hero(Baptiste) || Hero Of(Event Player) == Hero(Baptiste));
+			Wait(0.100, Ignore Condition);
+			Stop Facing(Event Player);
+			Call Subroutine(AI_Start_Facing);
+		End;
+		Event Player.Can_Change_Arc = True;
+	}
+}
+
+rule("Use Mobility")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Magnitude Of(Throttle Of(Event Player)) != 0;
+		Event Player.Mobility != Empty Array;
+		(!Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			|| !Entity Exists(First Of(Event Player.Target_Order))) == True;
+		Distance Between(Position Of(Event Player), Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position,
+			Barriers Do Not Block LOS) ? Event Player.Walk_To_Position : Event Player.Current_Node) > Max(Event Player.Mobility_Distance,
+			Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 2 : 0);
+		Is True For Any(Event Player.Mobility, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Mobility, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Mobility, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(Event Player.Mobility,
+			Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Skip If(Ray Cast Hit Position(Eye Position(Event Player) + Direction From Angles(Horizontal Facing Angle Of(Event Player), 0)
+			* Event Player.Mobility_Distance, Eye Position(Event Player) + Direction From Angles(Horizontal Facing Angle Of(Event Player),
+			0) * Event Player.Mobility_Distance - Vector(0, 5, 0), Null, All Players(All Teams), False) == Eye Position(Event Player)
+			+ Direction From Angles(Horizontal Facing Angle Of(Event Player), 0) * Event Player.Mobility_Distance - Vector(0, 5, 0), 24);
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = (Event Player.Current_Mobility == Button(Ability 1) ? Global.Ability1_Arc : Global.Ability2_Arc)
+			[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(
+			Event Player))];
+		Event Player.Current_Mobility = Random Value In Array(Event Player.Mobility);
+		If(Array Contains(Event Player.Hold, Event Player.Current_Mobility) == True);
+			Start Holding Button(Event Player, Event Player.Current_Mobility);
+			Wait Until(Is Dead(Event Player) || Entity Exists(First Of(Event Player.Target_Order)) || Distance Between(Position Of(
+				Event Player), Event Player.Walk_To_Position) < Event Player.Mobility_Distance, 9999);
+			Stop Holding Button(Event Player, Event Player.Current_Mobility);
+		Else If(Array Contains(Event Player.Confirm, Event Player.Current_Mobility) == True);
+			Press Button(Event Player, Event Player.Current_Mobility);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Event Player.Current_Mobility) == True);
+			Wait Until(!Entity Exists(First Of(Event Player.Target_Order)), 99999);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? Is In Alternate Form(Event Player) : (
+				Event Player.Current_Mobility == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player)), 2);
+			Press Button(Event Player, Event Player.Current_Mobility);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Wait Until((Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player), Eye Position(
+				Event Player.Target_Order), Barriers Do Not Block LOS)) || (Distance Between(Event Player, Event Player.Walk_To_Position) < 2)
+				|| (Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? !Is In Alternate Form(Event Player) : !(
+				Event Player.Current_Mobility == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player))),
+				9999);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? !Is In Alternate Form(Event Player) : (
+				Event Player.Current_Mobility == Button(Ability 1) ? !Is Using Ability 1(Event Player) : !Is Using Ability 2(Event Player)),
+				1);
+			Press Button(Event Player, Event Player.Current_Mobility);
+		Else;
+			Press Button(Event Player, Event Player.Current_Mobility);
+		End;
+		Event Player.Can_Change_Arc = True;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Heal Ability")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Healing != Empty Array;
+		Normalized Health(Event Player) < (Entity Exists(First Of(Event Player.Target_Order)) ? 0.500 : 1);
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is True For Any(Event Player.Healing, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Healing, Current Array Element)) && (Array Contains(
+			Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element) > 0 : Array Contains(
+			Event Player.Healing, Current Array Element)) && (Array Contains(Event Player.Resource, Current Array Element)
+			? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(Event Player.Healing, Current Array Element)))
+			== True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = (Event Player.Current_Mobility == Button(Ability 1) ? Global.Ability1_Arc : Global.Ability2_Arc)
+			[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(
+			Event Player))];
+		Event Player.Current_Healing = Random Value In Array(Event Player.Healing);
+		If(Hero Being Duplicated(Event Player) == Hero(Ana) || Hero Of(Event Player) == Hero(Ana));
+			Stop Facing(Event Player);
+			Start Facing(Event Player, Down, Has Status(Event Player, Knocked Down) || Has Status(Event Player, Asleep) || Has Status(
+				Event Player, Frozen) || Has Status(Event Player, Stunned) ? 0 : 320, To World, Direction and Turn Rate);
+			Wait(0.100, Ignore Condition);
+		End;
+		If(Array Contains(Event Player.Hold, Event Player.Current_Healing) == True);
+			Start Holding Button(Event Player, Event Player.Current_Healing);
+			Wait Until(Ability Cooldown(Event Player, Event Player.Current_Healing) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 3);
+			Stop Holding Button(Event Player, Event Player.Current_Healing);
+		Else If(Array Contains(Event Player.Confirm, Event Player.Current_Healing) == True);
+			Press Button(Event Player, Event Player.Current_Healing);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Event Player.Current_Healing) == True);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? Is In Alternate Form(Event Player) : (
+				Event Player.Current_Mobility == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player)), 2);
+			Press Button(Event Player, Event Player.Current_Healing);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Wait Until((Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player), Eye Position(
+				Event Player.Target_Order), Barriers Do Not Block LOS)) || (Health(Event Player) == Max Health(Event Player)) || (
+				Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? !Is In Alternate Form(Event Player) : !(
+				Event Player.Current_Mobility == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player))),
+				9999);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? !Is In Alternate Form(Event Player) : (
+				Event Player.Current_Mobility == Button(Ability 1) ? !Is Using Ability 1(Event Player) : !Is Using Ability 2(Event Player)),
+				1);
+			Press Button(Event Player, Event Player.Current_Healing);
+		Else;
+			Press Button(Event Player, Event Player.Current_Healing);
+		End;
+		Event Player.Can_Change_Arc = True;
+		Call Subroutine(AI_Start_Facing);
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Ultimate")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Ultimate Charge Percent(Event Player) == 100;
+		Normalized Health(Event Player) <= Event Player.Ultimate_Health;
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Count Of(Filtered Array(Event Player.Target_Order, Team Of(First Of(Event Player.Target_Order))
+			== Event Player.Ultimate_Target_Team && Distance Between(Event Player, First Of(Event Player.Target_Order))
+			< Event Player.Use_Ultimate_Max && Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element),
+			Barriers Do Not Block LOS))) >= Min(Event Player.Ultimate_Targets, Number Of Players(Opposite Team Of(Team Of(Event Player))));
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = Global.Ultimate_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Wait(Max(Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))), Null,
+			All Players(All Teams), False), Eye Position(First Of(Event Player.Target_Order))) / 320, 0.250), Abort When False);
+		Skip If(Hero Being Duplicated(Event Player) == Hero(D.Va) || Hero Of(Event Player) == Hero(D.Va) || (Hero Of(Event Player) == Hero(
+			Echo) && !Is Duplicating(Event Player)), 2);
+		Event Player.Primary_Max = Event Player.Ultimate_Max;
+		Event Player.Primary_Min = Event Player.Ultimate_Min;
+		If(Hero Being Duplicated(Event Player) == Hero(Baptiste) || Hero Of(Event Player) == Hero(Baptiste));
+			Stop Facing(Event Player);
+			Start Facing(Event Player, Direction From Angles(Horizontal Facing Angle Of(Event Player), 10), Has Status(Event Player,
+				Knocked Down) || Has Status(Event Player, Asleep) || Has Status(Event Player, Frozen) || Has Status(Event Player, Stunned)
+				? 0 : 320, To World, Direction and Turn Rate);
+			Wait(0.100, Ignore Condition);
+		End;
+		If(Array Contains(Event Player.Hold, Button(Ultimate)) == True);
+			Start Holding Button(Event Player, Button(Ultimate));
+			Wait Until(!Is Using Ultimate(Event Player) || !Entity Exists(First Of(Event Player.Target_Order)) || Is Dead(Event Player)
+				|| !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Stop Holding Button(Event Player, Button(Ultimate));
+		Else If(Array Contains(Event Player.Confirm, Button(Ultimate)) == True);
+			Press Button(Event Player, Button(Ultimate));
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Button(Ultimate)) == True);
+			Press Button(Event Player, Button(Ultimate));
+			Wait Until(!Is Using Ultimate(Event Player) || !Entity Exists(First Of(Event Player.Target_Order)) || Is Dead(Event Player)
+				|| !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Button(Ultimate));
+		Else;
+			Press Button(Event Player, Button(Ultimate));
+		End;
+		Wait Until(Is Dead(Event Player), Max(Event Player.Ultimate_Duration, 1));
+		Event Player.Primary_Max = Global.Primary_Max[Index Of Array Value(Global.All_Heros, Hero Of(Event Player))];
+		Event Player.Primary_Min = Global.Primary_Min[Index Of Array Value(Global.All_Heros, Hero Of(Event Player))];
+		Event Player.Can_Change_Arc = True;
+		Call Subroutine(AI_Start_Facing);
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Offensive Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Secondary_Offensive != Empty Array;
+		Team Of(Event Player) != Team Of(First Of(Event Player.Target_Order));
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Is In View Angle(Event Player, Eye Position(First Of(Event Player.Target_Order)), 15) == True;
+		Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))) <= Event Player.Secondary_Max;
+		Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))) >= Event Player.Secondary_Min;
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is True For Any(Event Player.Secondary_Offensive, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Secondary_Offensive, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Secondary_Offensive, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(
+			Event Player.Secondary_Offensive, Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Skip If(!Array Contains(Event Player.Use_If_Shield, Button(Secondary Fire)) && !Is In Line of Sight(Eye Position(Event Player),
+			Eye Position(First Of(Event Player.Target_Order)), Enemy Barriers Block LOS), 20);
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = Global.Secondary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Wait(Max(Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))), Null,
+			All Players(All Teams), False), Eye Position(First Of(Event Player.Target_Order))) / 320, 0.250), Abort When False);
+		If(Array Contains(Event Player.Hold, Button(Secondary Fire)) == True);
+			Start Holding Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), Event Player.Charging_Time != Null ? Event Player.Charging_Time : 999999);
+			Stop Holding Button(Event Player, Button(Secondary Fire));
+		Else If(Array Contains(Event Player.Confirm, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Button(Secondary Fire));
+		Else;
+			Press Button(Event Player, Button(Secondary Fire));
+		End;
+		Event Player.Can_Change_Arc = True;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Defence Secondary")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Secondary_Defensive != Empty Array;
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is True For Any(Event Player.Secondary_Defensive, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Secondary_Defensive, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Secondary_Defensive, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(
+			Event Player.Secondary_Defensive, Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = Global.Secondary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		If(Array Contains(Event Player.Hold, Button(Secondary Fire)) == True);
+			Start Holding Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Stop Holding Button(Event Player, Button(Secondary Fire));
+		Else If(Array Contains(Event Player.Confirm, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Button(Secondary Fire));
+		Else;
+			Press Button(Event Player, Button(Secondary Fire));
+		End;
+		Event Player.Can_Change_Arc = True;
+	}
+}
+
+rule("Use Heal Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Secondary_Healing != Empty Array;
+		Normalized Health(Event Player) < (Entity Exists(First Of(Event Player.Target_Order)) ? 0.500 : 1);
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is True For Any(Event Player.Secondary_Healing, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Secondary_Healing, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Secondary_Healing, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(
+			Event Player.Secondary_Healing, Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = Global.Secondary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		If(Array Contains(Event Player.Hold, Button(Secondary Fire)) == True);
+			Wait Until(!Entity Exists(First Of(Event Player.Target_Order)), 99999);
+			Start Holding Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Stop Holding Button(Event Player, Button(Secondary Fire));
+		Else If(Array Contains(Event Player.Confirm, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Button(Secondary Fire));
+		Else;
+			Press Button(Event Player, Button(Secondary Fire));
+		End;
+		Event Player.Can_Change_Arc = True;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Bot Hero Restrictions")
+{
+	event
+	{
+		Subroutine;
+		Heros;
+	}
+
+	actions
+	{
+		If(Slot Of(Event Player) <= 5);
+			Event Player.Role_Lock = Slot Of(Event Player) == 0 ? Global.Slot1_Role_Lock : (Slot Of(Event Player)
+				== 1 ? Global.Slot2_Role_Lock : (Slot Of(Event Player) == 2 ? Global.Slot3_Role_Lock : (Slot Of(Event Player)
+				== 3 ? Global.Slot4_Role_Lock : (Slot Of(Event Player) == 4 ? Global.Slot5_Role_Lock : (Slot Of(Event Player)
+				== 5 ? Global.Slot6_Role_Lock : 0)))));
+			If(Event Player.Role_Lock == 0);
+				Event Player.Hero_Pool = Global.Vaild_Heros;
+			Else If(Event Player.Role_Lock == 1);
+				Event Player.Hero_Pool = Filtered Array(Global.Vaild_Heros, Array Contains(All Tank Heroes, Current Array Element));
+			Else If(Event Player.Role_Lock == 2);
+				Event Player.Hero_Pool = Filtered Array(Global.Vaild_Heros, Array Contains(All Damage Heroes, Current Array Element));
+			Else If(Event Player.Role_Lock == 3);
+				Event Player.Hero_Pool = Filtered Array(Global.Vaild_Heros, Array Contains(All Support Heroes, Current Array Element));
+			Else If(Event Player.Role_Lock == 4);
+				Event Player.Hero_Pool = Array(Hero(Reinhardt), Hero(Sigma), Hero(Orisa));
+			Else If(Event Player.Role_Lock == 5);
+				Event Player.Hero_Pool = Array(Hero(Ramattra), Hero(D.Va), Hero(Roadhog), Hero(Winston), Hero(Wrecking Ball), Hero(Zarya), Hero(
+					Doomfist));
+			Else If(Event Player.Role_Lock == 6);
+				Event Player.Hero_Pool = Array(Hero(Mercy), Hero(Moira), Hero(Ana), Hero(Baptiste), Hero(Kiriko), Hero(Lifeweaver));
+			Else If(Event Player.Role_Lock == 7);
+				Event Player.Hero_Pool = Array(Hero(Brigitte), Hero(Lúcio), Hero(Zenyatta), Hero(Illari));
+			End;
+		Else;
+			Event Player.Hero_Pool = Global.Vaild_Heros;
+		End;
+		Wait(1, Ignore Condition);
+		Skip If(Global.AI_Gamertags, 2);
+		Event Player.AI_Username = Custom String("{0} {1}", Array(Custom String("Flex"), Custom String("Tank"), Custom String("Damage"),
+			Custom String("Support"), Custom String("Main Tank"), Custom String("Off Tank"), Custom String("Main Support"), Custom String(
+			"Off Support"))[Event Player.Role_Lock], Index Of Array Value(Filtered Array(Remove From Array(All Players(All Teams),
+			Filtered Array(All Players(All Teams), !Is Dummy Bot(Current Array Element))),
+			Current Array Element.Role_Lock == Event Player.Role_Lock), Event Player) + 1);
+		Start Forcing Dummy Bot Name(Event Player, Event Player.AI_Username);
+	}
+}
+
+rule("Bot Died Restore Ultimate")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Stored_Ult_Charge = Ultimate Charge Percent(Event Player);
+		Wait Until(Is Alive(Event Player), 9999);
+		Wait(0.100, Ignore Condition);
+		Wait Until(Hero Of(Event Player) == Event Player.Hero, 99999);
+		Wait(0.100, Ignore Condition);
+		Set Ultimate Charge(Event Player, Event Player.Stored_Ult_Charge);
+	}
+}
+
+rule("Swap Hero If Duplicate Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Event Player.Hero;
+		Number Of Heroes(Hero Of(Event Player), Team Of(Event Player)) > Workshop Setting Integer(Custom String("AI"), Custom String(
+			"Max Dupicate Heros"), 1, 1, 6, 13);
+		(Is In Spawn Room(Event Player) || !Has Spawned(Event Player)) == True;
+	}
+
+	actions
+	{
+		Wait(Random Real(0, 3), Abort When False);
+		Event Player.Hero = Random Value In Array(Filtered Array(Is Team On Offense(Team Of(Event Player))
+			? Global.T2_Available_Heros : Global.T1_Available_Heros, Array Contains(Event Player.Hero_Pool, Current Array Element)));
+		Start Forcing Player To Be Hero(Event Player, Event Player.Hero);
+		Call Subroutine(Hero_Variables);
+		Event Player.Ultimates_Used = Player Stat(Event Player, Ultimates Used);
+	}
+}
+
+rule("Swap Hero If Not Correct Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) != Event Player.Hero;
+		(Is In Spawn Room(Event Player) || !Has Spawned(Event Player)) == True;
+	}
+
+	actions
+	{
+		Wait(0.100, Abort When False);
+		Start Forcing Player To Be Hero(Event Player, Event Player.Hero);
+		Call Subroutine(Hero_Variables);
+		Event Player.Ultimates_Used = Player Stat(Event Player, Ultimates Used);
+		Wait(3, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Passive Ability")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Passive != Custom String("None");
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Team Of(First Of(Event Player.Target_Order)) != Team Of(Event Player);
+		(Event Player.Passive == Custom String("Eject") ? Is In Alternate Form(Event Player) : (Event Player.Passive == Custom String(
+			"Exo Boots") || Event Player.Passive == Custom String("Hover Jets") || Event Player.Passive == Custom String("Glide")
+			? Entity Exists(First Of(Event Player.Target_Order)) : Is Dead(Event Player))) == True;
+	}
+
+	actions
+	{
+		If(Event Player.Passive == Custom String("Eject"));
+			Event Player.Primary_Max = 25;
+			Event Player.Primary_Min = 20;
+			Event Player.Ultimate_Health = 1;
+			Event Player.Ultimate_Targets = 0;
+			Event Player.Offensive = Empty Array;
+			Event Player.Defensive = Empty Array;
+			Event Player.Mobility = Empty Array;
+			Event Player.Healing = Empty Array;
+			Event Player.Secondary_Fire = Empty Array;
+			Event Player.Secondary_Offensive = Empty Array;
+			Event Player.Secondary_Defensive = Empty Array;
+			Event Player.Secondary_Healing = Empty Array;
+			Event Player.Hold = Empty Array;
+			Event Player.Confirm = Empty Array;
+			Event Player.Toggle = Empty Array;
+			Event Player.Cooldown = Empty Array;
+			Event Player.Charge = Empty Array;
+			Event Player.Resource = Empty Array;
+			Event Player.Charging = Empty Array;
+			Event Player.Heal_Friendlys = Empty Array;
+			Wait Until(!Is In Alternate Form(Event Player), 99999);
+			Call Subroutine(Hero_Variables);
+		Else If(Event Player.Passive == Custom String("Exo Boots"));
+			Wait Until(Is On Ground(Event Player), 99999);
+			Start Holding Button(Event Player, Button(Crouch));
+			Wait Until(!Entity Exists(First Of(Event Player.Target_Order)), Event Player.Charging_Time);
+			Stop Holding Button(Event Player, Button(Crouch));
+			Skip If(!Entity Exists(First Of(Event Player.Target_Order)), 1);
+			Press Button(Event Player, Button(Jump));
+		Else If(Event Player.Passive == Custom String("Hover Jets"));
+			Start Holding Button(Event Player, Button(Secondary Fire));
+			Wait Until(!Entity Exists(First Of(Event Player.Target_Order)), 99999);
+			Stop Holding Button(Event Player, Button(Secondary Fire));
+		Else If(Event Player.Passive == Custom String("Glide"));
+			Start Holding Button(Event Player, Button(Jump));
+			Wait Until(!Entity Exists(First Of(Event Player.Target_Order)), 99999);
+			Stop Holding Button(Event Player, Button(Jump));
+		End;
+	}
+}
+
+rule("Reload")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		!Is Reloading(Event Player) == True;
+		((Max Ammo(Event Player, 0) > 0 && Ammo(Event Player, 0) == 0) || (Max Ammo(Event Player, 1) > 0 && Ammo(Event Player, 1) == 0))
+			== True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Reload));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("----------------------------------- AI ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- Miscellaneous ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Request Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Array Contains(Global.Vaild_Heros, Hero Of(Event Player)) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(Ray Cast Hit Player(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(Event Player) * 99,
+			All Players(Team Of(Event Player)), Filtered Array(All Players(Team Of(Event Player)), !Array Contains(
+			Current Array Element.Hero_Pool, Hero Of(Event Player))), False)) == True;
+	}
+
+	actions
+	{
+		Event Player.Request = Ray Cast Hit Player(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * 99, All Players(Team Of(Event Player)), Filtered Array(All Players(Team Of(Event Player)), !Array Contains(
+			Current Array Element.Hero_Pool, Hero Of(Event Player))), False);
+		Event Player.Request.Requested_Hero = Hero Of(Event Player);
+		Small Message(Event Player, Custom String("Requested {1} To Play {0}", Hero Icon String(Hero Of(Event Player)),
+			Event Player.Request.AI_Username));
+		If(Is In Spawn Room(Event Player));
+			Wait(2, Ignore Condition);
+			Set Player Allowed Heroes(Event Player, Remove From Array(All Heroes, Hero Of(Event Player)));
+			Wait(0.100, Ignore Condition);
+			Reset Player Hero Availability(Event Player);
+		Else;
+			Small Message(Event Player, Custom String("(AI Will Only Swap After You've Swapped Off)"));
+		End;
+		Wait(3, Ignore Condition);
+	}
+}
+
+rule("Swap Hero Once Requested")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Event Player.Requested_Hero != Null;
+		Hero Of(Event Player) != Event Player.Requested_Hero;
+	}
+
+	actions
+	{
+		Wait(2.100, Ignore Condition);
+		Wait Until(Is In Spawn Room(Event Player) && Is True For All(Filtered Array(All Players(Team Of(Event Player)), !Is Dummy Bot(
+			Current Array Element)), Hero Of(Current Array Element) != Event Player.Requested_Hero), 99999);
+		Small Message(All Players(Team Of(Event Player)), Custom String("{0} Completed Hero Swap To {1}", Event Player.AI_Username,
+			Event Player.Requested_Hero));
+		If(Team Of(Event Player) == Team 1);
+			Modify Global Variable(T1_Available_Heros, Append To Array, Event Player.Hero);
+		Else;
+			Modify Global Variable(T2_Available_Heros, Append To Array, Event Player.Hero);
+		End;
+		Event Player.Hero = Event Player.Requested_Hero;
+		If(Team Of(Event Player) == Team 1);
+			Modify Global Variable(T1_Available_Heros, Remove From Array By Value, Event Player.Hero);
+		Else;
+			Modify Global Variable(T2_Available_Heros, Remove From Array By Value, Event Player.Hero);
+		End;
+		Event Player.Requested_Hero = Null;
+		Set Player Allowed Heroes(Filtered Array(All Players(Team Of(Event Player)), !Is Dummy Bot(Current Array Element)), Team Of(
+			Event Player) == Team 1 ? Global.T1_Available_Heros : Global.T2_Available_Heros);
+	}
+}
+
+rule("Duplicate Set Variables")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Echo;
+	}
+
+	conditions
+	{
+		Is Duplicating(Event Player) == True;
+	}
+
+	actions
+	{
+		Call Subroutine(Hero_Variables);
+		Wait Until(!Is Duplicating(Event Player), 99999);
+		Call Subroutine(Hero_Variables);
+	}
+}
+
+rule("Widowmaker Primary Charge")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Widowmaker) || Hero Of(Event Player) == Hero(Widowmaker)) == True;
+		Is Firing Secondary(Event Player) == True;
+		(Array Contains(Event Player.Hold, Button(Primary Fire)) || !Array Contains(Event Player.Charging, Button(Primary Fire))) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Hold, Remove From Array By Value, Button(Primary Fire));
+		Modify Player Variable(Event Player, Charging, Append To Array, Button(Primary Fire));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Widowmaker Primary Hold")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Widowmaker) || Hero Of(Event Player) == Hero(Widowmaker)) == True;
+		Is Firing Secondary(Event Player) != True;
+		(Array Contains(Event Player.Charging, Button(Primary Fire)) || !Array Contains(Event Player.Hold, Button(Primary Fire))) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Charging, Remove From Array By Value, Button(Primary Fire));
+		Modify Player Variable(Event Player, Hold, Append To Array, Button(Primary Fire));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Lúcio Use Speed")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Lúcio) || Hero Of(Event Player) == Hero(Lúcio)) == True;
+		Is In Alternate Form(Event Player) != True;
+		Normalized Health(Event Player) > (Entity Exists(First Of(Event Player.Target_Order)) ? 0.500 : 1);
+		Magnitude Of(Throttle Of(Event Player)) != 0;
+		Distance Between(Position Of(Event Player), Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position,
+			Barriers Do Not Block LOS) ? Event Player.Walk_To_Position : Event Player.Current_Node) > Max(Event Player.Mobility_Distance,
+			Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? 2 : 0);
+		Global.Use_Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 1));
+		Wait(Event Player.Charging_Time, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Lúcio Use Heal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Lúcio) || Hero Of(Event Player) == Hero(Lúcio)) == True;
+		Is In Alternate Form(Event Player) == True;
+		((Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(
+			Event Player.Target_Order)), Barriers Do Not Block LOS) && Team Of(First Of(Event Player.Target_Order)) == Team Of(
+			Event Player)) || (Normalized Health(Event Player) < 1) || Distance Between(Event Player, Event Player.Walk_To_Position) <= 2)
+			== True;
+		Global.Use_Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 1));
+		Wait(Event Player.Charging_Time, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Mercy Resurrection")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Mercy) || Hero Of(Event Player) == Hero(Mercy)) == True;
+		Ability Cooldown(Event Player, Button(Ability 2)) == Null;
+		(Number Of Dead Players(Team Of(Event Player)) > 0 && Distance Between(Event Player, First Of(Sorted Array(All Dead Players(
+			Team Of(Event Player)), Distance Between(Event Player, Current Array Element)))) < 2.500) == True;
+		Is Alive(Event Player) == True;
+		Global.Use_Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 2));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Ana / Mercy Weapon Damage")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		(Event Player.Current_Hero == Hero(Ana) || Event Player.Current_Hero == Hero(Mercy)) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Array Contains(Event Player.Heal_Friendlys, Button(Primary Fire)) == True;
+		Team Of(Event Player) != Team Of(First Of(Event Player.Target_Order));
+		Global.Use_Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Set Weapon(Event Player, 2);
+		Modify Player Variable(Event Player, Heal_Friendlys, Remove From Array By Value, Button(Primary Fire));
+	}
+}
+
+rule("Ana / Mercy Weapon Heal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		(Event Player.Current_Hero == Hero(Ana) || Event Player.Current_Hero == Hero(Mercy)) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Array Contains(Event Player.Heal_Friendlys, Button(Primary Fire)) != True;
+		Team Of(Event Player) == Team Of(First Of(Event Player.Target_Order));
+		Global.Use_Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Set Weapon(Event Player, 1);
+		Modify Player Variable(Event Player, Heal_Friendlys, Append To Array, Button(Primary Fire));
+	}
+}
+
+rule("Mercy Enforce Currrent Weapon")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Event Player.Current_Hero == Hero(Mercy);
+		Weapon(Event Player) != (Array Contains(Event Player.Heal_Friendlys, Button(Primary Fire)) ? 1 : 2);
+		Global.Use_Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Set Weapon(Event Player, Array Contains(Event Player.Heal_Friendlys, Button(Primary Fire)) ? 1 : 2);
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Zenyata Use Healing Orb")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Zenyatta) || Hero Of(Event Player) == Hero(Zenyatta)) == True;
+		Is Alive(Event Player) == True;
+		Entity Exists(First Of(Event Player.Target_Order)) == True;
+		Team Of(First Of(Event Player.Target_Order)) == Team Of(Event Player);
+		First Of(Event Player.Target_Order) != Event Player.Zen_Orb_Target;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Is Using Ultimate(Event Player) != True;
+		Global.Use_Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Event Player.Zen_Orb_Target = First Of(Filtered Array(Sorted Array(Remove From Array(All Living Players(Team Of(Event Player)),
+			Event Player), Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player)
+			+ Facing Direction Of(Event Player) * 30, All Living Players(Team Of(Event Player)), Event Player, False),
+			Current Array Element)), Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element),
+			Barriers Do Not Block LOS) && Is In View Angle(Event Player, Eye Position(Current Array Element), 25)));
+		Event Player.Zen_Orb_Hero = Hero Of(Event Player.Zen_Orb_Target);
+		Press Button(Event Player, Button(Ability 1));
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Zenyata Lose Healing Orb (Sight)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Zenyatta) || Hero Of(Event Player) == Hero(Zenyatta)) == True;
+		Entity Exists(Event Player.Zen_Orb_Target) == True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(Event Player.Zen_Orb_Target), Barriers Do Not Block LOS) != True;
+		Global.Use_Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Wait(4, Abort When False);
+		Event Player.Zen_Orb_Target = Null;
+	}
+}
+
+rule("Zenyata Lose Healing Orb (Dead)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Zenyatta) || Hero Of(Event Player) == Hero(Zenyatta)) == True;
+		Entity Exists(Event Player.Zen_Orb_Target) == True;
+		(Is Dead(Event Player) || Is Dead(Event Player.Zen_Orb_Target)) == True;
+		Global.Use_Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Event Player.Zen_Orb_Target = Null;
+	}
+}
+
+rule("Zenyata Lose Healing Orb (Hero Swap)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Zenyatta) || Hero Of(Event Player) == Hero(Zenyatta)) == True;
+		Entity Exists(Event Player.Zen_Orb_Target) == True;
+		(Hero Of(Event Player) != Hero(Zenyatta) || Hero Of(Event Player.Zen_Orb_Target) != Event Player.Zen_Orb_Hero) == True;
+		Global.Use_Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Wait(0.500, Abort When False);
+		Event Player.Zen_Orb_Target = Null;
+	}
+}
+
+rule("Seen By Memory")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Workshop Setting Toggle(Custom String("AI"), Custom String("Memory"), True, 9) == True;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Event Player.Seen_By_Memory = Is True For Any(All Living Players(Opposite Team Of(Team Of(Event Player))), Is In Line of Sight(
+			Eye Position(Current Array Element), Eye Position(Event Player), Barriers Do Not Block LOS)) ? Workshop Setting Integer(
+			Custom String("AI"), Custom String("Memory Duration"), 5, 0, 10, 10) : Max(Event Player.Seen_By_Memory - 1, 0);
+		Event Player.Seen_By_Memory = Is Dead(Event Player) ? 0 : Event Player.Seen_By_Memory;
+		Loop If Condition Is True;
+	}
+}
+
+rule("Create Bot")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		(Number Of Players(Team 1) < Global.Number_Of_Bots_T1 || Number Of Players(Team 2) < Global.Number_Of_Bots_T2) == True;
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Skip If(Number Of Players(Team 1) >= Global.Number_Of_Bots_T1, 1);
+		Create Dummy Bot(Random Value In Array(All Heroes), Team 1, -1, Random Value In Array(Spawn Points(Team 1)), Vector(0, 0, 0));
+		Skip If(Number Of Players(Team 2) >= Global.Number_Of_Bots_T2, 1);
+		Create Dummy Bot(Random Value In Array(All Heroes), Team 2, -1, Random Value In Array(Spawn Points(Team 2)), Vector(0, 0, 0));
+		Loop If Condition Is True;
+	}
+}
+
+rule("Remove Bot")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Number Of Players(Team 1) > Max(Global.Number_Of_Bots_T1, Count Of(Filtered Array(All Players(Team 1), !Is Dummy Bot(
+			Current Array Element)))) || Number Of Players(Team 2) > Max(Global.Number_Of_Bots_T2, Count Of(Filtered Array(All Players(
+			Team 2), !Is Dummy Bot(Current Array Element))))) == True;
+	}
+
+	actions
+	{
+		Wait(Random Real(1, 3), Abort When False);
+		Skip If(Team Of(Event Player) == Team 2, 2);
+		Skip If(Number Of Players(Team 1) <= Global.Number_Of_Bots_T1, 1);
+		Destroy Dummy Bot(Team Of(Event Player), Slot Of(Event Player));
+		Skip If(Team Of(Event Player) == Team 1, 2);
+		Skip If(Number Of Players(Team 2) <= Global.Number_Of_Bots_T2, 1);
+		Destroy Dummy Bot(Team Of(Event Player), Slot Of(Event Player));
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("----------------------------------- Miscellaneous ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- Subroutine ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Subroutine;
+		Global_Setup;
+	}
+
+	actions
+	{
+		Global.Vaild_Heros = Array(Hero(Reinhardt), Hero(Winston), Hero(Roadhog), Hero(Zarya), Hero(D.Va), Hero(Orisa), Hero(
+			Wrecking Ball), Hero(Sigma), Hero(Mercy), Hero(Zenyatta), Hero(Lúcio), Hero(Ana), Hero(Brigitte), Hero(Moira), Hero(Baptiste),
+			Hero(Reaper), Hero(Tracer), Hero(Hanzo), Hero(Torbjörn), Hero(Pharah), Hero(Widowmaker), Hero(Bastion), Hero(Symmetra), Hero(
+			Genji), Hero(Cassidy), Hero(Junkrat), Hero(Soldier: 76), Hero(Mei), Hero(Sombra), Hero(Doomfist), Hero(Ashe), Hero(Echo), Hero(
+			Junker Queen), Hero(Kiriko), Hero(Ramattra), Hero(Lifeweaver), Hero(Sojourn), Hero(Illari));
+		Global.T1_Available_Heros = Global.Vaild_Heros;
+		Global.T2_Available_Heros = Global.Vaild_Heros;
+		Global.Hero_Prioritize_Order = Array(Hero(Mercy), Hero(Brigitte), Hero(Lúcio), Hero(Ana), Hero(Illari), Hero(Moira), Hero(
+			Zenyatta), Hero(Baptiste), Hero(Wrecking Ball), Hero(Winston), Hero(Reinhardt), Hero(Sigma), Hero(Orisa), Hero(Zarya), Hero(
+			D.Va), Hero(Roadhog), Hero(Sombra), Hero(Widowmaker), Hero(Doomfist), Hero(Tracer), Hero(Reaper), Hero(Genji), Hero(Symmetra),
+			Hero(Hanzo), Hero(Mei), Hero(Torbjörn), Hero(Junkrat), Hero(Cassidy), Hero(Soldier: 76), Hero(Ashe), Hero(Echo), Hero(Bastion),
+			Hero(Pharah));
+		Global.Hero_Prioritize_Order = Sorted Array(Global.Hero_Prioritize_Order, Index Of Array Value(Global.Hero_Prioritize_Order,
+			Current Array Element) * -1);
+		Global.Swap_After_Ult = Workshop Setting Toggle(Custom String("AI"), Custom String("Only Swap Hero After Using Ultimate"), True,
+			6);
+		Global.Slot1_Role_Lock = Workshop Setting Combo(Custom String("Role Lock"), Custom String("Player 1"), 0, Array(Custom String(
+			"Any"), Custom String("Tank"), Custom String("DPS"), Custom String("Support"), Custom String("Main Tank"), Custom String(
+			"Off Tank"), Custom String("Main Support"), Custom String("Off Support")), 0);
+		Global.Slot2_Role_Lock = Workshop Setting Combo(Custom String("Role Lock"), Custom String("Player 2"), 0, Array(Custom String(
+			"Any"), Custom String("Tank"), Custom String("DPS"), Custom String("Support"), Custom String("Main Tank"), Custom String(
+			"Off Tank"), Custom String("Main Support"), Custom String("Off Support")), 0);
+		Global.Slot3_Role_Lock = Workshop Setting Combo(Custom String("Role Lock"), Custom String("Player 3"), 0, Array(Custom String(
+			"Any"), Custom String("Tank"), Custom String("DPS"), Custom String("Support"), Custom String("Main Tank"), Custom String(
+			"Off Tank"), Custom String("Main Support"), Custom String("Off Support")), 0);
+		Global.Slot4_Role_Lock = Workshop Setting Combo(Custom String("Role Lock"), Custom String("Player 4"), 0, Array(Custom String(
+			"Any"), Custom String("Tank"), Custom String("DPS"), Custom String("Support"), Custom String("Main Tank"), Custom String(
+			"Off Tank"), Custom String("Main Support"), Custom String("Off Support")), 0);
+		Global.Slot5_Role_Lock = Workshop Setting Combo(Custom String("Role Lock"), Custom String("Player 5"), 0, Array(Custom String(
+			"Any"), Custom String("Tank"), Custom String("DPS"), Custom String("Support"), Custom String("Main Tank"), Custom String(
+			"Off Tank"), Custom String("Main Support"), Custom String("Off Support")), 0);
+		Global.Slot6_Role_Lock = Workshop Setting Combo(Custom String("Role Lock"), Custom String("Player 6"), 0, Array(Custom String(
+			"Any"), Custom String("Tank"), Custom String("DPS"), Custom String("Support"), Custom String("Main Tank"), Custom String(
+			"Off Tank"), Custom String("Main Support"), Custom String("Off Support")), 0);
+	}
+}
+
+rule("Hero Values")
+{
+	event
+	{
+		Subroutine;
+		Hero_Values;
+	}
+
+	actions
+	{
+		Global.All_Heros = Array(Hero(Reinhardt), Hero(Winston), Hero(Roadhog), Hero(Zarya), Hero(D.Va), Hero(Orisa), Hero(Wrecking Ball),
+			Hero(Sigma), Hero(Mercy), Hero(Zenyatta), Hero(Lúcio), Hero(Ana), Hero(Brigitte), Hero(Moira), Hero(Baptiste), Hero(Reaper),
+			Hero(Tracer), Hero(Hanzo), Hero(Torbjörn), Hero(Pharah), Hero(Widowmaker), Hero(Bastion), Hero(Symmetra), Hero(Genji), Hero(
+			Cassidy), Hero(Junkrat), Hero(Soldier: 76), Hero(Mei), Hero(Sombra), Hero(Doomfist), Hero(Ashe), Hero(Echo), Hero(
+			Junker Queen), Hero(Kiriko), Hero(Ramattra), Hero(Lifeweaver), Hero(Sojourn), Hero(Illari), Hero(Mauga), Hero(Venture));
+		Global.Passive = Array(Custom String("Steadfast"), Custom String("None"), Custom String("None"), Custom String("Energy"),
+			Custom String("Eject"), Custom String("None"), Custom String("None"), Custom String("None"), Custom String("Regeneration"),
+			Custom String("None"), Custom String("Wall Ride"), Custom String("None"), Custom String("Inspire"), Custom String("None"),
+			Custom String("Exo Boots"), Custom String("The Reaping"), Custom String("None"), Custom String("Wall Climb"), Custom String(
+			"None"), Custom String("Hover Jets"), Custom String("None"), Custom String("Ironclad"), Custom String("None"), Custom String(
+			"Cyber-Agility"), Custom String("None"), Custom String("Total Mayhem"), Custom String("None"), Custom String("None"),
+			Custom String("Opportunist"), Custom String("The Best Defence"), Custom String("None"), Custom String("Glide"), Custom String(
+			"Adrenaline Rush"), Custom String("Wall Climb"), Custom String("None"), Custom String("Parting Gift"), Custom String("None"));
+		Global.Primary_Max = Array(4, 8, 6, 14, 5, 40, 18, 18, 25, 20, 20, 35, 5, 15, 30, 8, 18, 30, 30, 30, 50, 40, 12, 20, 30, 30, 40,
+			14, 25, 8, 40, 30, 25, 40, 50, 30, 40, 40);
+		Global.Primary_Min = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 6, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0);
+		Global.Secondary_Max = Array(40, 30, 18, 30, 0, 35, 0, 0, 0, 50, 5, 35, 40, 20, 40, 0, 0, 0, 6, 0, 50, 35, 30, 6, 5, 8, 30, 40, 12,
+			18, 40, 20, 15, 30, 20, 30, 50, 20);
+		Global.Secondary_Min = Array(5, 8, 6, 14, 0, 5, 0, 0, 0, 20, 0, 15, 7, 0, 0, 0, 0, 0, 0, 0, 10, 0, 12, 0, 0, 0, 4, 14, 6, 0, 10, 0,
+			0, 0, 0, 0, 0, 0);
+		Global.Ability1_Max = Array(25, 20, 20, 0, 20, 0, 0, 0, 20, 30, 0, 15, 15, 0, 0, 0, 0, 30, 0, 0, 0, 25, 0, 12, 0, 8, 0, 0, 12, 20,
+			0, 0, 0, 25, 10, 0, 0, 0);
+		Global.Ability1_Min = Array(0, 14, 6, 0, 6, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0);
+		Global.Ability2_Max = Array(30, 0, 0, 25, 30, 0, 0, 25, 6, 30, 0, 35, 15, 20, 30, 0, 0, 25, 20, 12, 10, 0, 0, 0, 6, 20, 0, 0, 0, 0,
+			30, 12, 6, 20, 20, 25, 25, 0);
+		Global.Ability2_Min = Array(0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 6, 0, 0, 0, 0,
+			0, 0, 0, 0);
+		Global.Mobility_Distance = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 5, 0, 0, 0, 10, 0, 0, 0, 4, 0, 0, 0, 20, 0, 0, 5,
+			0, 0, 0, 0, 12, 8);
+		Global.Charge_Time = Array(0, 1.500, 0, 0, 0, 4, 1, 1.200, 0, 4, 1, 0, 0, 0, 1, 0, 0, 1.200, 0, 0, 1.400, 2.500, 1.200, 0, 4, 0, 0,
+			0, 0, 1.400, 0.100, 0, 0, 0, 0, 1, 0, 1);
+		Global.Use_Ultimate_Max = Array(20, 30, 15, 30, 25, 10, 15, 25, 25, 25, 25, 30, 25, 25, 30, 10, 6, 30, 30, 15, 100, 28, 30, 12, 40,
+			15, 30, 25, 18, 8, 30, 30, 20, 30, 20, 30, 50, 30);
+		Global.Ultimate_Health = Array(1, 0.350, 1, 1, 1, 1, 1, 1, 1, 0.500, 0.600, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 0.350, 1, 1, 1, 1, 1, 1);
+		Global.Ultimate_Targets = Array(3, 1, 2, 3, 3, 3, 1, 3, 3, 3, 3, 1, 0, 2, 3, 2, 1, 2, 1, 2, 0, 1, 1, 1, 2, 1, 2, 2, 2, 1, 2, 1, 2,
+			3, 2, 3, 2, 2);
+		Global.Ultimate_Target_Team = Array(0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 1, 0, 0);
+		Global.Ultimate_Max = Array(4, 4, 0, 14, 25, 25, 18, 24, 25, 20, 20, 35, 5, 20, 30, 0, 18, 30, 30, 0, 50, 25, 12, 6, 0, 0, 40, 14,
+			25, 3, 40, 30, 25, 40, 50, 30, 30, 40);
+		Global.Ultimate_Min = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0);
+		Global.Primary_Arc = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.500, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0);
+		Global.Secondary_Arc = Array(0, 0, 0, 0.250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.400, 0, 0, 0, 0, 0, 0, 0.500, 0, 0, 0, 0.500, 0, 0, 0,
+			0, 0, 0, 0.400, 0, 0, 0, 0, 0);
+		Global.Ability1_Arc = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.500, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0);
+		Global.Ability2_Arc = Array(0, 0, 0, 0, 0, 0, 0, 0.200, 0, 0, 0, 0.350, 0, 0, 0.400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.500, 0, 0, 0,
+			0, 0.400, 0, 0, 0.600, 0.600, 0, 0, 0);
+		Global.Ultimate_Arc = Array(0, 0, 0, 0.250, 0, 0, 0, -0.100, 0, 0, 0, 0, 0, 0, 0, 0, 0.050, 0, 0.500, 0, 0, 0, 0, 0, 0, 0.500, 0,
+			0.200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		Global.Ultimate_Duration = Array(0, 10, 6, 0, 0, 12, 0, 0, 0, 6, 0, 0, 10, 8, 0, 4, 0, 0, 6, 4, 0, 6, 0, 6, 6, 0, 0, 0, 0, 4, 0,
+			10, 3, 12, 15, 10, 0, 4);
+		Global.Aim_Predict_Scale = Array(10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+			10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10);
+		Abort If(Global.Can_Hear == False);
+		Global.Melee_Sound_Max = Array(10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+			10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10);
+		Global.Primary_Sound_Max = Array(20, 20, 20, 20, 20, 30, 30, 30, 15, 20, 20, 15, 15, 25, 30, 20, 20, 0, 25, 30, 25, 30, 20, 20, 30,
+			30, 30, 20, 20, 15, 25, 25, 25, 15, 20, 0, 25, 30);
+		Global.Secondary_Sound_Max = Array(0, 0, 30, 30, 15, 0, 0, 0, 15, 15, 15, 0, 0, 20, 30, 0, 0, 0, 20, 25, 0, 20, 12, 20, 30, 0, 30,
+			15, 10, 15, 0, 25, 0, 15, 0, 20, 25, 18);
+		Global.Ability1_Sound_Max = Array(15, 25, 20, 0, 15, 0, 0, 15, 10, 0, 0, 15, 25, 15, 15, 15, 20, 0, 0, 25, 25, 0, 0, 25, 20, 0, 30,
+			25, 0, 15, 20, 25, 25, 15, 30, 10, 20, 20);
+		Global.Ability2_Sound_Max = Array(30, 15, 15, 0, 20, 0, 0, 20, 10, 0, 15, 0, 15, 0, 0, 10, 10, 20, 20, 0, 0, 0, 0, 15, 15, 0, 0, 0,
+			0, 20, 0, 20, 25, 25, 25, 20, 20, 0);
+		Global.Ultimate_Sound_Max = Array(0, 20, 30, 0, 0, 0, 0, 20, 20, 30, 0, 0, 25, 30, 0, 20, 0, 0, 20, 25, 0, 30, 0, 20, 15, 0, 25, 0,
+			0, 0, 0, 0, 30, 30, 30, 30, 30, 40);
+		Global.Walking_Sound_Max = Array(30, 25, 30, 30, 30, 30, 30, 0, 20, 0, 25, 25, 30, 25, 25, 25, 20, 25, 30, 30, 25, 30, 25, 20, 25,
+			25, 25, 25, 20, 30, 25, 0, 25, 20, 25, 25, 25, 25);
+		Global.Crouch_Walk_Sound_Max = Array(5, 5, 5, 5, 5, 5, 5, 0, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+			0, 5, 5, 5, 5, 5, 5);
+	}
+}
+
+rule("Gamertags")
+{
+	event
+	{
+		Subroutine;
+		Gamertags;
+	}
+
+	actions
+	{
+		Global.Gamertags = Array(Custom String("Spiderman318"), Custom String("Spiderman423"), Custom String("Hollywoof423"),
+			Custom String("Hollywoof318"), Custom String("Sunpatches"), Custom String("Sunpatches77"), Custom String("Sk366in"),
+			Custom String("Breggers537"), Custom String("GenjiMain2019"), Custom String("BastionMain2021"), Custom String("MercyUWU794"),
+			Custom String("WorkshopGamer2022"), Custom String("Spiderman31807"), Custom String("Hollywoof31807"), Custom String(
+			"MineralMiner2681"), Custom String("CallMeDave2291"), Custom String("GenericDude4378"), Custom String("GirlyGamerXOXO91876"),
+			Custom String("ImBatman"), Custom String("Deadpool"), Custom String("Not_Ur_Friend6719"), Custom String("Comp4Life"),
+			Custom String("Overwatch2_When5456"), Custom String("Jakey_Bakey"), Custom String("The_BarStool45219"), Custom String(
+			"TeamFortressWatch"), Custom String("AI"), Custom String("Robot"), Custom String("Bot"), Custom String(
+			"Artificial Intelligence"), Custom String("Dummy2"), Custom String("Sussy_Baka"), Custom String("Patchie"), Custom String(
+			"OhhhWhoLivesUnderMyBed"), Custom String("Terminater"), Custom String("Prototype C"), Custom String("OilyWater"),
+			Custom String("BlueBlood"), Custom String("FallDude546"), Custom String("KillerMain2022"), Custom String(
+			"Toxic_Friendship_GoBye"), Custom String("Toxic_Waste_Disposal"), Custom String("Toxic_DumpSite"), Custom String(
+			"Xx_Mercy_xX"), Custom String("CallMeDaddy"), Custom String("CallMeMommy"), Custom String("CallMeSus"), Custom String(
+			"CallMe01100010"), Custom String("CallMeAt_18006745210"), Custom String("Stranger_Fans_4"), Custom String(
+			"Idk Im Writing 100 of these?!?!"), Custom String("Send Help Plz"), Custom String("ProNoob69"), Custom String("YuffyDuffy329"),
+			Custom String("Aimbot4You"), Custom String("HackerMan-801"), Custom String("Slenderdude"), Custom String("Iron_Catto"),
+			Custom String("AEG_Rain"), Custom String("Name.EXE"), Custom String("Error 404"), Custom String("Kill.EXE"), Custom String(
+			"EXE-Failed"), Custom String("WasteOfSpace"), Custom String("Tangey_Blue3191"), Custom String("DragonDogma"), Custom String(
+			"PlayStation5Boii"), Custom String("PS4_4_Life"), Custom String("Clash-Royal4319"), Custom String("Ark.Survival.Dino"),
+			Custom String("UnrealEngine5Pog"), Custom String("OW2_Beta_2026"), Custom String("LamarDavis6969"), Custom String(
+			"GamerTag.EXE"), Custom String("FunkeyMonk"), Custom String("CoCo"), Custom String("GabeRed"), Custom String("HelenPeg630"),
+			Custom String("Friendo3464"), Custom String("DoiKnowYou"), Custom String("SurvivorMain2018"), Custom String("Virgo-Cutie2964"),
+			Custom String("Minecrafter-54791"), Custom String("LetsHateThisGame"), Custom String("Humon Disguise"), Custom String(
+			"Disguised AI"), Custom String("UrMomGay666"), Custom String("DemonChild666"), Custom String("Angelic555Transcend"),
+			Custom String("Super.. Hot.."), Custom String("Well Done Gregory!"), Custom String("Meme5481"), Custom String(
+			"PleaseLaugh4700"), Custom String("Tini-TheCat"), Custom String("Kitto-Catto-5471"), Custom String("BoardHouse444"),
+			Custom String("IHaveNoFriends"), Custom String("Rick&Morty-S6?"), Custom String("ItsAFriday6682"), Custom String(
+			"Triple0-Double2-54"), Custom String("IronBaby420"), Custom String("SpiderBastion42307"), Custom String("X_Simp318"),
+			Custom String("YuffBoi2020"), Custom String("BatMan318"), Custom String("FreakVessel22"), Custom String("FunBastion8910"),
+			Custom String("ImFreaky2020"), Custom String("SpiderMuffy8910"), Custom String("NickBoi34768"), Custom String("TimeMan_XX"),
+			Custom String("IronBlue_XX"), Custom String("NickGamer37481"), Custom String("FunFace6969"), Custom String("Its_Bastion555"),
+			Custom String("TheMuffy_XX"), Custom String("TheVessel420"), Custom String("GoodMan001"), Custom String("TheDaddy37481"),
+			Custom String("FreakPatch9910"), Custom String("SunTimes423"), Custom String("X_Gamer42307"), Custom String("FreakMan31423"),
+			Custom String("FreakVessel005"), Custom String("TheFunny999"), Custom String("FunGamer1891"), Custom String("FunMercy0420"),
+			Custom String("GoodMercy666"), Custom String("IronFace37481"), Custom String("Virgo40420"), Custom String("GoodBastion92"),
+			Custom String("CallmeName9910"), Custom String("BatPatch.EXE"), Custom String("Error40442307"), Custom String(
+			"SpiderDaddy31807"), Custom String("GamerMan37481"), Custom String("ErrorBoi37481"), Custom String("GoodLúcio420"),
+			Custom String("AEG_Vessel423"), Custom String("GoodLuffy9910"), Custom String("GamerFreaky_XX"), Custom String("X_Mercy555"),
+			Custom String("Its_Baby999"), Custom String("IronFreaky420"), Custom String("TheLúcio69"), Custom String("SunPatch.EXE"),
+			Custom String("TimePlease6969"), Custom String("VirgoFreaky34768"), Custom String("CallmeMuffy31807"), Custom String(
+			"FiveSimp555"), Custom String("GamerBlue31423"), Custom String("BatDaddy005"), Custom String("ErrorVessel37481"),
+			Custom String("Its_Simp31423"), Custom String("CallmeBastion42307"), Custom String("GoodMercy318"), Custom String(
+			"JauneMuffy.EXE"), Custom String("XX_Tuffy420"), Custom String("ImBaby_X"), Custom String("ErrorBoi31807"), Custom String(
+			"X_Bastion22"), Custom String("DuffyUWU_X"), Custom String("ProUWU_XX"), Custom String("VirgoRain1891"), Custom String(
+			"InsymGamer555"), Custom String("GamerPatch555"), Custom String("Its_Funny_X"), Custom String("FiveLuffy.EXE"), Custom String(
+			"ImUWU2020"), Custom String("IronFunny720"), Custom String("ErrorMuffy420"), Custom String("FiveDaddy005"), Custom String(
+			"TimeMan555"), Custom String("Jaune4048910"), Custom String("VirgoLúcio87431"), Custom String("JauneFunny31807"),
+			Custom String("X_Man.EXE"), Custom String("X_Luffy_X"), Custom String("BuffyBoi42307"), Custom String("X_Muffy6969"),
+			Custom String("XX_Face_XX"), Custom String("IronGenji37481"), Custom String("NickSimp001"), Custom String("BatVessel22"),
+			Custom String("FreakName.EXE"), Custom String("NightBoi6969"), Custom String("XX_Bastion666"), Custom String("GoodLúcio42307"),
+			Custom String("NightMercy_XX"), Custom String("XX_Mommy22"), Custom String("NightBoi9910"), Custom String("InsymBoi0420"),
+			Custom String("GamerMuffy720"), Custom String("YuffTuffy555"), Custom String("YuffMommy92"), Custom String("SpiderSimp555"),
+			Custom String("TheSimp1891"), Custom String("FiveBaby999"), Custom String("VirgoPlease_XX"), Custom String("TimeBlue37481"),
+			Custom String("GoodGamer42307"), Custom String("IronMuffy420"), Custom String("GamerDaddy555"), Custom String("ImBastion720"),
+			Custom String("FunPatch666"), Custom String("CallmeBaby666"), Custom String("TimeMommy420"), Custom String("TimeMan420"),
+			Custom String("ProBaby1891"), Custom String("VirgoGenji22"), Custom String("X_Times1891"), Custom String("YuffSimp31423"),
+			Custom String("RedFace92"), Custom String("YuffBastion31807"), Custom String("VirgoUWU31807"), Custom String("SpiderMuffy78"),
+			Custom String("GamerName0420"), Custom String("IronFace92"), Custom String("GamerFreaky6969"), Custom String("NickMan999"),
+			Custom String("XX_Funny92"), Custom String("Sun404005"), Custom String("DuffyDaddy720"), Custom String("FiveBastion42307"),
+			Custom String("TimeBastion.EXE"), Custom String("NightBastion666"), Custom String("VirgoPlease42307"));
+	}
+}
+
+rule("Hero Set Variables")
+{
+	event
+	{
+		Subroutine;
+		Hero_Variables;
+	}
+
+	actions
+	{
+		Event Player.Can_Change_Arc = True;
+		Event Player.Current_Hero = Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player);
+		Event Player.Aim_Predict_Scale = Global.Aim_Predict_Scale[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Passive = Global.Passive[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Primary_Max = Global.Primary_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Primary_Min = Global.Primary_Min[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Secondary_Max = Global.Secondary_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Secondary_Min = Global.Secondary_Min[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Aim_Arc = Global.Primary_Arc[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ability1_Max = Global.Ability1_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Mobility_Distance = Global.Mobility_Distance[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Charging_Time = Global.Charge_Time[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ultimate_Duration = Global.Ultimate_Duration[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Use_Ultimate_Max = Global.Use_Ultimate_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ability1_Min = Global.Ability1_Min[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ability2_Max = Global.Ability2_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ultimate_Health = Global.Ultimate_Health[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ultimate_Targets = Global.Ultimate_Targets[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ability2_Min = Global.Ability2_Min[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ultimate_Target_Team = Global.Ultimate_Target_Team[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)
+			] == 0 ? Opposite Team Of(Team Of(Event Player)) : Team Of(Event Player);
+		Event Player.Ultimate_Max = Global.Ultimate_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ultimate_Min = Global.Ultimate_Min[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Alternative_Form = Empty Array;
+		Event Player.Offensive = Empty Array;
+		Event Player.Defensive = Empty Array;
+		Event Player.Mobility = Empty Array;
+		Event Player.Healing = Empty Array;
+		Event Player.Secondary_Fire = Empty Array;
+		Event Player.Secondary_Offensive = Empty Array;
+		Event Player.Use_If_Shield = Empty Array;
+		Event Player.Secondary_Defensive = Empty Array;
+		Event Player.Secondary_Healing = Empty Array;
+		Event Player.Hold = Empty Array;
+		Event Player.Confirm = Empty Array;
+		Event Player.Toggle = Empty Array;
+		Event Player.Cooldown = Empty Array;
+		Event Player.Charge = Empty Array;
+		Event Player.Resource = Empty Array;
+		Event Player.Charging = Empty Array;
+		Event Player.Heal_Friendlys = Empty Array;
+		If(Is True For Any(Array(Hero(Brigitte), Hero(Doomfist), Hero(Genji), Hero(Junkrat), Hero(Reinhardt), Hero(Roadhog), Hero(Bastion),
+			Hero(Hanzo), Hero(Winston), Hero(Junker Queen), Hero(Ramattra), Hero(Sombra)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Offensive, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Ana), Hero(Ashe), Hero(Mercy), Hero(Moira), Hero(Orisa), Hero(Reaper), Hero(Sigma), Hero(Zarya)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Defensive, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Cassidy), Hero(Echo), Hero(Soldier: 76), Hero(Tracer), Hero(Widowmaker), Hero(Winston), Hero(
+			Wrecking Ball), Hero(D.Va), Hero(Sojourn), Hero(Illari)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Mobility, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Ashe), Hero(Cassidy), Hero(D.Va), Hero(Doomfist), Hero(Echo), Hero(Junkrat), Hero(Moira), Hero(
+			Reinhardt), Hero(Sigma), Hero(Widowmaker), Hero(Hanzo), Hero(Zenyatta), Hero(Ana), Hero(Orisa), Hero(Junker Queen), Hero(
+			Ramattra), Hero(Sojourn)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Offensive, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Baptiste), Hero(Genji), Hero(Pharah), Hero(Winston), Hero(Wrecking Ball), Hero(Torbjörn), Hero(Mei),
+			Hero(Doomfist), Hero(Orisa)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Defensive, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Reaper), Hero(Lúcio), Hero(Sombra)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Mobility, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Baptiste), Hero(Mei)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Healing, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Ana), Hero(Roadhog), Hero(Soldier: 76), Hero(Tracer), Hero(Kiriko)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Healing, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Cassidy), Hero(Genji), Hero(Mei), Hero(Roadhog), Hero(Symmetra), Hero(Torbjörn), Hero(Zarya), Hero(
+			Zenyatta), Hero(Kiriko), Hero(Lifeweaver), Hero(Winston), Hero(Illari)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Secondary_Fire, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Doomfist), Hero(Echo), Hero(Junkrat), Hero(Lúcio), Hero(Soldier: 76), Hero(Sombra), Hero(Reinhardt),
+			Hero(Brigitte), Hero(Junker Queen), Hero(Bastion), Hero(Orisa), Hero(Sojourn)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Secondary_Offensive, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(D.Va), Hero(Sigma), Hero(Ramattra)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Secondary_Defensive, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Secondary_Healing, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Lúcio)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Confirm, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Bastion), Hero(Mei), Hero(Reaper), Hero(Wrecking Ball), Hero(Hanzo), Hero(Mercy), Hero(D.Va), Hero(
+			Soldier: 76), Hero(Ramattra), Hero(Orisa)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Toggle, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Mei), Hero(Reaper), Hero(Ashe)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Confirm, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Genji), Hero(Moira), Hero(Tracer), Hero(Widowmaker), Hero(Wrecking Ball), Hero(Hanzo), Hero(Mei),
+			Hero(Orisa)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Toggle, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Brigitte), Hero(D.Va), Hero(Doomfist), Hero(Reinhardt), Hero(Sombra), Hero(Symmetra), Hero(Zenyatta),
+			Hero(Lifeweaver), Hero(Winston), Hero(Illari)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Confirm, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Toggle, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Ultimate));
+		End;
+		If(Is True For Any(Array(Hero(Baptiste), Hero(Cassidy), Hero(Junkrat), Hero(Sigma), Hero(Symmetra), Hero(Lifeweaver), Hero(Orisa)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Confirm, Append To Array, Button(Ultimate));
+		End;
+		If(Is True For Any(Array(Hero(Ramattra)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Toggle, Append To Array, Button(Ultimate));
+		End;
+		If(Is True For All(Array(Hero(Bastion), Hero(Junkrat), Hero(Lúcio), Hero(Soldier: 76), Hero(Symmetra), Hero(Tracer), Hero(
+			Wrecking Ball), Hero(Zenyatta)), Event Player.Current_Hero != Current Array Element));
+			Modify Player Variable(Event Player, Cooldown, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For All(Array(Hero(Bastion), Hero(Brigitte), Hero(Zenyatta)), Event Player.Current_Hero != Current Array Element));
+			Modify Player Variable(Event Player, Cooldown, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Brigitte), Hero(Doomfist), Hero(Echo), Hero(Orisa), Hero(Reinhardt), Hero(Sigma), Hero(Soldier: 76),
+			Hero(Sombra), Hero(Bastion), Hero(Junker Queen)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Cooldown, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Junkrat), Hero(Symmetra), Hero(Tracer)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charge, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Brigitte)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charge, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charge, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Resource, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Resource, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(D.Va), Hero(Pharah), Hero(Illari)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Resource, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charging, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charging, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Doomfist), Hero(Sigma), Hero(Symmetra), Hero(Zenyatta), Hero(Winston)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charging, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Cassidy), Hero(Orisa)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charging, Append To Array, Button(Ultimate));
+		End;
+		If(Is True For Any(Array(Hero(Ashe), Hero(Hanzo), Hero(Illari)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charging, Append To Array, Button(Primary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Ana), Hero(Ashe), Hero(Baptiste), Hero(Bastion), Hero(Brigitte), Hero(Cassidy), Hero(D.Va), Hero(
+			Moira), Hero(Reinhardt), Hero(Soldier: 76), Hero(Sombra), Hero(Symmetra), Hero(Tracer), Hero(Widowmaker), Hero(Winston), Hero(
+			Wrecking Ball), Hero(Zarya), Hero(Hanzo), Hero(Junker Queen), Hero(Illari)),
+			Event Player.Current_Hero == Current Array Element));
+			Event Player.Aim_Predict = 0.050;
+		End;
+		If(Is True For Any(Array(Hero(Doomfist), Hero(Echo), Hero(Genji), Hero(Lúcio), Hero(Mei), Hero(Orisa), Hero(Sigma), Hero(Torbjörn),
+			Hero(Zenyatta), Hero(Mercy), Hero(Sojourn), Hero(Ramattra), Hero(Kiriko), Hero(Lifeweaver)),
+			Event Player.Current_Hero == Current Array Element));
+			Event Player.Aim_Predict = 0.225;
+		End;
+		If(Is True For Any(Array(Hero(Pharah), Hero(Junkrat)), Event Player.Current_Hero == Current Array Element));
+			Event Player.Aim_Predict = 0.400;
+		End;
+		If(Is True For Any(Array(Hero(Bastion), Hero(Lúcio), Hero(Wrecking Ball), Hero(Ramattra)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Alternative_Form, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Alternative_Form, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For All(Array(Hero(Ashe), Hero(Illari)), Event Player.Current_Hero != Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Primary Fire));
+		End;
+		If(Is True For Any(Array(Hero(D.Va)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Alternative_Form, Append To Array, Custom String("Passive"));
+		End;
+		If(Is True For All(Array(Hero(Ana), Hero(Brigitte), Hero(Hanzo), Hero(Junkrat), Hero(Roadhog)),
+			Event Player.Current_Hero != Current Array Element));
+			Modify Player Variable(Event Player, Use_If_Shield, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For All(Array(Hero(Ana), Hero(Ashe), Hero(Cassidy), Hero(Echo), Hero(Sigma), Hero(Zenyatta)),
+			Event Player.Current_Hero != Current Array Element));
+			Modify Player Variable(Event Player, Use_If_Shield, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For All(Array(Hero(Echo), Hero(Lúcio), Hero(Orisa), Hero(Soldier: 76), Hero(Sombra)),
+			Event Player.Current_Hero != Current Array Element));
+			Modify Player Variable(Event Player, Use_If_Shield, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Ana), Hero(Kiriko), Hero(Lifeweaver), Hero(Mercy), Hero(Moira)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Heal_Friendlys, Append To Array, Button(Primary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Baptiste), Hero(Illari)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Heal_Friendlys, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Baptiste), Hero(Kiriko)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Heal_Friendlys, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Ana), Hero(Baptiste), Hero(Brigitte), Hero(Kiriko), Hero(Lifeweaver), Hero(Lúcio), Hero(Moira)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Heal_Friendlys, Append To Array, Button(Ability 2));
+		End;
+	}
+}
+
+rule("Start AI Facing")
+{
+	event
+	{
+		Subroutine;
+		AI_Start_Facing;
+	}
+
+	actions
+	{
+		If(Global.AI_Aim_Type == 0);
+			Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) ? Direction Towards(Eye Position(Event Player),
+				Eye Position(First Of(Event Player.Target_Order))) : (Is In Line of Sight(Eye Position(Event Player),
+				Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? Direction Towards(Eye Position(Event Player),
+				Event Player.Walk_To_Position) : Direction From Angles(Horizontal Angle From Direction(Direction Towards(Eye Position(
+				Event Player), Event Player.Current_Node)), 0)), Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(
+				Event Player, Asleep), Has Status(Event Player, Frozen), Has Status(Event Player, Stunned)), Current Array Element == True)
+				? 0 : (Magnitude Of(Throttle Of(Event Player)) == 0 && !Entity Exists(First Of(Event Player.Target_Order))
+				? 0 : Global.AI_Turn_Speed), To World, Direction and Turn Rate);
+		Else If(Global.AI_Aim_Type == 1);
+			Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) ? Direction From Angles(
+				Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))
+				+ Velocity Of(First Of(Event Player.Target_Order)) * Event Player.Aim_Predict * (Distance Between(Event Player, First Of(
+				Event Player.Target_Order)) / Event Player.Aim_Predict_Scale))), Vertical Angle From Direction(Direction Towards(Eye Position(
+				Event Player), Eye Position(First Of(Event Player.Target_Order))))) : (Is In Line of Sight(Eye Position(Event Player),
+				Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? Direction Towards(Eye Position(Event Player),
+				Event Player.Walk_To_Position) : Direction From Angles(Horizontal Angle From Direction(Direction Towards(Eye Position(
+				Event Player), Event Player.Current_Node)), 0)), Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(
+				Event Player, Asleep), Has Status(Event Player, Frozen), Has Status(Event Player, Stunned)), Current Array Element == True)
+				? 0 : (Magnitude Of(Throttle Of(Event Player)) == 0 && !Entity Exists(First Of(Event Player.Target_Order))
+				? 0 : Global.AI_Turn_Speed), To World, Direction and Turn Rate);
+		Else If(Global.AI_Aim_Type == 2);
+			Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) ? Direction From Angles(
+				Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player), Eye Position(First Of(
+				Event Player.Target_Order)))), Vertical Angle From Direction(Direction Towards(Eye Position(Event Player),
+				Event Player.Aim_Arc > 0 ? First Of(Event Player.Target_Order) : Eye Position(First Of(Event Player.Target_Order))))
+				+ Distance Between(Event Player, First Of(Event Player.Target_Order)) * Event Player.Aim_Arc * -1) : (Is In Line of Sight(
+				Eye Position(Event Player), Event Player.Walk_To_Position, Barriers Do Not Block LOS) ? Direction Towards(Eye Position(
+				Event Player), Event Player.Walk_To_Position) : Direction From Angles(Horizontal Angle From Direction(Direction Towards(
+				Eye Position(Event Player), Event Player.Current_Node)), 0)), Is True For Any(Array(Has Status(Event Player, Knocked Down),
+				Has Status(Event Player, Asleep), Has Status(Event Player, Frozen), Has Status(Event Player, Stunned)),
+				Current Array Element == True) ? 0 : (Magnitude Of(Throttle Of(Event Player)) == 0 && !Entity Exists(First Of(
+				Event Player.Target_Order)) ? 0 : Global.AI_Turn_Speed), To World, Direction and Turn Rate);
+		Else;
+			Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) ? Direction From Angles(
+				Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))
+				+ Velocity Of(First Of(Event Player.Target_Order)) * Event Player.Aim_Predict * (Distance Between(Event Player, First Of(
+				Event Player.Target_Order)) / Event Player.Aim_Predict_Scale))), Vertical Angle From Direction(Direction Towards(Eye Position(
+				Event Player), Event Player.Aim_Arc > 0 ? First Of(Event Player.Target_Order) : Eye Position(First Of(
+				Event Player.Target_Order)))) + Distance Between(Event Player, First Of(Event Player.Target_Order))
+				* Event Player.Aim_Arc * -1) : (Is In Line of Sight(Eye Position(Event Player), Event Player.Walk_To_Position,
+				Barriers Do Not Block LOS) ? Direction Towards(Eye Position(Event Player), Event Player.Walk_To_Position)
+				: Direction From Angles(Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player),
+				Event Player.Current_Node)), 0)), Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(Event Player,
+				Asleep), Has Status(Event Player, Frozen), Has Status(Event Player, Stunned)), Current Array Element == True) ? 0 : (
+				Magnitude Of(Throttle Of(Event Player)) == 0 && !Entity Exists(First Of(Event Player.Target_Order))
+				? 0 : Global.AI_Turn_Speed), To World, Direction and Turn Rate);
+		End;
+	}
+}
+
+rule("AI Difficulty")
+{
+	event
+	{
+		Subroutine;
+		AI_Difficulty;
+	}
+
+	actions
+	{
+		If(Global.AI_Difficulty == 1);
+			Global.AI_Aim_Type = 0;
+			Global.AI_Turn_Speed = 100;
+			Global.Targeting_Type = 0;
+			Global.Use_Complex_Abilitys = False;
+			Global.Can_Hear = False;
+			Global.Team_Based_Targeting = True;
+			Global.Invisible_Targeting = 3;
+			Global.Ignore_Abilitys = True;
+		Else If(Global.AI_Difficulty == 2);
+			Global.AI_Aim_Type = 2;
+			Global.AI_Turn_Speed = 225;
+			Global.Targeting_Type = 1;
+			Global.Use_Complex_Abilitys = False;
+			Global.Can_Hear = False;
+			Global.Team_Based_Targeting = True;
+			Global.Invisible_Targeting = 1;
+			Global.Ignore_Abilitys = True;
+		Else If(Global.AI_Difficulty == 2);
+			Global.AI_Aim_Type = 3;
+			Global.AI_Turn_Speed = 320;
+			Global.Targeting_Type = 3;
+			Global.Use_Complex_Abilitys = True;
+			Global.Can_Hear = True;
+			Global.Team_Based_Targeting = True;
+			Global.Invisible_Targeting = 0;
+			Global.Ignore_Abilitys = False;
+		End;
+	}
+}
+
+rule("Nodes Setup")
+{
+	event
+	{
+		Subroutine;
+		Node_Setup;
+	}
+
+	actions
+	{
+		If(Current Map == Map(Hanaoka));
+			Call Subroutine(Hanaoka);
+		End;
+		For Global Variable(Jump_Index, 0, Count Of(Global.Jump_End), 1);
+			Create Projectile(Orb Projectile, Null, Global.Jump_End[Global.Jump_Index], Down, To World, Damage, All Teams, 0, 1, 8,
+				Bad Explosion, Explosion Sound, 0, 50, 1, 0, 0, 0);
+		End;
+	}
+}
+
+rule("Hanaoka")
+{
+	event
+	{
+		Subroutine;
+		Hanaoka;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(-5.049, 45.600, -134.002), Vector(4.531, 45.600, -133.932), Vector(4.605, 45.600, -129.534),
+			Vector(-5.241, 45.600, -129.587), Vector(-14.561, 45.600, -129.510), Vector(-14.370, 45.602, -133.916), Vector(-10.188, 45.600,
+			-125.230), Vector(0.315, 45.581, -125.014), Vector(12.118, 45.600, -127.888), Vector(15.194, 45.600, -126.126), Vector(13.976,
+			45.600, -120.026), Vector(-18.978, 45.600, -127.955), Vector(-25.603, 45.600, -125.695), Vector(-25.815, 45.581, -119.747),
+			Vector(-27.354, 43.559, -94.427), Vector(-22.009, 45.581, -115.952), Vector(-19.003, 45.583, -111.959), Vector(-4.772, 45.583,
+			-121.295), Vector(5.028, 45.583, -118.492), Vector(-0.428, 45.583, -111.366), Vector(-10.240, 45.583, -111.780), Vector(
+			-14.952, 45.583, -119.240), Vector(-22.309, 45.550, -83.131), Vector(-24.092, 45.644, -79.979), Vector(-28.653, 45.202,
+			-71.225), Vector(-27.317, 44.559, -65.263), Vector(-22.772, 41.586, -84.146), Vector(-18.403, 41.558, -87.561), Vector(-18.062,
+			41.556, -80.754), Vector(0.782, 41.551, -74.043), Vector(4.773, 42.530, -69.551), Vector(9.239, 42.534, -73.513), Vector(
+			-2.838, 44.534, -52.397), Vector(-7.499, 44.546, -52.167), Vector(-6.654, 44.529, -58.099), Vector(-2.667, 44.529, -57.811),
+			Vector(-5.073, 41.550, -73.555), Vector(9.603, 41.557, -80.276), Vector(10.732, 41.557, -83.999), Vector(15.604, 42.549,
+			-83.990), Vector(13.344, 42.549, -76.480), Vector(19.592, 42.550, -69.891), Vector(12.006, 42.550, -61.619), Vector(12.575,
+			41.570, -55.765), Vector(10.033, 41.491, -89.734), Vector(16.694, 42.549, -90.211), Vector(16.067, 41.559, -95.976), Vector(
+			9.777, 41.558, -96.126), Vector(14.735, 41.563, -104.339), Vector(5.211, 41.559, -103.936), Vector(-17.772, 41.559, -97.257),
+			Vector(-17.134, 41.559, -105.600), Vector(0.114, 39.921, -54.777), Vector(-19.068, 41.570, -46.163), Vector(-14.266, 41.570,
+			-46.712), Vector(12.928, 41.557, -49.259), Vector(10.477, 41.675, -38.044), Vector(16.821, 41.677, -38.103), Vector(13.091,
+			41.569, -30.726), Vector(-2.370, 42.467, -16.190), Vector(6.506, 42.088, -24.653), Vector(-9.087, 42.088, -21.526), Vector(
+			-9.514, 41.569, -30.063), Vector(2.042, 41.529, -30.820), Vector(-19.913, 41.550, -30.903), Vector(-19.257, 42.050, -19.764),
+			Vector(-22.972, 41.810, -27.664), Vector(-27.743, 42.050, -20.214), Vector(-27.473, 42.612, -15.096), Vector(-19.435, 42.712,
+			-14.896), Vector(-24.055, 43.050, -10.112), Vector(-16.925, 43.146, -11.575), Vector(-23.991, 43.130, 0.005), Vector(-17.949,
+			43.125, -0.053), Vector(-9.209, 43.050, -10.725), Vector(18.668, 44.050, -17.468), Vector(23.078, 44.050, -20.974), Vector(
+			26.401, 44.089, -16.934), Vector(22.448, 44.089, -13.752), Vector(18.823, 46.050, 1.467), Vector(27.220, 46.050, 7.047),
+			Vector(12.606, 46.050, 2.181), Vector(6.460, 46.051, 6.956), Vector(10.058, 46.113, 6.926), Vector(9.380, 46.050, 0.040),
+			Vector(9.682, 46.050, 13.853), Vector(12.387, 46.050, 11.825), Vector(15.907, 46.050, 6.779), Vector(18.036, 46.069, 12.689),
+			Vector(24.255, 46.050, 3.620), Vector(23.839, 46.050, 10.559), Vector(20.012, 41.050, 6.901), Vector(12.194, 41.050, 6.951),
+			Vector(9.453, 41.050, 12.228), Vector(9.396, 41.050, 2.149), Vector(-10.435, 43.050, 2.756), Vector(-18.646, 43.050, 7.062),
+			Vector(-10.132, 43.050, 10.837), Vector(-8.180, 43.548, 9.224), Vector(-7.888, 43.714, 4.563), Vector(-2.963, 44.060, 4.852),
+			Vector(-3.077, 44.060, 9.438), Vector(-17.987, 43.130, 14.021), Vector(-23.782, 43.130, 14.084), Vector(-17.303, 43.050,
+			25.693), Vector(-9.789, 43.050, 24.632), Vector(-27.517, 42.050, 34.466), Vector(-19.219, 42.050, 34.186), Vector(-19.340,
+			42.355, 29.474), Vector(-27.742, 42.451, 29.280), Vector(-23.964, 43.079, 23.129), Vector(-2.195, 42.323, 30.483), Vector(
+			1.893, 43.096, 25.388), Vector(2.608, 42.925, -11.730), Vector(18.931, 44.050, 31.725), Vector(22.617, 44.050, 35.590), Vector(
+			26.090, 44.087, 31.173), Vector(22.403, 44.087, 27.850), Vector(-25.742, 44.564, 77.625), Vector(-28.777, 45.083, 84.927),
+			Vector(-24.076, 45.573, 91.461), Vector(-21.958, 45.547, 97.199), Vector(4.949, 45.558, 132.839), Vector(0.813, 45.558,
+			125.596), Vector(-5.316, 45.545, 149.128), Vector(4.271, 45.540, 148.505), Vector(4.453, 45.545, 142.351), Vector(15.087,
+			45.545, 141.861), Vector(15.456, 45.545, 134.053), Vector(-5.481, 45.545, 142.173), Vector(-14.584, 45.540, 148.500), Vector(
+			-13.977, 45.545, 142.039), Vector(-25.681, 45.545, 141.766), Vector(10.505, 45.558, 133.826), Vector(0.080, 45.616, 139.035),
+			Vector(-10.021, 45.619, 138.995), Vector(-25.677, 45.558, 131.564), Vector(-19.186, 45.558, 125.503), Vector(-14.047, 45.558,
+			132.561), Vector(-5.084, 45.558, 134.728), Vector(-10.095, 45.701, 125.851), Vector(-19.635, 45.558, 131.048), Vector(-17.566,
+			41.559, 118.518), Vector(5.111, 41.560, 117.920), Vector(14.986, 41.563, 116.419), Vector(16.245, 41.559, 109.099), Vector(
+			16.440, 42.549, 103.934), Vector(10.200, 41.520, 104.203), Vector(10.095, 41.559, 109.335), Vector(10.337, 41.553, 98.123),
+			Vector(16.056, 42.549, 97.916), Vector(13.215, 42.549, 90.730), Vector(9.146, 41.557, 94.677), Vector(5.041, 41.553, 90.674),
+			Vector(9.077, 42.530, 86.481), Vector(5.619, 42.532, 83.328), Vector(0.331, 41.550, 86.515), Vector(-2.802, 44.527, 72.480),
+			Vector(-2.717, 44.534, 66.069), Vector(-7.373, 44.546, 65.955), Vector(-7.340, 44.529, 71.938), Vector(-10.707, 41.550,
+			87.077), Vector(-15.014, 41.552, 92.298), Vector(-19.363, 41.556, 97.862), Vector(-27.904, 43.557, 109.533), Vector(20.009,
+			42.550, 83.808), Vector(11.643, 42.550, 76.506), Vector(12.265, 41.569, 70.041), Vector(-14.994, 41.569, 60.900), Vector(
+			-18.799, 41.571, 59.713), Vector(4.390, 41.555, -78.515), Vector(-15.290, 41.553, -78.311));
+		Global.Healthkits = Array(Vector(-31.014, 44.559, -65.712), Vector(18.008, 41.571, -49.003), Vector(17.871, 42.549, -84.011),
+			Vector(-4.953, 41.551, -75.798), Vector(-24.932, 41.546, -37.488), Vector(-23.023, 42.050, -21.030), Vector(15.022, 42.030,
+			-22.443), Vector(29.609, 46.050, 6.949), Vector(23.428, 41.050, 6.978), Vector(-22.984, 42.050, 35.248), Vector(14.846, 42.032,
+			36.837), Vector(-24.996, 41.544, 50.507), Vector(-31.023, 44.559, 79.502), Vector(-4.973, 41.551, 89.467), Vector(17.779,
+			42.549, 97.714), Vector(17.984, 41.571, 63.011));
+		Global.ObjectiveA_Nodes = Array(Vector(0.154, 39.735, -52.508), Vector(-2.488, 39.735, -52.587), Vector(-5.177, 39.679, -52.041),
+			Vector(-10.102, 39.732, -52.161), Vector(-10.210, 39.714, -49.710), Vector(-5.106, 39.678, -49.512), Vector(-2.467, 39.766,
+			-49.452), Vector(0.050, 39.734, -49.372), Vector(-0.082, 39.734, -45.814), Vector(-2.364, 39.678, -45.891), Vector(-5.355,
+			39.664, -45.933), Vector(-10.374, 39.715, -46.030), Vector(-10.424, 39.717, -43.104), Vector(-7.707, 39.736, -52.190), Vector(
+			-7.757, 39.767, -49.358), Vector(-7.871, 39.767, -45.743), Vector(-7.805, 39.683, -43.195), Vector(-5.197, 39.766, -43.143),
+			Vector(-2.590, 39.721, -43.083), Vector(0.050, 39.733, -43.023), Vector(8.586, 41.050, 16.094), Vector(5.502, 41.050, 16.022),
+			Vector(5.567, 41.050, 13.031), Vector(5.599, 41.050, 10.128), Vector(5.632, 41.050, 7.049), Vector(5.665, 41.050, 3.970),
+			Vector(5.696, 41.050, 1.066), Vector(5.729, 41.050, -2.013), Vector(8.633, 41.050, -1.981), Vector(3.176, 41.050, -2.048),
+			Vector(3.142, 41.050, 1.119), Vector(3.108, 41.050, 4.107), Vector(3.077, 41.050, 7.011), Vector(3.043, 41.050, 10.178),
+			Vector(3.012, 41.050, 13.081), Vector(2.981, 41.050, 15.896), Vector(0.056, 41.050, 15.861), Vector(0.085, 41.050, 13.225),
+			Vector(0.124, 41.050, 9.674), Vector(0.152, 41.050, 7.125), Vector(0.152, 41.050, 3.958), Vector(0.166, 41.050, 0.703), Vector(
+			0.201, 41.050, -2.376), Vector(6.519, 41.384, 114.889), Vector(6.654, 41.381, 111.458), Vector(6.646, 41.384, 108.467), Vector(
+			6.707, 41.384, 106.267), Vector(4.577, 41.384, 106.203), Vector(1.572, 41.384, 106.368), Vector(-1.552, 41.384, 106.465),
+			Vector(-4.469, 41.384, 106.508), Vector(-7.394, 41.384, 106.768), Vector(-9.954, 41.384, 107.021), Vector(-12.729, 41.384,
+			106.843), Vector(-15.640, 41.384, 106.815), Vector(4.710, 41.380, 108.573), Vector(4.551, 41.369, 111.389), Vector(4.521,
+			41.380, 114.734), Vector(1.912, 41.378, 114.798), Vector(1.839, 41.362, 111.455), Vector(1.802, 41.374, 108.288), Vector(
+			-1.139, 41.369, 108.583), Vector(-1.134, 41.363, 111.574), Vector(-1.099, 41.372, 114.653), Vector(-4.024, 41.370, 114.690),
+			Vector(-3.652, 41.363, 111.859), Vector(-3.432, 41.369, 108.334), Vector(-6.595, 41.378, 108.374), Vector(-6.662, 41.360,
+			111.365), Vector(-6.729, 41.364, 114.353), Vector(-9.893, 41.372, 114.276), Vector(-9.822, 41.358, 111.021), Vector(-9.798,
+			41.374, 108.382), Vector(-12.724, 41.376, 108.382), Vector(-12.773, 41.364, 111.285), Vector(-12.773, 41.381, 114.364), Vector(
+			-15.222, 41.384, 114.230), Vector(-15.258, 41.380, 111.063), Vector(-15.317, 41.384, 108.160), Vector(-15.093, 41.385,
+			-93.621), Vector(-15.061, 41.381, -96.437), Vector(-14.960, 41.381, -98.988), Vector(-14.883, 41.383, -101.276), Vector(
+			-12.194, 41.383, -101.230), Vector(-12.225, 41.367, -98.591), Vector(-12.252, 41.362, -96.215), Vector(-12.283, 41.382,
+			-93.487), Vector(-9.041, 41.382, -93.447), Vector(-9.012, 41.363, -96.175), Vector(-8.987, 41.360, -98.551), Vector(-8.963,
+			41.376, -101.105), Vector(-6.354, 41.374, -101.075), Vector(-6.383, 41.362, -98.438), Vector(-6.510, 41.366, -96.356), Vector(
+			-6.541, 41.383, -93.365), Vector(-3.773, 41.383, -93.333), Vector(-3.698, 41.362, -96.104), Vector(-3.324, 41.363, -98.396),
+			Vector(-3.324, 41.374, -101.124), Vector(-0.557, 41.374, -101.124), Vector(-0.557, 41.362, -98.221), Vector(-0.557, 41.363,
+			-95.581), Vector(-0.557, 41.385, -93.208), Vector(1.815, 41.385, -93.208), Vector(1.815, 41.368, -96.022), Vector(1.815,
+			41.363, -98.454), Vector(1.815, 41.378, -100.974), Vector(4.425, 41.382, -100.974), Vector(4.425, 41.362, -98.510), Vector(
+			4.425, 41.373, -95.870), Vector(4.429, 41.385, -92.964), Vector(6.662, 41.386, -93.099), Vector(6.274, 41.384, -96.234),
+			Vector(6.309, 41.371, -98.421), Vector(6.309, 41.386, -101.148), Vector(-1.184, 39.604, 67.645), Vector(1.104, 39.604, 67.668),
+			Vector(1.050, 39.604, 65.217), Vector(-1.147, 39.604, 65.266), Vector(-3.872, 39.604, 65.302), Vector(-6.424, 39.604, 65.302),
+			Vector(-8.188, 39.604, 65.141), Vector(-10.915, 39.604, 65.200), Vector(-10.756, 39.604, 67.558), Vector(-8.295, 39.604,
+			67.728), Vector(1.074, 39.604, 62.528), Vector(-1.091, 39.604, 62.523), Vector(-3.818, 39.604, 62.521), Vector(-6.549, 39.604,
+			62.489), Vector(-8.817, 39.693, 62.463), Vector(-11.093, 39.604, 62.437), Vector(-11.055, 39.604, 59.353), Vector(-8.500,
+			39.604, 59.383), Vector(-6.212, 39.604, 59.409), Vector(-3.748, 39.604, 59.438), Vector(-1.231, 39.604, 59.466), Vector(1.229,
+			39.604, 59.466), Vector(1.229, 39.604, 56.541), Vector(-1.410, 39.604, 56.541), Vector(-3.786, 39.604, 56.541), Vector(-6.602,
+			39.604, 56.541), Vector(-9.153, 39.604, 56.541), Vector(-11.441, 39.604, 56.541));
+		Global.ObjectiveB_Nodes = Array();
+		Global.Chokepoint = Array();
+		Global.Staircase_Top = Array(Vector(10.326, 45.581, -116.489), Vector(-29.789, 45.581, -114.196), Vector(-28.180, 43.413, -99.507),
+			Vector(-30.023, 43.557, -91.207), Vector(-24.499, 45.550, -86.134), Vector(-9.897, 42.612, -108.066), Vector(-5.054, 45.581,
+			-116.851), Vector(-0.077, 42.612, -108.187), Vector(-8.605, 41.552, -67.429), Vector(-10.678, 44.525, -60.708), Vector(-21.132,
+			44.566, -61.552), Vector(-1.131, 41.552, -67.544), Vector(0.818, 44.525, -60.872), Vector(-23.824, 44.595, -50.932), Vector(
+			-19.061, 41.569, -43.081), Vector(-9.847, 41.569, -34.155), Vector(-0.098, 41.569, -34.091), Vector(8.092, 41.569, -45.622),
+			Vector(8.518, 41.569, -52.262), Vector(-14.819, 41.571, -55.220), Vector(14.123, 44.050, -15.508), Vector(5.328, 43.050,
+			-8.313), Vector(14.818, 46.050, -3.268), Vector(-7.847, 43.050, -2.153), Vector(-8.035, 43.050, 16.089), Vector(26.931, 44.080,
+			-8.963), Vector(22.027, 46.050, -3.015), Vector(14.965, 46.050, 17.280), Vector(21.928, 46.050, 16.802), Vector(27.468, 44.083,
+			22.729), Vector(5.386, 43.050, 22.920), Vector(13.961, 44.050, 29.999), Vector(-0.886, 41.550, 81.830), Vector(-8.969, 41.550,
+			81.466), Vector(-11.047, 44.525, 75.315), Vector(-21.168, 44.566, 75.813), Vector(-24.829, 45.550, 100.005), Vector(-27.753,
+			43.414, 113.614), Vector(-29.791, 45.558, 127.913), Vector(-5.131, 45.556, 130.697), Vector(-0.913, 42.612, 122.559), Vector(
+			-9.357, 42.612, 122.268), Vector(10.413, 45.558, 131.434), Vector(0.823, 44.525, 75.132), Vector(-29.908, 43.557, 105.362),
+			Vector(-24.116, 44.597, 64.532), Vector(-18.834, 41.569, 57.167), Vector(-9.905, 41.569, 47.921), Vector(-0.133, 41.569,
+			48.301), Vector(8.215, 41.569, 59.563), Vector(8.045, 41.569, 66.249), Vector(-15.260, 41.569, 68.956));
+		Global.Staircase_Bottom = Array(Vector(10.514, 41.561, -108.639), Vector(-22.793, 41.559, -106.376), Vector(-22.784, 41.559,
+			-99.365), Vector(-30.076, 41.550, -85.667), Vector(-24.590, 43.668, -91.017), Vector(-13.434, 41.559, -108.087), Vector(-5.121,
+			41.559, -103.503), Vector(3.361, 41.558, -108.391), Vector(-6.199, 39.895, -62.332), Vector(-12.182, 41.550, -68.842), Vector(
+			-14.029, 41.550, -70.899), Vector(-3.167, 39.893, -62.654), Vector(4.900, 42.550, -65.169), Vector(-23.984, 41.638, -44.141),
+			Vector(-13.705, 39.697, -43.294), Vector(-9.814, 39.697, -39.205), Vector(-0.063, 39.697, -39.237), Vector(2.923, 39.697,
+			-45.384), Vector(2.850, 39.697, -52.293), Vector(-10.348, 39.893, -55.514), Vector(10.014, 42.088, -19.524), Vector(5.173,
+			41.050, -3.353), Vector(10.600, 43.081, -10.501), Vector(-2.803, 41.085, -2.144), Vector(-2.676, 41.085, 16.037), Vector(
+			23.088, 41.156, -1.607), Vector(21.925, 44.089, -8.781), Vector(10.672, 43.082, 24.538), Vector(21.940, 44.087, 22.022),
+			Vector(22.669, 41.085, 15.469), Vector(5.241, 41.170, 18.075), Vector(10.588, 42.088, 33.438), Vector(-3.149, 39.893, 76.979),
+			Vector(-6.514, 39.893, 76.647), Vector(-12.756, 41.550, 82.719), Vector(-14.269, 41.550, 84.750), Vector(-24.650, 43.582,
+			105.200), Vector(-22.824, 41.559, 113.421), Vector(-22.663, 41.559, 120.508), Vector(-4.998, 41.559, 117.546), Vector(2.977,
+			41.558, 122.534), Vector(-13.067, 41.559, 122.359), Vector(10.329, 41.561, 122.407), Vector(4.655, 42.550, 78.954), Vector(
+			-29.989, 41.550, 98.532), Vector(-24.105, 41.569, 57.186), Vector(-13.419, 39.604, 57.232), Vector(-9.837, 39.604, 53.856),
+			Vector(-0.171, 39.604, 53.413), Vector(2.720, 39.604, 59.669), Vector(2.395, 39.604, 66.327), Vector(-10.228, 39.893, 69.756));
+		Global.Healthkits_Small = Array(Vector(-31.014, 44.559, -65.712), Vector(18.008, 41.571, -49.003), Vector(17.871, 42.549, -84.011),
+			Vector(-4.953, 41.551, -75.798), Vector(-24.932, 41.546, -37.488), Vector(-23.023, 42.050, -21.030), Vector(15.022, 42.030,
+			-22.443), Vector(23.428, 41.050, 6.978), Vector(-22.984, 42.050, 35.248), Vector(14.846, 42.032, 36.837), Vector(-24.996,
+			41.544, 50.507), Vector(-31.023, 44.559, 79.502), Vector(-4.973, 41.551, 89.467), Vector(17.779, 42.549, 97.714), Vector(
+			17.984, 41.571, 63.011));
+		Global.Healthkits_Large = Array(Vector(29.609, 46.050, 6.949));
+		Global.Staircase_Middle = Array(0, Vector(-29.750, 43.413, -107.197), 0, 0, 0, 0, Vector(-5.079, 42.612, -108.270), 0, 0, Vector(
+			-15.619, 42.541, -65.286), Vector(-17.237, 42.571, -67.215), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Vector(14.853, 45.050, -6.782),
+			0, 0, Vector(27.724, 42.050, -2.704), 0, Vector(14.960, 45.050, 20.707), 0, Vector(27.097, 42.050, 15.902), 0, 0, 0, 0, Vector(
+			-15.468, 42.546, 79.908), Vector(-17.271, 42.569, 81.530), 0, 0, Vector(-28.990, 43.413, 120.918), Vector(-5.080, 42.612,
+			122.454), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		Global.Jump_Start = Array();
+		Global.Jump_End = Array();
+	}
+}
+
+disabled rule("----------------------------------- Subroutine ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- Track Sombra Stealth ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Setup Sombra")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+	}
+
+	actions
+	{
+		Event Player.Invisible_Cooldown = 1.500;
+		Event Player.In_Combat_Array = Empty Array;
+		Event Player.Is_Visible_Array = Empty Array;
+		Chase Player Variable At Rate(Event Player, Invisible_Cooldown, 0, Event Player.In_Combat_Array == Empty Array ? 1 : 0,
+			Destination and Rate);
+	}
+}
+
+rule("Reset In Combat - Objective")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		(Is Team On Defense(Team Of(Event Player)) ? Is On Objective(Event Player) && Is True For Any(All Living Players(Opposite Team Of(
+			Team Of(Event Player))), Is On Objective(Current Array Element)) : Is On Objective(Event Player)) == True;
+	}
+
+	actions
+	{
+		Skip If(Array Contains(Event Player.In_Combat_Array, Custom String("On Objective")), 1);
+		Modify Player Variable(Event Player, In_Combat_Array, Append To Array, Custom String("On Objective"));
+		Wait Until((Is Team On Defense(Team Of(Event Player)) ? Is On Objective(Event Player) && Is True For Any(All Living Players(
+			Opposite Team Of(Team Of(Event Player))), Is On Objective(Current Array Element)) : Is On Objective(Event Player)) != True,
+			99999);
+		Wait(2, Restart When True);
+		Modify Player Variable(Event Player, In_Combat_Array, Remove From Array By Value, Custom String("On Objective"));
+	}
+}
+
+rule("Reset In Combat - Taken Damage")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+	}
+
+	actions
+	{
+		Event Player.Invisible_Cooldown = 1.500;
+		Modify Player Variable(Event Player, In_Combat_Array, Append To Array, Custom String("Took Damage"));
+		Wait(2, Restart When True);
+		Modify Player Variable(Event Player, In_Combat_Array, Remove From Array By Value, Custom String("Took Damage"));
+	}
+}
+
+rule("Reset In Combat - Firing Primary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		Is Firing Primary(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Invisible_Cooldown = 1.500;
+		Skip If(Array Contains(Event Player.In_Combat_Array, Custom String("Firing Primary")), 1);
+		Modify Player Variable(Event Player, In_Combat_Array, Append To Array, Custom String("Firing Primary"));
+		Wait Until(!Is Firing Primary(Event Player), 99999);
+		Wait(2, Restart When True);
+		Modify Player Variable(Event Player, In_Combat_Array, Remove From Array By Value, Custom String("Firing Primary"));
+	}
+}
+
+rule("Reset In Combat - EMP")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Invisible_Cooldown = 1.500;
+		Skip If(Array Contains(Event Player.In_Combat_Array, Custom String("Used EMP")), 1);
+		Modify Player Variable(Event Player, In_Combat_Array, Append To Array, Custom String("Used EMP"));
+		Wait(2, Ignore Condition);
+		Modify Player Variable(Event Player, In_Combat_Array, Remove From Array By Value, Custom String("Used EMP"));
+	}
+}
+
+rule("Reset In Combat - Quick Melee")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		Is Meleeing(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Invisible_Cooldown = 1.500;
+		Skip If(Array Contains(Event Player.In_Combat_Array, Custom String("Quick Melee")), 1);
+		Modify Player Variable(Event Player, In_Combat_Array, Append To Array, Custom String("Quick Melee"));
+		Wait Until(!Is Meleeing(Event Player), 99999);
+		Wait(2, Restart When True);
+		Modify Player Variable(Event Player, In_Combat_Array, Remove From Array By Value, Custom String("Quick Melee"));
+	}
+}
+
+rule("Reset In Combat - Virus")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Invisible_Cooldown = 1.500;
+		Skip If(Array Contains(Event Player.In_Combat_Array, Custom String("Used Virus")), 1);
+		Modify Player Variable(Event Player, In_Combat_Array, Append To Array, Custom String("Used Virus"));
+		Wait Until(!Is Using Ability 1(Event Player), 99999);
+		Wait(2, Restart When True);
+		Modify Player Variable(Event Player, In_Combat_Array, Remove From Array By Value, Custom String("Used Virus"));
+	}
+}
+
+rule("Reset In Combat - Hacking Player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		Event Player.Invisible_Cooldown == 0;
+		(Is Firing Secondary(Event Player) && Is True For Any(Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))),
+			!Has Status(Current Array Element, Hacked)), Distance Between(Event Player, Current Array Element)
+			<= 15 && Is In Line of Sight(Eye Position(Event Player), Current Array Element, Barriers Do Not Block LOS) && Is In View Angle(
+			Event Player, Current Array Element, 40))) == True;
+	}
+
+	actions
+	{
+		Event Player.Invisible_Cooldown = 1.500;
+		Skip If(Array Contains(Event Player.In_Combat_Array, Custom String("Hacking Player")), 1);
+		Modify Player Variable(Event Player, In_Combat_Array, Append To Array, Custom String("Hacking Player"));
+		Wait Until((Is Firing Secondary(Event Player) && Is True For Any(Filtered Array(All Living Players(Opposite Team Of(Team Of(
+			Event Player))), !Has Status(Current Array Element, Hacked)), Distance Between(Event Player, Current Array Element)
+			<= 15 && Is In Line of Sight(Eye Position(Event Player), Current Array Element, Barriers Do Not Block LOS) && Is In View Angle(
+			Event Player, Current Array Element, 40))) != True, 99999);
+		Wait(2, Restart When True);
+		Modify Player Variable(Event Player, In_Combat_Array, Remove From Array By Value, Custom String("Hacking Player"));
+	}
+}
+
+rule("Is Visible - Hacking Medkit")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		Event Player.Invisible_Cooldown == 0;
+		(Is Firing Secondary(Event Player) && Is True For Any(Global.Healthkits, Distance Between(Event Player, Current Array Element)
+			<= 15 && Is In Line of Sight(Eye Position(Event Player), Current Array Element, Barriers Do Not Block LOS) && Is In View Angle(
+			Event Player, Current Array Element - Vector(0, 1.550, 0), 40))) == True;
+	}
+
+	actions
+	{
+		Skip If(Array Contains(Event Player.Is_Visible_Array, Custom String("Hacking Medkit")), 1);
+		Modify Player Variable(Event Player, Is_Visible_Array, Append To Array, Custom String("Hacking Medkit"));
+		Wait Until((Is Firing Secondary(Event Player) && Is True For Any(Global.Healthkits, Distance Between(Event Player,
+			Current Array Element) <= 15 && Is In Line of Sight(Eye Position(Event Player), Current Array Element,
+			Barriers Do Not Block LOS) && Is In View Angle(Event Player, Current Array Element - Vector(0, 1.550, 0), 40))) != True,
+			99999);
+		Modify Player Variable(Event Player, Is_Visible_Array, Remove From Array By Value, Custom String("Hacking Medkit"));
+	}
+}
+
+rule("Is Visible - Infra-Sight")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		Event Player.Invisible_Cooldown == 0;
+		Is True For Any(Players On Hero(Hero(Widowmaker), Opposite Team Of(Team Of(Event Player))), Is Using Ultimate(
+			Current Array Element)) == True;
+	}
+
+	actions
+	{
+		Skip If(Array Contains(Event Player.Is_Visible_Array, Custom String("Infra-Sight")), 1);
+		Modify Player Variable(Event Player, Is_Visible_Array, Append To Array, Custom String("Infra-Sight"));
+		Wait Until(!Is True For Any(Players On Hero(Hero(Widowmaker), Opposite Team Of(Team Of(Event Player))), Is Using Ultimate(
+			Current Array Element)), 99999);
+		Modify Player Variable(Event Player, Is_Visible_Array, Remove From Array By Value, Custom String("Infra-Sight"));
+	}
+}
+
+rule("Not In Combat - Translocator")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		Is Using Ability 2(Event Player) == True;
+		Event Player.Invisible_Cooldown != 0;
+	}
+
+	actions
+	{
+		Wait Until(!Is Using Ability 2(Event Player), 0.250);
+		Event Player.In_Combat_Array = Empty Array;
+		Event Player.Invisible_Cooldown -= Min(Event Player.Invisible_Cooldown, 0.500);
+	}
+}
+
+rule("Exit Invisiblity - Primary, Virus, Quick Melee")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		Event Player.Invisible_Cooldown == 0;
+		Is True For Any(Array(Button(Primary Fire), Button(Ability 1), Button(Melee)), Is Button Held(Event Player, Current Array Element))
+			== True;
+	}
+
+	actions
+	{
+		Event Player.Invisible_Cooldown = 1.500;
+		Skip If(Array Contains(Event Player.In_Combat_Array, Custom String("Button Press - Exit")), 1);
+		Modify Player Variable(Event Player, In_Combat_Array, Append To Array, Custom String("Button Press - Exit"));
+		Wait(2, Ignore Condition);
+		Modify Player Variable(Event Player, In_Combat_Array, Remove From Array By Value, Custom String("Button Press - Exit"));
+	}
+}
+
+rule("Exit Invisiblity - EMP")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Sombra) || Hero Of(Event Player) == Hero(Sombra)) == True;
+		Event Player.Invisible_Cooldown == 0;
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+	}
+
+	actions
+	{
+		Event Player.Invisible_Cooldown = 1.500;
+		Skip If(Array Contains(Event Player.In_Combat_Array, Custom String("EMP Press - Exit")), 1);
+		Modify Player Variable(Event Player, In_Combat_Array, Append To Array, Custom String("EMP Press - Exit"));
+		Wait(2, Ignore Condition);
+		Modify Player Variable(Event Player, In_Combat_Array, Remove From Array By Value, Custom String("EMP Press - Exit"));
+	}
+}
+
+disabled rule("----------------------------------- Track Sombra Stealth ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
