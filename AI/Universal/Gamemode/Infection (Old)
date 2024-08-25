@@ -1,0 +1,3094 @@
+settings
+{
+	main
+	{
+		Description: "Infection But With AI - Y108E\nMade By Spiderman318\n\nIf The Score Is Tied The KD (Kill, Death Ratio)\nIs Used To Determine The Winner"
+		Mode Name: "Infection AI"
+	}
+
+	lobby
+	{
+		Max FFA Players: 10
+	}
+
+	modes
+	{
+		disabled Capture the Flag
+		{
+			Flag Dropped Lock Time: 5.0
+			Flag Return Time: 4.0
+			Flag Score Respawn Time: 15.0
+		}
+
+		Deathmatch
+		{
+			Game Mode Start: Immediately
+			Limit Roles: 2 Of Each Role Per Team
+			Score To Win: 5000
+			Spawn Health Packs: Disabled
+
+			enabled maps
+			{
+				Black Forest 972777519512063901
+				Black Forest Winter 972777519512063901
+				Castillo 972777519512063901
+				Château Guillard 972777519512063901
+				Château Guillard Halloween 972777519512063901
+				Ecopoint: Antarctica Winter 972777519512063901
+				Kanezaka 972777519512063901
+				Malevento 972777519512063901
+			}
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Ultimate Generation: 10%
+			Ultimate Generation - Combat: 0%
+			Ultimate Generation - Passive: 0%
+
+			D.Va
+			{
+				Defense Matrix: Off
+			}
+
+			Lifeweaver
+			{
+				Weapons Enabled: Thorn Volley Only
+			}
+
+			Mercy
+			{
+				Weapons Enabled: Caduceus Blaster Only
+			}
+
+			Symmetra
+			{
+				Sentry Turret: Off
+			}
+
+			Torbjörn
+			{
+				Deploy Turret: Off
+			}
+
+			disabled heroes
+			{
+				Illari
+			}
+		}
+	}
+
+	workshop
+	{
+		Amount: 8
+		Difficulty: [2]
+		Disable Collision With Friendlys: Off
+		Max Amount Of Rounds: 15
+		Sound Based Detection: Off
+		Targeting Type: [1]
+		Ultimate Points% Saved When Converted: 50
+		Use More Complex Abilitys Zen Orbs Lucio Crossfade Etc: Off
+	}
+
+	extensions
+	{
+		Spawn More Dummy Bots
+	}
+}
+
+variables
+{
+	global:
+		0: Path_Nodes
+		3: Ultimate_Cost
+		4: Retain_Points_Converted
+		5: Retain_Points_New_Round
+		7: Turn_Speed
+		8: All_Heros
+		9: Primary_Max
+		10: Aim_Type
+		11: Number_Of_Bots
+		12: Ability1_Max
+		13: Mobility_Distance
+		14: Primary_Min
+		16: Ultimate_Duration
+		17: Secondary_Max
+		18: Secondary_Min
+		19: Charge_Time
+		20: Use_Ultimate_Max
+		21: Ultimate_Health
+		22: Gamertags
+		24: Invisible_Targeting
+		25: Targeting_Type
+		26: Difficulty
+		28: Can_Hear
+		29: Complex_Abilitys
+		30: Ignore_Abilitys
+		31: Random_Gamertags
+		32: Vaild_heros
+		33: Hero_Pool
+		35: Ability1_Min
+		36: Ability2_Max
+		37: Ability2_Min
+		39: Primary_Arc
+		40: Secondary_Arc
+		41: Ultimate_Max
+		43: Ability1_Arc
+		44: Ability2_Arc
+		45: Ultimate_Arc
+		46: Living_Heros
+		47: Leaderboard
+		48: Primary_Sound_Max
+		49: Secondary_Sound_Max
+		50: Ability1_Sound_Max
+		51: Ability2_Sound_Max
+		52: Ultimate_Sound_Max
+		53: Walking_Sound_Max
+		54: Crouch_Walk_Sound_Max
+		55: Melee_Sound_Max
+		57: Temp_Leaderboard
+		58: Is_Final_3
+		59: Round
+		60: Round_Starting
+		61: Max_Rounds
+		62: Heighest_Score
+		63: Temp_Living
+		64: Died
+
+	player:
+		0: Pathing_Location
+		1: Pathing_Node
+		2: Primary_Max
+		3: Aim_Predict
+		4: Node_Options
+		5: Player_Position
+		6: Offensive
+		7: Defensive
+		8: Mobility
+		9: Ultimate_Points
+		10: Allowed_Nodes
+		11: Healing
+		12: Ability1_Max
+		13: Mobility_Distance
+		14: Hero
+		15: Secondary_Fire
+		16: Secondary_Offensive
+		17: Secondary_Defensive
+		18: Secondary_Healing
+		19: Hold
+		20: Confirm
+		21: Toggle
+		22: Current_Offensive
+		23: Current_Defensive
+		24: Current_Mobility
+		25: Current_Healing
+		26: Targets
+		27: Target_Order
+		28: Primary_Min
+		29: Cooldown
+		30: Charge
+		31: Resource
+		32: Ultimate_Cost
+		33: Secondary_Max
+		34: Secondary_Min
+		35: Charging
+		36: Charging_Time
+		37: Use_Ultimate_Max
+		38: Ultimate_Health
+		39: Randomise_Hero
+		41: Ultimate_Targets
+		42: Orgin_Hero
+		43: Ability1_Min
+		44: Ability2_Max
+		45: Ability2_Min
+		46: Heal_Friendlys
+		47: Converted_To
+		48: Walk_To_Max
+		49: Walk_To_Min
+		54: Aim_Arc
+		55: Can_Change_Arc
+		56: Ultimate_Max
+		58: Ultimate_Duration
+		60: Use_If_Shield
+		61: Alternative_Form
+		64: Current_Hero
+}
+
+subroutines
+{
+	0: Black_Forest
+	1: Necropolis
+	2: Castillo
+	3: Ecopoint_Antarctica
+	4: Chateau_Guillard
+	5: Hero_Values
+	6: Hero_Variables
+	7: Malevento
+	8: Kanezaka
+	9: Node_Setup
+	11: Petra
+	14: AI_Start_Facing
+	15: Gamertags
+	16: Difficulty
+	17: New_Round
+	18: Update_Leaderboard
+	19: Update_Living
+}
+
+rule("------------------------------------------- Made By Spiderman318 | YT Spiderman318 ---------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Retain_Points_Converted = Workshop Setting Integer(Custom String("Game"), Custom String(
+			"Ultimate Points% Saved When Converted"), 75, 0, 100, 2);
+		Global.Retain_Points_New_Round = Workshop Setting Integer(Custom String("Game"), Custom String(
+			"Ultimate Points% Saved Between Rounds"), 25, 0, 100, 3);
+		Global.Hero_Pool = Filtered Array(Randomized Array(All Heroes), Current Array Index < Workshop Setting Integer(Custom String(
+			"Game"), Custom String("Max Amount Of Heros"), 37, 2, 100, 5));
+		Global.Round = 1;
+		Global.Max_Rounds = Workshop Setting Integer(Custom String("Game"), Custom String("Max Amount Of Rounds"), 100, 0, 100, 6);
+		Create HUD Text(All Players(All Teams), Custom String("Leaderboard\n    1: {0}{1}\n{2}", Hero Icon String(First Of(
+			Global.Leaderboard)), Count Of(Players On Hero(First Of(Global.Leaderboard), All Teams)), Custom String("    2: {0}{1}\n{2}",
+			Hero Icon String(Global.Leaderboard[1]), Count Of(Players On Hero(Global.Leaderboard[1], All Teams)), Custom String(
+			"    3: {0}{1}", Hero Icon String(Global.Leaderboard[2]), Count Of(Players On Hero(Global.Leaderboard[2], All Teams))))), Null,
+			Custom String("Round {0}/{1}", Global.Round, Evaluate Once(Min(Global.Max_Rounds, Count Of(Global.Hero_Pool) - 1))), Left, 0,
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Global.Vaild_heros = Array(Hero(Reinhardt), Hero(Winston), Hero(Roadhog), Hero(Zarya), Hero(D.Va), Hero(Orisa), Hero(
+			Wrecking Ball), Hero(Sigma), Hero(Mercy), Hero(Zenyatta), Hero(Lúcio), Hero(Ana), Hero(Brigitte), Hero(Moira), Hero(Baptiste),
+			Hero(Reaper), Hero(Tracer), Hero(Hanzo), Hero(Torbjörn), Hero(Pharah), Hero(Widowmaker), Hero(Bastion), Hero(Symmetra), Hero(
+			Genji), Hero(Cassidy), Hero(Junkrat), Hero(Soldier: 76), Hero(Mei), Hero(Sombra), Hero(Doomfist), Hero(Ashe), Hero(Echo), Hero(
+			Junker Queen), Hero(Kiriko), Hero(Ramattra), Hero(Lifeweaver), Hero(Sojourn));
+		Global.Number_Of_Bots = Workshop Setting Integer(Custom String("AI"), Custom String("Amount"), 12, 1, 24, 8);
+		Global.Difficulty = Workshop Setting Combo(Custom String("AI"), Custom String("Difficulty"), 0, Array(Custom String(
+			"Custom Difficulty (Dont Override)"), Custom String("Easy"), Custom String("Normal"), Custom String("Hard")), -1);
+		Global.Aim_Type = Workshop Setting Combo(Custom String("AI"), Custom String("Aim Type"), 0, Array(Custom String(
+			"Basic (Aim At Head With No Leading Or Arc"), Custom String("Leading (Aim At Head With Leading But No Arc)"), Custom String(
+			"Arc (Aim At Head WIth Arc But No Leading)"), Custom String("Advanced (Aim At Head With Leading And Arc)")), 0);
+		Global.Invisible_Targeting = Workshop Setting Combo(Custom String("AI"), Custom String("Invisible Targeting"), 0, Array(
+			Custom String("While Hacking Or While 3 MetersOr Less Away"), Custom String("While Hacking"), Custom String(
+			"While 3 Meters Or Less Away"), Custom String("Never")), 1);
+		Global.Targeting_Type = Workshop Setting Combo(Custom String("AI"), Custom String("Targeting Type"), 0, Array(Custom String(
+			"Basic (LOS)"), Custom String("Hero Basic (LOS / ABS)"), Custom String("Inproved (LOS / SBT)"), Custom String(
+			"Hero Inproved (LOS / ABS / SBT)"), Custom String(
+			"\nLOS - Line Of SIght\r\n\r\nABS - Ability Based Sight\r\nDoes'nt Include Sonic Arrow\r"), Custom String(
+			"\nSBT - Sound Based Targeting\r\nOnly Works If Sound Based Detection Enabled")), 2);
+		Global.Can_Hear = Workshop Setting Toggle(Custom String("AI"), Custom String("Sound Based Detection"), True, 3);
+		Global.Complex_Abilitys = Workshop Setting Toggle(Custom String("AI"), Custom String(
+			"Use More Complex Abilitys (Zen Orbs, Lucio Crossfade, Etc)"), True, 4);
+		Global.Ignore_Abilitys = Workshop Setting Toggle(Custom String("AI"), Custom String(
+			"Ignore Abilitys (Continues To Fire Into Deflect, Defence Matrix, Etc)"), False, 5);
+		Global.Random_Gamertags = Workshop Setting Toggle(Custom String("AI"), Custom String("Random Gamertags"), True, 6);
+		Global.Turn_Speed = Workshop Setting Integer(Custom String("AI"), Custom String("Turn Speed"), 225, 10, 500, 7);
+		Call Subroutine(Difficulty);
+		Wait Until(Is Assembling Heroes, 99999);
+		Call Subroutine(Hero_Values);
+		Skip If(Global.Random_Gamertags == False, 1);
+		Call Subroutine(Gamertags);
+		Call Subroutine(Node_Setup);
+		Call Subroutine(New_Round);
+		Disable Built-In Game Mode Scoring;
+		Global.Died = Empty Array;
+	}
+}
+
+disabled rule("----------------------------------- Pathfinder ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Pathfind Melee/Jump")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Magnitude Of(Throttle Of(Event Player)) > 0;
+		Is Alive(Event Player) == True;
+		Speed Of(Event Player) < 2;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Skip If((Hero Of(Event Player) == Hero(Sombra) || Hero Being Duplicated(Event Player) == Hero(Sombra)) && Is Using Ability 1(
+			Event Player), 2);
+		Skip If(Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player), Eye Position(
+			First Of(Event Player.Target_Order)), Barriers Do Not Block LOS) && Team Of(Event Player) != Team Of(First Of(
+			Event Player.Target_Order)), 1);
+		Press Button(Event Player, Button(Melee));
+		Press Button(Event Player, Button(Jump));
+		Wait(Max(Server Load / 1000, 3), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Current Node")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		If(Distance Between(Event Player, Event Player.Pathing_Node) < 3);
+			Modify Player Variable(Event Player, Allowed_Nodes, Remove From Array By Value, Event Player.Pathing_Node);
+		End;
+		Event Player.Player_Position = Position Of(Event Player);
+		Event Player.Node_Options = Filtered Array(Event Player.Allowed_Nodes, Distance Between(Event Player, Current Array Element)
+			<= 30);
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Is In Line of Sight(Eye Position(Event Player),
+			Current Array Element, Barriers Do Not Block LOS) == True);
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Y Component Of(Ray Cast Hit Position(Eye Position(
+			Event Player), World Vector Of(Vector(0, -999, 0), Event Player, Rotation And Translation), All Players(All Teams),
+			Event Player, True)) + 1.550 + 1.200 > Y Component Of(Current Array Element));
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 2), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 2) + Vector(0, -99, 0), Null,
+			All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 2)) < 15);
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 4), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 4) + Vector(0, -99, 0), Null,
+			All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 4)) < 15);
+		Event Player.Node_Options = Filtered Array(Event Player.Node_Options, Distance Between(Ray Cast Hit Position(Eye Position(
+			Event Player) + Direction Towards(Eye Position(Event Player), Current Array Element) * (Distance Between(Eye Position(
+			Event Player), Current Array Element) / 1.200), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 1.200) + Vector(0, -99, 0),
+			Null, All Players(All Teams), False), Eye Position(Event Player) + Direction Towards(Eye Position(Event Player),
+			Current Array Element) * (Distance Between(Eye Position(Event Player), Current Array Element) / 1.200)) < 15);
+		If(Count Of(Event Player.Node_Options) == 0);
+			Event Player.Allowed_Nodes = Global.Path_Nodes;
+		End;
+		Event Player.Node_Options = Sorted Array(Event Player.Node_Options, Distance Between(Event Player, Current Array Element)
+			+ Distance Between(Event Player.Pathing_Location, Current Array Element));
+		Event Player.Pathing_Node = First Of(Event Player.Node_Options);
+		Wait(Max(Server Load / 1000, 1.500), Ignore Condition);
+		Loop;
+	}
+}
+
+rule("Walk To Target")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(!Entity Exists(First Of(Event Player.Target_Order)) || Hero Of(First Of(Event Player.Target_Order)) == Hero Of(Event Player))
+			!= True;
+		Event Player.Pathing_Location != Position Of(First Of(Event Player.Target_Order)) + Vector(0, 1.550, 0);
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Walk_To_Max = Min(Event Player.Primary_Max - Event Player.Primary_Max / 2,
+			Event Player.Secondary_Max - Event Player.Secondary_Max / 2);
+		Event Player.Walk_To_Min = Min(Event Player.Primary_Min - Event Player.Primary_Min / 2, Min(
+			Event Player.Secondary_Min - Event Player.Secondary_Min / 2, 3.500));
+		Event Player.Pathing_Location = Position Of(First Of(Event Player.Target_Order)) + Vector(0, 1.550, 0);
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Find Targets (Patrol)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(!Entity Exists(First Of(Event Player.Target_Order)) || Hero Of(First Of(Event Player.Target_Order)) == Hero Of(Event Player))
+			== True;
+		Has Spawned(Event Player) == True;
+		(Distance Between(Event Player, Event Player.Pathing_Location) < 3 || Event Player.Pathing_Location == Null) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(Max(Server Load / 1000, 0.500), Abort When False);
+		Event Player.Allowed_Nodes = Global.Path_Nodes;
+		Event Player.Walk_To_Max = 1.800;
+		Event Player.Walk_To_Min = 0;
+		Event Player.Pathing_Location = Last Of(Sorted Array(Global.Path_Nodes, Distance Between(Event Player, Current Array Element)));
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("----------------------------------- Pathfinder ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- AI ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Setup AI")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Skip If(Global.Random_Gamertags == False, 1);
+		Start Forcing Dummy Bot Name(Event Player, Random Value In Array(Global.Gamertags));
+		Call Subroutine(AI_Start_Facing);
+		Event Player.Can_Change_Arc = True;
+		Wait Until(Is Game In Progress, 99999);
+		Start Throttle In Direction(Event Player, Is In Line of Sight(Eye Position(Event Player), Event Player.Pathing_Location,
+			Barriers Do Not Block LOS) ? (Distance Between(Event Player, Event Player.Pathing_Location)
+			< Event Player.Walk_To_Min ? Direction Towards(Event Player.Pathing_Location, Event Player) : Direction Towards(Event Player,
+			Event Player.Pathing_Location)) : Direction Towards(Position Of(Event Player), Event Player.Pathing_Node), (Distance Between(
+			Event Player, Event Player.Pathing_Location) < Event Player.Walk_To_Min || Distance Between(Event Player,
+			Event Player.Pathing_Location) > Event Player.Walk_To_Max) && Is In Line of Sight(Eye Position(Event Player),
+			Event Player.Pathing_Location, Barriers Do Not Block LOS) ? 1 : (Is In Line of Sight(Eye Position(Event Player),
+			Event Player.Pathing_Location, Barriers Do Not Block LOS) ? 0 : 1), To World, Replace existing throttle,
+			Direction and Magnitude);
+		Event Player.Pathing_Location = Last Of(Sorted Array(Global.Path_Nodes, Distance Between(Event Player, Current Array Element)));
+	}
+}
+
+rule("AI Target List")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		If(Global.Is_Final_3);
+			Event Player.Targets = All Living Players(All Teams);
+		Else;
+			Event Player.Targets = Append To Array(Filtered Array(All Living Players(All Teams), Is In Line of Sight(Eye Position(
+				Event Player), Eye Position(Current Array Element), Barriers Do Not Block LOS)), Filtered Array(All Living Players(All Teams),
+				Event Player.Current_Hero == Hero(Sombra) && Normalized Health(Current Array Element) < 0.500));
+			Skip If(Global.Can_Hear == False, 8);
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(All Teams), Distance Between(
+				Event Player, Current Array Element) <= Global.Primary_Sound_Max[Index Of Array Value(Global.All_Heros, Hero Of(
+				Current Array Element))] && Is Firing Primary(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(All Teams), Distance Between(
+				Event Player, Current Array Element) <= Global.Secondary_Sound_Max[Index Of Array Value(Global.All_Heros, Hero Of(
+				Current Array Element))] && Is Firing Secondary(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(All Teams), Distance Between(
+				Event Player, Current Array Element) <= Global.Ability1_Sound_Max[Index Of Array Value(Global.All_Heros, Hero Of(
+				Current Array Element))] && Is Using Ability 1(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(All Teams), Distance Between(
+				Event Player, Current Array Element) <= Global.Ability2_Sound_Max[Index Of Array Value(Global.All_Heros, Hero Of(
+				Current Array Element))] && Is Using Ability 2(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(All Teams), Distance Between(
+				Event Player, Current Array Element) < Global.Ultimate_Sound_Max[Index Of Array Value(Global.All_Heros, Hero Of(
+				Current Array Element))] && Is Using Ultimate(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(All Teams), Distance Between(
+				Event Player, Current Array Element) <= Global.Walking_Sound_Max[Index Of Array Value(Global.All_Heros, Hero Of(
+				Current Array Element))] && !Is Crouching(Current Array Element) && Is Moving(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(All Teams), Distance Between(
+				Event Player, Current Array Element) <= Global.Crouch_Walk_Sound_Max[Index Of Array Value(Global.All_Heros, Hero Of(
+				Current Array Element))] && Is Crouching(Current Array Element) && Is Moving(Current Array Element)));
+			Modify Player Variable(Event Player, Targets, Append To Array, Filtered Array(All Living Players(All Teams), Distance Between(
+				Event Player, Current Array Element) <= Global.Melee_Sound_Max[Index Of Array Value(Global.All_Heros, Hero Of(
+				Current Array Element))] && Is Meleeing(Current Array Element)));
+			If(Global.Invisible_Targeting == 0);
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Sombra), Opposite Team Of(
+					Team Of(Event Player))), Is Using Ability 1(Current Array Element) && !Is Firing Secondary(Current Array Element)
+					&& Distance Between(Eye Position(Event Player), Position Of(Current Array Element)) > 3 && Distance Between(Position Of(
+					Event Player), Position Of(Current Array Element)) > 3));
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Echo), Opposite Team Of(Team Of(
+					Event Player))), Hero Being Duplicated(Current Array Element) == Hero(Sombra) && Is Using Ability 1(Current Array Element)
+					&& !Is Firing Secondary(Current Array Element) && Distance Between(Eye Position(Event Player), Position Of(
+					Current Array Element)) > 3 && Distance Between(Position Of(Event Player), Position Of(Current Array Element)) > 3));
+			Else If(Global.Invisible_Targeting == 3);
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Sombra), Opposite Team Of(
+					Team Of(Event Player))), Is Using Ability 1(Current Array Element)));
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Echo), Opposite Team Of(Team Of(
+					Event Player))), Hero Being Duplicated(Current Array Element) == Hero(Sombra) && Is Using Ability 1(Current Array Element)));
+			Else If(Global.Invisible_Targeting == 1);
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Sombra), Opposite Team Of(
+					Team Of(Event Player))), Is Using Ability 1(Current Array Element) && !Is Firing Secondary(Current Array Element)));
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Echo), Opposite Team Of(Team Of(
+					Event Player))), Is Using Ability 1(Current Array Element) && !Is Firing Secondary(Current Array Element)
+					&& Hero Being Duplicated(Current Array Element) == Hero(Sombra)));
+			Else;
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Sombra), Opposite Team Of(
+					Team Of(Event Player))), Is Using Ability 1(Current Array Element) && Distance Between(Eye Position(Event Player), Position Of(
+					Current Array Element)) > 3 && Distance Between(Position Of(Event Player), Position Of(Current Array Element)) > 3));
+				Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Players On Hero(Hero(Echo), Opposite Team Of(Team Of(
+					Event Player))), Is Using Ability 1(Current Array Element) && Hero Being Duplicated(Current Array Element) == Hero(Sombra)
+					&& Distance Between(Eye Position(Event Player), Position Of(Current Array Element)) > 3 && Distance Between(Position Of(
+					Event Player), Position Of(Current Array Element)) > 3));
+			End;
+		End;
+		Modify Player Variable(Event Player, Targets, Remove From Array By Value, Event Player);
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(All Players(All Teams), Has Status(
+			Current Array Element, Asleep) || Is In Spawn Room(Current Array Element) || Has Status(Current Array Element, Phased Out)
+			|| !Has Spawned(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(D.Va),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(D.Va)), Is Firing Secondary(Current Array Element) && Is In View Angle(
+			Current Array Element, Eye Position(Event Player), 70)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Zarya),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Zarya)), Is Using Ability 1(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Reaper),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Reaper)), Is Using Ability 1(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Genji),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Genji)), Is Using Ability 2(Current Array Element) && Is In View Angle(
+			Current Array Element, Eye Position(Event Player), 70)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Sigma),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Sigma)), Is Using Ability 1(Current Array Element) && Is In View Angle(
+			Current Array Element, Eye Position(Event Player), 70)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Doomfist),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Doomfist)), Is Using Ultimate(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Moira),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Moira)), Is Using Ability 1(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Mei),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Mei)), Is Using Ability 1(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Zenyatta),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Zenyatta)), Is Using Ultimate(Current Array Element)));
+		Event Player.Targets = Remove From Array(Event Player.Targets, Filtered Array(Append To Array(Players On Hero(Hero(Tracer),
+			All Teams), Hero Being Duplicated(Event Player) == Hero(Tracer)), Is Using Ability 2(Current Array Element)));
+		Modify Player Variable(Event Player, Targets, Remove From Array By Value, Players On Hero(Hero Of(Event Player), All Teams));
+		Event Player.Target_Order = Sorted Array(Event Player.Targets, Distance Between(Event Player, Current Array Element) * Health(
+			Current Array Element) - (Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element),
+			Barriers Do Not Block LOS) ? 1 : 2));
+		If(!Entity Exists(First Of(Event Player.Target_Order)));
+			Press Button(Event Player, Button(Reload));
+		End;
+		Wait(Max(Server Load / 1000, 0.500), Ignore Condition);
+		Loop;
+	}
+}
+
+rule("Stop Primary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Firing Primary(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		(!Entity Exists(First Of(Event Player.Target_Order)) || Distance Between(Position Of(Event Player), First Of(
+			Event Player.Target_Order)) <= Event Player.Primary_Min || !Is In Line of Sight(Eye Position(Event Player), Eye Position(
+			First Of(Event Player.Target_Order)), Barriers Do Not Block LOS) || Distance Between(Position Of(Event Player), First Of(
+			Event Player.Target_Order)) > Event Player.Primary_Max) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Button(Primary Fire));
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Fire Primary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(!Entity Exists(First Of(Event Player.Target_Order)) || Hero Of(First Of(Event Player.Target_Order)) == Hero Of(Event Player))
+			!= True;
+		Is Firing Primary(Event Player) != True;
+		Event Player.Primary_Max > 0;
+		Is Alive(Event Player) == True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Distance Between(Position Of(Event Player), First Of(Event Player.Target_Order)) > Event Player.Primary_Min;
+		Distance Between(Position Of(Event Player), First Of(Event Player.Target_Order)) <= Event Player.Primary_Max;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 1);
+		Event Player.Aim_Arc = Global.Primary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Wait(Max(Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))), Null,
+			All Players(All Teams), False), Eye Position(First Of(Event Player.Target_Order))) / 320, 0.250), Abort When False);
+		If(Array Contains(Event Player.Charging, Button(Primary Fire)) == True);
+			While(Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+				&& Entity Exists(First Of(Event Player.Target_Order)) && Is Alive(Event Player) && Distance Between(Position Of(Event Player),
+				First Of(Event Player.Target_Order)) > Event Player.Primary_Min && Distance Between(Position Of(Event Player), First Of(
+				Event Player.Target_Order)) <= Event Player.Primary_Max);
+				If(Array Contains(Event Player.Hold, Button(Primary Fire)) == True);
+					Start Holding Button(Event Player, Button(Primary Fire));
+					Wait(Event Player.Charging_Time, Ignore Condition);
+					Stop Holding Button(Event Player, Button(Primary Fire));
+				Else;
+					Wait(Event Player.Charging_Time, Ignore Condition);
+					Press Button(Event Player, Button(Primary Fire));
+				End;
+			End;
+		Else;
+			Start Holding Button(Event Player, Button(Primary Fire));
+		End;
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Stop Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Hero Being Duplicated(Event Player) == Hero(Lifeweaver) || Hero Of(Event Player) == Hero(Lifeweaver) ? Is Firing Primary(
+			Event Player) && Is In Alternate Form(Event Player) : Is Firing Secondary(Event Player)) == True;
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		(!Entity Exists(First Of(Event Player.Target_Order)) || Distance Between(Position Of(Event Player), First Of(
+			Event Player.Target_Order)) < Event Player.Secondary_Min || !Is In Line of Sight(Eye Position(Event Player), Eye Position(
+			First Of(Event Player.Target_Order)), Barriers Do Not Block LOS) || Distance Between(Position Of(Event Player), First Of(
+			Event Player.Target_Order)) > Event Player.Secondary_Max) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Button(Secondary Fire));
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Fire Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(!Entity Exists(First Of(Event Player.Target_Order)) || Hero Of(First Of(Event Player.Target_Order)) == Hero Of(Event Player))
+			!= True;
+		(Hero Being Duplicated(Event Player) == Hero(Lifeweaver) || Hero Of(Event Player) == Hero(Lifeweaver) ? !Is Firing Primary(
+			Event Player) : !Is Firing Secondary(Event Player)) == True;
+		Event Player.Secondary_Max > 0;
+		Is Alive(Event Player) == True;
+		Distance Between(Position Of(Event Player), First Of(Event Player.Target_Order)) > Event Player.Secondary_Min;
+		Distance Between(Position Of(Event Player), First Of(Event Player.Target_Order)) < Event Player.Secondary_Max;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 1);
+		Event Player.Aim_Arc = Global.Secondary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Wait(Max(Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))), Null,
+			All Players(All Teams), False), Eye Position(First Of(Event Player.Target_Order))) / 320, 0.250), Abort When False);
+		If(Array Contains(Event Player.Charging, Button(Secondary Fire)) == True);
+			While(Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+				&& Entity Exists(First Of(Event Player.Target_Order)) && Is Alive(Event Player) && Distance Between(Position Of(Event Player),
+				First Of(Event Player.Target_Order)) > Event Player.Secondary_Min && Distance Between(Position Of(Event Player), First Of(
+				Event Player.Target_Order)) <= Event Player.Secondary_Max);
+				If(Array Contains(Event Player.Hold, Button(Secondary Fire)) == True);
+					Start Holding Button(Event Player, Button(Secondary Fire));
+					Wait(Event Player.Charging_Time, Ignore Condition);
+					Stop Holding Button(Event Player, Button(Secondary Fire));
+				Else;
+					Wait(Event Player.Charging_Time, Ignore Condition);
+					Press Button(Event Player, Button(Secondary Fire));
+				End;
+			End;
+		Else;
+			Start Holding Button(Event Player, Button(Secondary Fire));
+		End;
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Offensive Ability")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Event Player.Offensive != Empty Array;
+		Is Alive(Event Player) == True;
+		(!Entity Exists(First Of(Event Player.Target_Order)) || Hero Of(First Of(Event Player.Target_Order)) == Hero Of(Event Player))
+			!= True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Is In View Angle(Event Player, Eye Position(First Of(Event Player.Target_Order)), 15) == True;
+		Is True For Any(Event Player.Offensive, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Offensive, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Offensive, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(Event Player.Offensive,
+			Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Event Player.Current_Offensive = Random Value In Array(Event Player.Offensive);
+		If(Event Player.Current_Offensive == Button(Ability 1));
+			Skip If(Distance Between(Event Player, First Of(Event Player.Target_Order)) > Event Player.Ability1_Max || Distance Between(
+				Event Player, First Of(Event Player.Target_Order)) < Event Player.Ability1_Min, 36);
+		Else;
+			Skip If(Distance Between(Event Player, First Of(Event Player.Target_Order)) > Event Player.Ability2_Max || Distance Between(
+				Event Player, First Of(Event Player.Target_Order)) < Event Player.Ability2_Min, 34);
+		End;
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = (Event Player.Current_Mobility == Button(Ability 1) ? Global.Ability1_Arc : Global.Ability2_Arc)
+			[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(
+			Event Player))];
+		Wait(Max(Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))), Null,
+			All Players(All Teams), False), Eye Position(First Of(Event Player.Target_Order))) / 320, 0.250), Abort When False);
+		If(Array Contains(Event Player.Hold, Event Player.Current_Offensive) == True);
+			Start Holding Button(Event Player, Event Player.Current_Offensive);
+			Wait Until(Ability Cooldown(Event Player, Event Player.Current_Offensive) > 0 || !Entity Exists(First Of(
+				Event Player.Target_Order)) || Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(
+				Event Player.Target_Order)), Barriers Do Not Block LOS),
+				Event Player.Charging_Time != Null ? Event Player.Charging_Time : 999999);
+			Stop Holding Button(Event Player, Event Player.Current_Offensive);
+		Else If(Array Contains(Event Player.Confirm, Event Player.Current_Offensive) == True);
+			Press Button(Event Player, Event Player.Current_Offensive);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Event Player.Current_Offensive) == True);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Offensive) ? Is In Alternate Form(Event Player) : (
+				Event Player.Current_Offensive == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player)), 2);
+			Press Button(Event Player, Event Player.Current_Offensive);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Wait Until((Array Contains(Event Player.Alternative_Form, Event Player.Current_Offensive) ? !Is In Alternate Form(Event Player)
+				: !(Event Player.Current_Offensive == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player)))
+				|| !Entity Exists(First Of(Event Player.Target_Order)) || Is Dead(Event Player) || !Is In Line of Sight(Eye Position(
+				Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS), 9999);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? !Is In Alternate Form(Event Player) : (
+				Event Player.Current_Mobility == Button(Ability 1) ? !Is Using Ability 1(Event Player) : !Is Using Ability 2(Event Player)),
+				1);
+			Press Button(Event Player, Event Player.Current_Offensive);
+		Else;
+			Press Button(Event Player, Event Player.Current_Offensive);
+		End;
+		Event Player.Can_Change_Arc = True;
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Defence Ability")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Event Player.Defensive != Empty Array;
+		Is Alive(Event Player) == True;
+		Is True For Any(Event Player.Defensive, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Defensive, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Defensive, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(Event Player.Defensive,
+			Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = (Event Player.Current_Mobility == Button(Ability 1) ? Global.Ability1_Arc : Global.Ability2_Arc)
+			[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(
+			Event Player))];
+		Event Player.Current_Defensive = Random Value In Array(Event Player.Defensive);
+		If(Event Player.Current_Hero == Hero(Baptiste));
+			Stop Facing(Event Player);
+			Start Facing(Event Player, Down, Has Status(Event Player, Knocked Down) || Has Status(Event Player, Asleep) || Has Status(
+				Event Player, Frozen) || Has Status(Event Player, Stunned) ? 0 : 320, To World, Direction and Turn Rate);
+			Wait(0.100, Ignore Condition);
+		Else If(Event Player.Current_Hero == Hero(Mei));
+			Stop Facing(Event Player);
+			Start Facing(Event Player, Direction From Angles(Horizontal Facing Angle Of(Event Player), 10), Has Status(Event Player,
+				Knocked Down) || Has Status(Event Player, Asleep) || Has Status(Event Player, Frozen) || Has Status(Event Player, Stunned)
+				? 0 : 320, To World, Direction and Turn Rate);
+			Wait(0.100, Ignore Condition);
+		End;
+		If(Array Contains(Event Player.Hold, Event Player.Current_Defensive) == True);
+			Start Holding Button(Event Player, Event Player.Current_Defensive);
+			Wait Until(Ability Cooldown(Event Player, Event Player.Current_Defensive) > 0 || !Entity Exists(First Of(
+				Event Player.Target_Order)) || Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(
+				Event Player.Target_Order)), Barriers Do Not Block LOS), 2.500);
+			Stop Holding Button(Event Player, Event Player.Current_Defensive);
+		Else If(Array Contains(Event Player.Confirm, Event Player.Current_Defensive) == True);
+			Press Button(Event Player, Event Player.Current_Defensive);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Event Player.Current_Defensive) == True);
+			Press Button(Event Player, Event Player.Current_Defensive);
+			Wait Until(Ability Cooldown(Event Player, Event Player.Current_Defensive) > 0 || !Entity Exists(First Of(
+				Event Player.Target_Order)) || Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(
+				Event Player.Target_Order)), Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Event Player.Current_Defensive);
+		Else;
+			Press Button(Event Player, Event Player.Current_Defensive);
+		End;
+		If(Event Player.Current_Hero == Hero(Baptiste) || Event Player.Current_Hero == Hero(Mei));
+			Wait(0.100, Ignore Condition);
+			Stop Facing(Event Player);
+			Call Subroutine(AI_Start_Facing);
+		End;
+		Event Player.Can_Change_Arc = True;
+	}
+}
+
+rule("Use Mobility")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Magnitude Of(Throttle Of(Event Player)) != 0;
+		Event Player.Mobility != Empty Array;
+		Is Alive(Event Player) == True;
+		(!Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			|| !Entity Exists(First Of(Event Player.Target_Order))) == True;
+		Distance Between(Position Of(Event Player), Is In Line of Sight(Eye Position(Event Player), Event Player.Pathing_Location,
+			Barriers Do Not Block LOS) ? Event Player.Pathing_Location : Event Player.Pathing_Node) > Max(Event Player.Mobility_Distance,
+			Is In Line of Sight(Eye Position(Event Player), Event Player.Pathing_Location, Barriers Do Not Block LOS) ? 2 : 0);
+		Is True For Any(Event Player.Mobility, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Mobility, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Mobility, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(Event Player.Mobility,
+			Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Skip If(Ray Cast Hit Position(Eye Position(Event Player) + Direction From Angles(Horizontal Facing Angle Of(Event Player), 0)
+			* Event Player.Mobility_Distance, Eye Position(Event Player) + Direction From Angles(Horizontal Facing Angle Of(Event Player),
+			0) * Event Player.Mobility_Distance - Vector(0, 5, 0), Null, All Players(All Teams), False) == Eye Position(Event Player)
+			+ Direction From Angles(Horizontal Facing Angle Of(Event Player), 0) * Event Player.Mobility_Distance - Vector(0, 5, 0), 24);
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = (Event Player.Current_Mobility == Button(Ability 1) ? Global.Ability1_Arc : Global.Ability2_Arc)
+			[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(
+			Event Player))];
+		Event Player.Current_Mobility = Random Value In Array(Event Player.Mobility);
+		If(Array Contains(Event Player.Hold, Event Player.Current_Mobility) == True);
+			Start Holding Button(Event Player, Event Player.Current_Mobility);
+			Wait Until(Is Dead(Event Player) || Entity Exists(First Of(Event Player.Target_Order)) || Distance Between(Position Of(
+				Event Player), Event Player.Pathing_Location) < Event Player.Mobility_Distance, 9999);
+			Stop Holding Button(Event Player, Event Player.Current_Mobility);
+		Else If(Array Contains(Event Player.Confirm, Event Player.Current_Mobility) == True);
+			Press Button(Event Player, Event Player.Current_Mobility);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Event Player.Current_Mobility) == True);
+			Wait Until(!Entity Exists(First Of(Event Player.Target_Order)), 99999);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? Is In Alternate Form(Event Player) : (
+				Event Player.Current_Mobility == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player)), 2);
+			Press Button(Event Player, Event Player.Current_Mobility);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Wait Until((Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player), Eye Position(
+				Event Player.Target_Order), Barriers Do Not Block LOS)) || (Distance Between(Event Player, Event Player.Pathing_Location) < 2)
+				|| (Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? !Is In Alternate Form(Event Player) : !(
+				Event Player.Current_Mobility == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player))),
+				9999);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? !Is In Alternate Form(Event Player) : (
+				Event Player.Current_Mobility == Button(Ability 1) ? !Is Using Ability 1(Event Player) : !Is Using Ability 2(Event Player)),
+				1);
+			Press Button(Event Player, Event Player.Current_Mobility);
+		Else;
+			Press Button(Event Player, Event Player.Current_Mobility);
+		End;
+		Event Player.Can_Change_Arc = True;
+		Wait(Max(Server Load / 1000, 1.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Heal Ability")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Event Player.Healing != Empty Array;
+		Normalized Health(Event Player) < (Entity Exists(First Of(Event Player.Target_Order)) ? 0.500 : 1);
+		Is Alive(Event Player) == True;
+		Is True For Any(Event Player.Healing, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Healing, Current Array Element)) && (Array Contains(
+			Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element) > 0 : Array Contains(
+			Event Player.Healing, Current Array Element)) && (Array Contains(Event Player.Resource, Current Array Element)
+			? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(Event Player.Healing, Current Array Element)))
+			== True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = (Event Player.Current_Mobility == Button(Ability 1) ? Global.Ability1_Arc : Global.Ability2_Arc)
+			[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(
+			Event Player))];
+		Event Player.Current_Healing = Random Value In Array(Event Player.Healing);
+		If(Event Player.Current_Hero == Hero(Ana));
+			Stop Facing(Event Player);
+			Start Facing(Event Player, Down, Has Status(Event Player, Knocked Down) || Has Status(Event Player, Asleep) || Has Status(
+				Event Player, Frozen) || Has Status(Event Player, Stunned) ? 0 : 320, To World, Direction and Turn Rate);
+			Wait(0.100, Ignore Condition);
+		End;
+		If(Array Contains(Event Player.Hold, Event Player.Current_Healing) == True);
+			Start Holding Button(Event Player, Event Player.Current_Healing);
+			Wait Until(Ability Cooldown(Event Player, Event Player.Current_Healing) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 3);
+			Stop Holding Button(Event Player, Event Player.Current_Healing);
+		Else If(Array Contains(Event Player.Confirm, Event Player.Current_Healing) == True);
+			Press Button(Event Player, Event Player.Current_Healing);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Event Player.Current_Healing) == True);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? Is In Alternate Form(Event Player) : (
+				Event Player.Current_Mobility == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player)), 2);
+			Press Button(Event Player, Event Player.Current_Healing);
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Wait Until((Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player), Eye Position(
+				Event Player.Target_Order), Barriers Do Not Block LOS)) || (Health(Event Player) == Max Health(Event Player)) || (
+				Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? !Is In Alternate Form(Event Player) : !(
+				Event Player.Current_Mobility == Button(Ability 1) ? Is Using Ability 1(Event Player) : Is Using Ability 2(Event Player))),
+				9999);
+			Skip If(Array Contains(Event Player.Alternative_Form, Event Player.Current_Mobility) ? !Is In Alternate Form(Event Player) : (
+				Event Player.Current_Mobility == Button(Ability 1) ? !Is Using Ability 1(Event Player) : !Is Using Ability 2(Event Player)),
+				1);
+			Press Button(Event Player, Event Player.Current_Healing);
+		Else;
+			Press Button(Event Player, Event Player.Current_Healing);
+		End;
+		If(Event Player.Current_Hero == Hero(Ana));
+			Wait(0.100, Ignore Condition);
+			Stop Facing(Event Player);
+			Call Subroutine(AI_Start_Facing);
+		End;
+		Event Player.Can_Change_Arc = True;
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Ultimate")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(!Entity Exists(First Of(Event Player.Target_Order)) || Hero Of(First Of(Event Player.Target_Order)) == Hero Of(Event Player))
+			!= True;
+		Is Alive(Event Player) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Normalized Health(Event Player) <= Event Player.Ultimate_Health;
+		Distance Between(Event Player, First Of(Event Player.Target_Order)) < Event Player.Use_Ultimate_Max;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Is In View Angle(Event Player, Eye Position(First Of(Event Player.Target_Order)), 15) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = Global.Ultimate_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Wait(Max(Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))), Null,
+			All Players(All Teams), False), Eye Position(First Of(Event Player.Target_Order))) / 320, 0.250), Abort When False);
+		Skip If(Hero Being Duplicated(Event Player) == Hero(D.Va) || Hero Of(Event Player) == Hero(D.Va) || (Hero Of(Event Player) == Hero(
+			Echo) && !Is Duplicating(Event Player)), 2);
+		Event Player.Primary_Max = Event Player.Ultimate_Max;
+		Event Player.Primary_Min = 0;
+		If(Event Player.Current_Hero == Hero(Baptiste));
+			Stop Facing(Event Player);
+			Start Facing(Event Player, Direction From Angles(Horizontal Facing Angle Of(Event Player), 10), Has Status(Event Player,
+				Knocked Down) || Has Status(Event Player, Asleep) || Has Status(Event Player, Frozen) || Has Status(Event Player, Stunned)
+				? 0 : 320, To World, Direction and Turn Rate);
+			Wait(0.100, Ignore Condition);
+		End;
+		If(Array Contains(Event Player.Hold, Button(Ultimate)) == True);
+			Start Holding Button(Event Player, Button(Ultimate));
+			Wait Until(!Is Using Ultimate(Event Player) || !Entity Exists(First Of(Event Player.Target_Order)) || Is Dead(Event Player)
+				|| !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Stop Holding Button(Event Player, Button(Ultimate));
+		Else If(Array Contains(Event Player.Confirm, Button(Ultimate)) == True);
+			Press Button(Event Player, Button(Ultimate));
+			Wait(Max(Event Player.Charging_Time, 2.500), Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Button(Ultimate)) == True);
+			Press Button(Event Player, Button(Ultimate));
+			Wait Until(!Is Using Ultimate(Event Player) || !Entity Exists(First Of(Event Player.Target_Order)) || Is Dead(Event Player)
+				|| !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Button(Ultimate));
+		Else;
+			Press Button(Event Player, Button(Ultimate));
+		End;
+		Wait Until(Is Dead(Event Player), Max(Event Player.Ultimate_Duration, 1));
+		Event Player.Primary_Max = Global.Primary_Max[Index Of Array Value(Global.All_Heros, Hero Of(Event Player))];
+		Event Player.Primary_Min = Global.Primary_Min[Index Of Array Value(Global.All_Heros, Hero Of(Event Player))];
+		Event Player.Can_Change_Arc = True;
+		If(Event Player.Current_Hero == Hero(Baptiste));
+			Wait(0.100, Ignore Condition);
+			Stop Facing(Event Player);
+			Call Subroutine(AI_Start_Facing);
+		End;
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Offensive Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Event Player.Secondary_Offensive != Empty Array;
+		Is Alive(Event Player) == True;
+		(!Entity Exists(First Of(Event Player.Target_Order)) || Hero Of(First Of(Event Player.Target_Order)) == Hero Of(Event Player))
+			!= True;
+		Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS)
+			== True;
+		Is In View Angle(Event Player, Eye Position(First Of(Event Player.Target_Order)), 15) == True;
+		Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))) <= Event Player.Secondary_Max;
+		Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))) >= Event Player.Secondary_Min;
+		Is True For Any(Event Player.Secondary_Offensive, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Secondary_Offensive, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Secondary_Offensive, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(
+			Event Player.Secondary_Offensive, Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = Global.Secondary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		Wait(Max(Distance Between(Ray Cast Hit Position(Eye Position(Event Player), Eye Position(Event Player) + Facing Direction Of(
+			Event Player) * Distance Between(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))), Null,
+			All Players(All Teams), False), Eye Position(First Of(Event Player.Target_Order))) / 320, 0.250), Abort When False);
+		If(Array Contains(Event Player.Hold, Button(Secondary Fire)) == True);
+			Start Holding Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), Event Player.Charging_Time != Null ? Event Player.Charging_Time : 999999);
+			Stop Holding Button(Event Player, Button(Secondary Fire));
+		Else If(Array Contains(Event Player.Confirm, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Button(Secondary Fire));
+		Else;
+			Press Button(Event Player, Button(Secondary Fire));
+		End;
+		Event Player.Can_Change_Arc = True;
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Use Defence Secondary")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Event Player.Secondary_Defensive != Empty Array;
+		Is Alive(Event Player) == True;
+		Is True For Any(Event Player.Secondary_Defensive, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Secondary_Defensive, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Secondary_Defensive, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(
+			Event Player.Secondary_Defensive, Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = Global.Secondary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		If(Array Contains(Event Player.Hold, Button(Secondary Fire)) == True);
+			Start Holding Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Stop Holding Button(Event Player, Button(Secondary Fire));
+		Else If(Array Contains(Event Player.Confirm, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Button(Secondary Fire));
+		Else;
+			Press Button(Event Player, Button(Secondary Fire));
+		End;
+		Event Player.Can_Change_Arc = True;
+	}
+}
+
+rule("Use Heal Secondary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Event Player.Secondary_Healing != Empty Array;
+		Is Alive(Event Player) == True;
+		Normalized Health(Event Player) < (Entity Exists(First Of(Event Player.Target_Order)) ? 0.500 : 1);
+		Is True For Any(Event Player.Secondary_Healing, (Array Contains(Event Player.Cooldown, Current Array Element) ? Ability Cooldown(
+			Event Player, Current Array Element) == Null : Array Contains(Event Player.Secondary_Healing, Current Array Element)) && (
+			Array Contains(Event Player.Charge, Current Array Element) ? Ability Charge(Event Player, Current Array Element)
+			> 0 : Array Contains(Event Player.Secondary_Healing, Current Array Element)) && (Array Contains(Event Player.Resource,
+			Current Array Element) ? Ability Resource(Event Player, Current Array Element) > 25 : Array Contains(
+			Event Player.Secondary_Healing, Current Array Element))) == True;
+	}
+
+	actions
+	{
+		Skip If(!Event Player.Can_Change_Arc, 2);
+		Event Player.Can_Change_Arc = False;
+		Event Player.Aim_Arc = Global.Secondary_Arc[Index Of Array Value(Global.All_Heros, Is Duplicating(Event Player)
+			? Hero Being Duplicated(Event Player) : Hero Of(Event Player))];
+		If(Array Contains(Event Player.Hold, Button(Secondary Fire)) == True);
+			Wait Until(!Entity Exists(First Of(Event Player.Target_Order)), 99999);
+			Start Holding Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Stop Holding Button(Event Player, Button(Secondary Fire));
+		Else If(Array Contains(Event Player.Confirm, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait(Event Player.Charging_Time, Ignore Condition);
+			Press Button(Event Player, Button(Primary Fire));
+		Else If(Array Contains(Event Player.Toggle, Button(Secondary Fire)) == True);
+			Press Button(Event Player, Button(Secondary Fire));
+			Wait Until(Ability Cooldown(Event Player, Button(Secondary Fire)) > 0 || !Entity Exists(First Of(Event Player.Target_Order))
+				|| Is Dead(Event Player) || !Is In Line of Sight(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order)),
+				Barriers Do Not Block LOS), 2.500);
+			Press Button(Event Player, Button(Secondary Fire));
+		Else;
+			Press Button(Event Player, Button(Secondary Fire));
+		End;
+		Event Player.Can_Change_Arc = True;
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Get D.VA Stats")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Hero == Hero(D.Va);
+		Is In Alternate Form(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Ultimate_Cost = 280;
+		Skip If(!Is Dummy Bot(Event Player), 20);
+		Event Player.Primary_Max = 25;
+		Event Player.Primary_Min = 0;
+		Event Player.Ultimate_Health = 1;
+		Event Player.Ultimate_Targets = 0;
+		Event Player.Offensive = Empty Array;
+		Event Player.Defensive = Empty Array;
+		Event Player.Mobility = Empty Array;
+		Event Player.Healing = Empty Array;
+		Event Player.Secondary_Fire = Empty Array;
+		Event Player.Secondary_Offensive = Empty Array;
+		Event Player.Secondary_Defensive = Empty Array;
+		Event Player.Secondary_Healing = Empty Array;
+		Event Player.Hold = Empty Array;
+		Event Player.Confirm = Empty Array;
+		Event Player.Toggle = Empty Array;
+		Event Player.Cooldown = Empty Array;
+		Event Player.Charge = Empty Array;
+		Event Player.Resource = Empty Array;
+		Event Player.Charging = Empty Array;
+		Event Player.Heal_Friendlys = Empty Array;
+		Wait Until(!Is In Alternate Form(Event Player), 99999);
+		Event Player.Ultimate_Cost = Global.Ultimate_Cost[Index Of Array Value(Global.All_Heros, Hero Of(Event Player))];
+		Abort If(!Is Dummy Bot(Event Player));
+		Call Subroutine(Hero_Variables);
+	}
+}
+
+rule("Reload")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		((Max Ammo(Event Player, 0) > 0 && Ammo(Event Player, 0) == 0) || (Max Ammo(Event Player, 1) > 0 && Ammo(Event Player, 1) == 0))
+			== True;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		!Is Reloading(Event Player) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Reload));
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("----------------------------------- AI ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- Miscellaneous ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Duplicate Set Variables")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Echo;
+	}
+
+	conditions
+	{
+		Is Duplicating(Event Player) == True;
+	}
+
+	actions
+	{
+		Call Subroutine(Hero_Variables);
+		Wait Until(!Is Duplicating(Event Player), 99999);
+		Call Subroutine(Hero_Variables);
+	}
+}
+
+rule("Widowmaker Primary Charge")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Widowmaker) || Hero Of(Event Player) == Hero(Widowmaker)) == True;
+		Is Firing Secondary(Event Player) == True;
+		(Array Contains(Event Player.Hold, Button(Primary Fire)) || !Array Contains(Event Player.Charging, Button(Primary Fire))) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Hold, Remove From Array By Value, Button(Primary Fire));
+		Modify Player Variable(Event Player, Charging, Append To Array, Button(Primary Fire));
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Widowmaker Primary Hold")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Widowmaker) || Hero Of(Event Player) == Hero(Widowmaker)) == True;
+		Is Firing Secondary(Event Player) != True;
+		(Array Contains(Event Player.Charging, Button(Primary Fire)) || !Array Contains(Event Player.Hold, Button(Primary Fire))) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Charging, Remove From Array By Value, Button(Primary Fire));
+		Modify Player Variable(Event Player, Hold, Append To Array, Button(Primary Fire));
+		Wait(Max(Server Load / 1000, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Lúcio Use Speed")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Lúcio) || Hero Of(Event Player) == Hero(Lúcio)) == True;
+		Is In Alternate Form(Event Player) != True;
+		Normalized Health(Event Player) > (Entity Exists(First Of(Event Player.Target_Order)) ? 0.500 : 1);
+		Magnitude Of(Throttle Of(Event Player)) != 0;
+		Distance Between(Position Of(Event Player), Is In Line of Sight(Eye Position(Event Player), Event Player.Pathing_Location,
+			Barriers Do Not Block LOS) ? Event Player.Pathing_Location : Event Player.Pathing_Node) > Max(Event Player.Mobility_Distance,
+			Is In Line of Sight(Eye Position(Event Player), Event Player.Pathing_Location, Barriers Do Not Block LOS) ? 2 : 0);
+		Global.Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 1));
+		Wait(Max(Event Player.Charging_Time, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Lúcio Use Heal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		(Hero Being Duplicated(Event Player) == Hero(Lúcio) || Hero Of(Event Player) == Hero(Lúcio)) == True;
+		Is In Alternate Form(Event Player) == True;
+		Normalized Health(Event Player) < 1;
+		Global.Complex_Abilitys == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 1));
+		Wait(Max(Event Player.Charging_Time, 1), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Create AI")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number Of Players(All Teams) < Global.Number_Of_Bots;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Create Dummy Bot(Random Value In Array(Is Game In Progress && !Global.Round_Starting ? Global.Living_Heros : Global.All_Heros),
+			All Teams, -1, Random Value In Array(Spawn Points(All Teams)), Vector(0, 0, 0));
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("----------------------------------- Miscellaneous ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- Subroutine ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Hero Values")
+{
+	event
+	{
+		Subroutine;
+		Hero_Values;
+	}
+
+	actions
+	{
+		Global.All_Heros = Array(Hero(Reinhardt), Hero(Winston), Hero(Roadhog), Hero(Zarya), Hero(D.Va), Hero(Orisa), Hero(Wrecking Ball),
+			Hero(Sigma), Hero(Mercy), Hero(Zenyatta), Hero(Lúcio), Hero(Ana), Hero(Brigitte), Hero(Moira), Hero(Baptiste), Hero(Reaper),
+			Hero(Tracer), Hero(Hanzo), Hero(Torbjörn), Hero(Pharah), Hero(Widowmaker), Hero(Bastion), Hero(Symmetra), Hero(Genji), Hero(
+			Cassidy), Hero(Junkrat), Hero(Soldier: 76), Hero(Mei), Hero(Sombra), Hero(Doomfist), Hero(Ashe), Hero(Echo), Hero(
+			Junker Queen), Hero(Kiriko), Hero(Ramattra), Hero(Lifeweaver), Hero(Sojourn));
+		Global.Ultimate_Cost = Array(1650, 1850, 2420, 2270, 1540, 1950, 1675, 2100, 1820, 2310, 2420, 2100, 2550, 2660, 2310, 1930, 1260,
+			1680, 2142, 2000, 1540, 2310, 1680, 1932, 1850, 1925, 2310, 1750, 1400, 1680, 2240, 1691, 2415, 2300, 1880, 2008, 2100);
+		Global.Primary_Max = Array(4, 8, 6, 14, 5, 40, 18, 18, 25, 20, 20, 35, 5, 0, 30, 8, 18, 30, 30, 30, 50, 40, 12, 20, 30, 30, 40, 14,
+			25, 8, 40, 30, 25, 40, 50, 30, 40);
+		Global.Primary_Min = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0);
+		Global.Secondary_Max = Array(0, 30, 18, 30, 0, 35, 0, 0, 0, 50, 5, 35, 40, 20, 0, 0, 0, 0, 6, 0, 50, 35, 30, 6, 5, 8, 30, 40, 12,
+			18, 40, 20, 15, 30, 20, 30, 50);
+		Global.Secondary_Min = Array(0, 8, 6, 14, 0, 5, 0, 0, 0, 20, 0, 15, 7, 0, 0, 0, 0, 0, 0, 0, 10, 0, 12, 0, 0, 0, 4, 14, 6, 0, 10, 0,
+			0, 0, 0, 0, 0);
+		Global.Ability1_Max = Array(25, 20, 20, 0, 20, 0, 0, 0, 20, 30, 0, 15, 15, 0, 0, 0, 0, 30, 0, 0, 0, 25, 0, 12, 0, 8, 0, 0, 0, 20,
+			0, 0, 0, 25, 10, 0, 0);
+		Global.Ability1_Min = Array(0, 14, 6, 0, 6, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0);
+		Global.Ability2_Max = Array(30, 0, 0, 25, 30, 0, 0, 25, 6, 30, 0, 35, 15, 20, 30, 0, 0, 25, 20, 12, 10, 0, 0, 0, 6, 20, 0, 0, 0, 0,
+			30, 12, 6, 20, 20, 25, 25);
+		Global.Ability2_Min = Array(0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 6, 0, 0, 0, 0,
+			0, 0, 0);
+		Global.Mobility_Distance = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 5, 0, 0, 0, 10, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 5,
+			0, 0, 0, 0, 12);
+		Global.Charge_Time = Array(0, 1.500, 0, 0, 0, 4, 1, 1.200, 0, 4, 1, 0, 0, 0, 1, 0, 0, 1.200, 0, 0, 1.400, 2.500, 1.200, 0, 4, 0, 0,
+			0, 0, 1.400, 0.100, 0, 0, 0, 0, 1, 0);
+		Global.Use_Ultimate_Max = Array(20, 30, 15, 30, 25, 10, 15, 25, 25, 25, 25, 30, 25, 25, 30, 10, 6, 30, 30, 15, 100, 28, 30, 12, 40,
+			15, 30, 25, 18, 8, 30, 30, 20, 30, 20, 30, 50);
+		Global.Ultimate_Health = Array(1, 0.350, 1, 1, 1, 1, 1, 1, 1, 0.500, 0.600, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 0.350, 1, 1, 1, 1, 1);
+		Global.Ultimate_Max = Array(4, 4, 0, 14, 25, 25, 18, 24, 0, 0, 0, 0, 0, 0, 30, 0, 18, 30, 30, 0, 50, 25, 12, 6, 0, 0, 40, 14, 25,
+			3, 40, 30, 25, 40, 50, 0, 30);
+		Global.Primary_Arc = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.500, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0);
+		Global.Secondary_Arc = Array(0, 0, 0, 0.250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.400, 0, 0, 0, 0, 0, 0, 0.500, 0, 0, 0, 0.500, 0, 0, 0,
+			0, 0, 0, 0.400, 0, 0, 0, 0);
+		Global.Ability1_Arc = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.500, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0);
+		Global.Ability2_Arc = Array(0, 0, 0, 0, 0, 0, 0, 0.200, 0, 0, 0, 0.350, 0, 0, 0.400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.500, 0, 0, 0,
+			0, 0.400, 0, 0, 0.600, 0.600, 0, 0);
+		Global.Ultimate_Arc = Array(0, 0, 0, 0.250, 0, 0, 0, -0.100, 0, 0, 0, 0, 0, 0, 0, 0, 0.050, 0, 0.500, 0, 0, 0, 0, 0, 0, 0.500, 0,
+			0.200, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		Global.Ultimate_Duration = Array(0, 10, 6, 0, 0, 12, 0, 0, 0, 6, 0, 0, 10, 8, 0, 4, 0, 0, 6, 4, 0, 6, 0, 6, 6, 0, 0, 0, 0, 4, 0,
+			10, 3, 12, 15, 10, 0);
+		Abort If(Global.Can_Hear == False);
+		Global.Primary_Sound_Max = Array(20, 20, 20, 20, 20, 30, 30, 30, 15, 20, 20, 15, 15, 25, 30, 20, 20, 0, 25, 30, 25, 30, 20, 20, 30,
+			30, 30, 20, 20, 15, 25, 25, 25, 15, 20, 0, 25);
+		Global.Secondary_Sound_Max = Array(0, 0, 30, 30, 15, 0, 0, 0, 15, 15, 15, 0, 0, 20, 30, 0, 0, 0, 20, 25, 0, 20, 12, 20, 30, 0, 30,
+			15, 10, 15, 0, 25, 0, 15, 0, 20, 25);
+		Global.Ability1_Sound_Max = Array(15, 25, 20, 0, 15, 0, 0, 15, 10, 0, 0, 15, 25, 15, 15, 15, 20, 0, 0, 25, 25, 0, 0, 25, 20, 0, 30,
+			25, 0, 15, 20, 25, 25, 15, 30, 10, 20);
+		Global.Ability2_Sound_Max = Array(30, 15, 15, 0, 20, 0, 0, 20, 10, 0, 15, 0, 15, 0, 0, 10, 10, 20, 20, 0, 0, 0, 0, 15, 15, 0, 0, 0,
+			0, 20, 0, 20, 25, 25, 25, 20, 20);
+		Global.Ultimate_Sound_Max = Array(0, 20, 30, 0, 0, 0, 0, 20, 20, 30, 0, 0, 25, 30, 0, 20, 0, 0, 20, 25, 0, 30, 0, 20, 15, 0, 25, 0,
+			0, 0, 0, 0, 30, 30, 30, 30, 30);
+		Global.Walking_Sound_Max = Array(30, 25, 30, 30, 30, 30, 30, 0, 20, 0, 25, 25, 30, 25, 25, 25, 20, 25, 30, 30, 25, 30, 25, 20, 25,
+			25, 25, 25, 20, 30, 25, 0, 25, 20, 25, 25, 25);
+	}
+}
+
+rule("Nodes Setup")
+{
+	event
+	{
+		Subroutine;
+		Node_Setup;
+	}
+
+	actions
+	{
+		If(Current Map == Map(Black Forest) || Current Map == Map(Black Forest Winter));
+			Call Subroutine(Black_Forest);
+			Abort;
+		End;
+		If(Current Map == Map(Necropolis));
+			Call Subroutine(Necropolis);
+			Abort;
+		End;
+		If(Current Map == Map(Castillo));
+			Call Subroutine(Castillo);
+			Abort;
+		End;
+		If(Current Map == Map(Ecopoint: Antarctica) || Current Map == Map(Ecopoint: Antarctica Winter));
+			Call Subroutine(Ecopoint_Antarctica);
+			Abort;
+		End;
+		If(Current Map == Map(Château Guillard) || Current Map == Map(Château Guillard Halloween));
+			Call Subroutine(Chateau_Guillard);
+			Abort;
+		End;
+		If(Current Map == Map(Malevento));
+			Call Subroutine(Malevento);
+			Abort;
+		End;
+		If(Current Map == Map(Petra));
+			Call Subroutine(Petra);
+			Abort;
+		End;
+		If(Current Map == Map(Kanezaka));
+			Call Subroutine(Kanezaka);
+			Abort;
+		End;
+	}
+}
+
+rule("Black Forest")
+{
+	event
+	{
+		Subroutine;
+		Black_Forest;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(31.642, 13.550, 33.951), Vector(26.883, 13.550, 35.730), Vector(30.832, 13.550, 28.375), Vector(
+			27.105, 13.398, 26.760), Vector(22.898, 13.495, 33.906), Vector(27.956, 13.643, 23.114), Vector(29.955, 14.550, 23.328),
+			Vector(33.672, 15.550, 22.771), Vector(34.141, 16.473, 19.901), Vector(34.093, 17.403, 18.040), Vector(33.961, 18.255, 16.324),
+			Vector(33.761, 18.550, 12.459), Vector(27.342, 18.550, 12.552), Vector(27.729, 18.523, 23.365), Vector(21.280, 18.501, 34.625),
+			Vector(15.760, 18.536, 12.195), Vector(15.974, 18.549, 7.259), Vector(12.715, 19.095, 15.778), Vector(13.861, 18.108, 16.944),
+			Vector(14.753, 17.255, 18.002), Vector(15.766, 16.265, 19.223), Vector(16.595, 15.452, 20.227), Vector(17.412, 14.650, 21.216),
+			Vector(17.837, 13.698, 21.964), Vector(22.221, 12.850, 18.270), Vector(19.338, 13.159, 28.567), Vector(14.241, 12.540, 31.759),
+			Vector(12.488, 12.968, 24.219), Vector(5.059, 12.199, 34.119), Vector(8.719, 13.168, 29.987), Vector(5.527, 13.380, 24.615),
+			Vector(6.730, 14.291, 17.192), Vector(4.087, 14.050, 13.305), Vector(-0.797, 14.661, 16.187), Vector(-0.609, 14.061, 23.661),
+			Vector(-6.578, 14.550, 28.316), Vector(-4.431, 13.601, 31.892), Vector(-3.557, 12.746, 33.338), Vector(-0.942, 12.466, 35.983),
+			Vector(-14.818, 14.549, 27.467), Vector(-15.480, 14.720, 31.801), Vector(-14.671, 15.613, 33.388), Vector(-12.668, 16.550,
+			36.227), Vector(-9.952, 17.541, 34.797), Vector(-8.407, 18.412, 33.927), Vector(-6.937, 19.285, 32.949), Vector(-4.430, 19.550,
+			31.763), Vector(-6.560, 19.550, 27.924), Vector(-9.385, 19.550, 24.073), Vector(-14.879, 19.550, 27.202), Vector(-16.710,
+			19.662, 24.422), Vector(-7.126, 19.620, 19.037), Vector(-3.474, 19.633, 26.151), Vector(-6.271, 14.738, 19.253), Vector(
+			-17.380, 14.564, 22.738), Vector(-13.237, 14.913, 14.600), Vector(-22.473, 13.937, 12.926), Vector(-17.240, 14.753, 9.540),
+			Vector(-1.232, 13.921, 9.479), Vector(-5.155, 14.839, 10.143), Vector(-5.506, 14.632, 5.354), Vector(-1.893, 14.026, 0.124),
+			Vector(-4.785, 14.929, 0.034), Vector(3.996, 14.050, -2.876), Vector(4.636, 13.827, 5.261), Vector(15.137, 13.693, 15.911),
+			Vector(21.457, 11.975, 12.057), Vector(21.521, 11.213, 10.509), Vector(21.395, 10.550, 4.420), Vector(21.111, 11.274, -0.823),
+			Vector(21.086, 12.083, -2.207), Vector(10.429, 18.550, 7.171), Vector(15.996, 18.550, 2.116), Vector(10.391, 18.550, 2.561),
+			Vector(1.689, 18.550, 1.771), Vector(1.335, 18.550, 7.754), Vector(-0.881, 19.355, 4.555), Vector(-6.095, 19.548, 4.937),
+			Vector(-8.350, 18.719, 4.825), Vector(-9.524, 17.930, 4.714), Vector(-10.918, 16.963, 4.583), Vector(-12.151, 16.109, 4.468),
+			Vector(-13.277, 15.327, 4.360), Vector(-14.585, 14.676, 4.245), Vector(-16.782, 13.784, 3.287), Vector(-3.369, 19.309, -4.747),
+			Vector(-3.543, 19.338, 14.592), Vector(16.071, 18.544, -1.742), Vector(12.115, 18.913, -5.537), Vector(13.313, 17.938, -6.851),
+			Vector(14.314, 17.119, -7.956), Vector(15.361, 16.264, -9.092), Vector(16.287, 15.370, -10.088), Vector(17.130, 14.565,
+			-11.009), Vector(18.240, 13.596, -12.239), Vector(27.826, 13.615, -13.019), Vector(29.649, 14.418, -13.194), Vector(31.587,
+			15.387, -13.290), Vector(33.723, 15.550, -12.833), Vector(34.046, 16.549, -9.780), Vector(34.093, 17.503, -7.862), Vector(
+			34.118, 18.332, -6.168), Vector(33.216, 18.550, -2.941), Vector(28.115, 18.550, -2.747), Vector(27.835, 18.520, -11.788),
+			Vector(22.454, 18.489, -22.334), Vector(32.873, 13.550, -25.091), Vector(30.644, 13.550, -18.742), Vector(26.660, 13.550,
+			-25.628), Vector(22.795, 13.511, -23.637), Vector(25.912, 13.285, -17.108), Vector(21.453, 12.886, -10.315), Vector(17.342,
+			13.024, -19.772), Vector(9.838, 12.430, -20.781), Vector(11.271, 13.075, -14.217), Vector(15.240, 13.725, -6.292), Vector(
+			8.871, 13.557, -11.054), Vector(2.986, 13.851, -16.728), Vector(8.191, 13.370, -19.807), Vector(2.090, 12.275, -25.596),
+			Vector(-3.646, 12.541, -24.205), Vector(-4.633, 13.457, -22.642), Vector(-5.489, 14.296, -21.188), Vector(-7.104, 14.614,
+			-18.405), Vector(-1.833, 14.355, -14.433), Vector(-1.905, 14.451, -8.059), Vector(-12.968, 14.803, -2.406), Vector(-13.009,
+			14.695, -8.810), Vector(-16.237, 14.507, 0.592), Vector(-23.905, 13.671, -0.933), Vector(-21.840, 14.282, -7.455), Vector(
+			-16.395, 14.562, -15.943), Vector(-15.484, 14.672, -21.839), Vector(-14.441, 15.647, -23.482), Vector(-12.294, 16.550,
+			-26.248), Vector(-10.297, 17.511, -25.061), Vector(-8.663, 18.430, -24.171), Vector(-6.994, 19.378, -23.245), Vector(-4.540,
+			19.550, -22.275), Vector(-7.177, 19.550, -18.390), Vector(-9.781, 19.550, -14.261), Vector(-15.515, 19.550, -17.898), Vector(
+			-16.918, 19.654, -15.079), Vector(-7.361, 19.624, -9.454), Vector(-3.742, 19.638, -16.911));
+		Global.B = Array(Vector(18.418, 10.550, 5.091), Vector(-11.521, 14.550, 31.736), Vector(-11.982, 14.614, -21.437), Vector(7.972,
+			18.550, 5.060));
+	}
+}
+
+rule("Necropolis")
+{
+	event
+	{
+		Subroutine;
+		Necropolis;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(0.925, 4.552, 23.103), Vector(11.869, 4.557, 18.985), Vector(14.115, 3.788, 17.135), Vector(
+			15.573, 2.812, 15.823), Vector(19.438, 2.550, 11.581), Vector(23.268, 3.425, 15.339), Vector(24.955, 4.406, 17.015), Vector(
+			26.520, 5.346, 18.642), Vector(28.135, 6.285, 20.266), Vector(30.146, 6.562, 22.436), Vector(23.795, 6.562, 27.848), Vector(
+			21.742, 7.479, 25.523), Vector(20.412, 8.388, 24.174), Vector(19.271, 9.216, 22.873), Vector(15.646, 9.846, 20.841), Vector(
+			13.479, 10.408, 23.236), Vector(12.118, 11.367, 24.495), Vector(-0.024, 11.572, 26.882), Vector(-2.253, 10.619, 26.925),
+			Vector(-10.048, 9.873, 27.803), Vector(-11.955, 8.957, 27.824), Vector(-19.488, 8.275, 27.879), Vector(-21.291, 7.359, 27.962),
+			Vector(-22.980, 6.506, 27.689), Vector(-26.302, 5.620, 24.732), Vector(-22.190, 4.687, 22.527), Vector(-12.495, 4.558, 23.038),
+			Vector(-12.384, 3.715, 19.038), Vector(-12.309, 2.735, 17.074), Vector(-12.393, 2.550, 13.464), Vector(-16.771, 2.550, 13.319),
+			Vector(-27.943, 4.936, 21.176), Vector(-32.221, 4.550, 13.585), Vector(-23.602, 3.243, 15.984), Vector(-27.743, 4.254, 17.324),
+			Vector(-32.078, 4.160, 8.931), Vector(-30.799, 3.550, 5.310), Vector(-25.816, 4.289, 5.870), Vector(-22.804, 4.550, 3.504),
+			Vector(-22.708, 4.550, -0.009), Vector(-23.010, 4.550, -3.775), Vector(-26.729, 3.832, -6.149), Vector(-30.738, 3.550, -6.398),
+			Vector(-32.235, 4.511, -9.710), Vector(-30.626, 3.550, 0.034), Vector(-35.486, 4.439, 0.198), Vector(-43.296, 5.345, 0.068),
+			Vector(-45.260, 6.325, 0.051), Vector(-47.937, 6.550, -0.104), Vector(-47.713, 7.517, -3.748), Vector(-47.453, 7.512, 3.714),
+			Vector(-44.566, 8.414, 4.962), Vector(-42.691, 9.350, 5.141), Vector(-40.766, 10.312, 5.374), Vector(-35.162, 10.551, 6.371),
+			Vector(-34.312, 10.550, 0.606), Vector(-44.686, 8.356, -5.196), Vector(-42.838, 9.278, -5.281), Vector(-41.069, 10.161,
+			-5.330), Vector(-34.806, 10.550, -5.940), Vector(-32.202, 10.550, -4.628), Vector(-29.500, 10.550, -0.147), Vector(-32.363,
+			10.550, 4.222), Vector(-27.599, 11.024, -11.172), Vector(-27.314, 11.067, 11.465), Vector(-23.267, 11.366, 6.486), Vector(
+			-21.648, 12.265, 5.907), Vector(-19.967, 12.528, 9.678), Vector(-23.611, 11.174, -7.046), Vector(-22.042, 12.045, -7.025),
+			Vector(-20.348, 12.528, -10.002), Vector(-20.432, 12.528, -5.797), Vector(-20.138, 12.528, 4.937), Vector(-19.131, 4.495,
+			0.039), Vector(-16.641, 3.570, 0.131), Vector(-14.625, 2.799, 0.288), Vector(-11.129, 2.555, 0.280), Vector(-12.582, 2.553,
+			-8.440), Vector(-12.215, 2.550, -13.893), Vector(-16.880, 2.550, -13.663), Vector(-16.860, 1.566, -9.742), Vector(-16.804,
+			0.634, -7.869), Vector(-16.734, -0.282, -6.045), Vector(-16.687, -1.217, -4.174), Vector(-16.745, -2.066, -2.474), Vector(
+			-15.384, -2.450, -0.096), Vector(-16.742, -1.997, 2.612), Vector(-16.691, -1.061, 4.485), Vector(-16.709, -0.251, 6.108),
+			Vector(-16.817, 0.597, 7.797), Vector(-16.706, 1.442, 9.493), Vector(-16.673, 2.296, 11.201), Vector(-10.065, -3.272, -0.002),
+			Vector(-8.257, -4.174, 0.047), Vector(-3.430, -4.450, 0.133), Vector(3.345, -4.450, 0.136), Vector(10.461, -3.574, 0.180),
+			Vector(12.585, -2.510, 0.215), Vector(11.733, -2.938, 0.164), Vector(14.188, -1.708, 0.282), Vector(15.969, -0.820, 0.281),
+			Vector(18.977, -0.449, 0.084), Vector(19.073, 2.536, 7.710), Vector(19.105, 1.587, 5.781), Vector(19.136, 0.612, 3.831),
+			Vector(18.972, -0.132, 2.343), Vector(19.437, 2.550, -8.325), Vector(19.433, 1.709, -6.023), Vector(19.485, 0.792, -4.186),
+			Vector(19.348, -0.063, -2.477), Vector(24.578, 2.551, 7.930), Vector(29.066, 2.551, -0.171), Vector(12.907, 2.551, 12.157),
+			Vector(4.456, 2.555, 12.797), Vector(-4.762, 2.555, 13.035), Vector(4.905, 2.555, 5.328), Vector(11.855, 2.549, 4.503), Vector(
+			-5.161, 2.553, 5.199), Vector(-11.472, 2.553, 5.420), Vector(2.240, 4.550, -23.315), Vector(11.785, 4.561, -19.641), Vector(
+			14.081, 3.798, -17.126), Vector(15.329, 2.865, -15.732), Vector(18.320, 2.549, -11.736), Vector(-12.490, 4.560, -23.093),
+			Vector(-12.293, 3.599, -18.807), Vector(-12.308, 2.735, -17.074), Vector(-26.334, 5.278, -23.481), Vector(-30.696, 4.723,
+			-17.916), Vector(-26.502, 4.337, -18.533), Vector(-24.186, 3.413, -16.360), Vector(-23.725, 6.136, -26.749), Vector(-21.972,
+			7.020, -26.934), Vector(-20.199, 7.917, -27.037), Vector(-12.167, 8.842, -27.300), Vector(24.877, 2.550, -5.446), Vector(
+			22.824, 2.862, -13.871), Vector(24.463, 3.780, -15.396), Vector(25.913, 4.609, -16.759), Vector(27.443, 5.509, -18.290),
+			Vector(28.904, 6.352, -19.722), Vector(30.870, 6.562, -21.684), Vector(23.963, 6.562, -27.823), Vector(21.764, 7.352, -25.878),
+			Vector(20.425, 8.272, -24.503), Vector(18.979, 9.249, -23.071), Vector(16.159, 9.846, -20.597), Vector(12.941, 10.777,
+			-23.707), Vector(10.049, 11.571, -26.572), Vector(-4.577, 9.825, -26.880), Vector(-2.059, 10.722, -27.016), Vector(-10.032,
+			9.882, -22.735), Vector(-5.375, 9.887, -22.186), Vector(-5.730, 9.887, -16.122), Vector(4.896, 11.571, -26.127), Vector(6.250,
+			12.154, -15.437), Vector(-2.169, 12.154, -15.887), Vector(3.118, 13.056, -15.420), Vector(15.368, 9.848, -16.060), Vector(
+			12.012, 9.848, -15.896), Vector(16.018, 9.849, 16.970), Vector(12.152, 9.849, 15.802), Vector(5.194, 11.572, 26.243), Vector(
+			5.894, 12.154, 15.240), Vector(-1.579, 12.154, 15.514), Vector(2.252, 13.063, 15.217), Vector(-4.818, 9.885, 21.503), Vector(
+			-5.652, 9.885, 16.171), Vector(-9.464, 10.143, 21.750));
+		Global.B = Array();
+	}
+}
+
+rule("Castillo")
+{
+	event
+	{
+		Subroutine;
+		Castillo;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(-112.641, 34.117, 25.816), Vector(-103.978, 34.106, 33.746), Vector(-117.272, 34.106, 37.124),
+			Vector(-110.297, 33.828, 39.355), Vector(-103.671, 33.857, 38.027), Vector(-96.296, 34.750, 37.937), Vector(-93.645, 33.783,
+			32.715), Vector(-86.256, 34.106, 39.975), Vector(-81.522, 34.106, 46.966), Vector(-84.590, 34.114, 51.687), Vector(-81.570,
+			34.121, 54.590), Vector(-74.734, 33.549, 53.041), Vector(-84.271, 34.112, 58.049), Vector(-78.562, 34.107, 62.707), Vector(
+			-84.646, 34.106, 62.173), Vector(-86.826, 35.011, 62.562), Vector(-90.666, 35.106, 63.496), Vector(-91.719, 35.106, 56.278),
+			Vector(-85.985, 34.108, 55.297), Vector(-93.462, 35.106, 49.151), Vector(-88.157, 34.237, 48.186), Vector(-94.496, 35.652,
+			39.319), Vector(-92.857, 36.447, 40.450), Vector(-91.160, 37.415, 41.635), Vector(-89.870, 38.301, 42.581), Vector(-88.941,
+			39.208, 43.876), Vector(-89.139, 40.180, 47.079), Vector(-95.385, 40.733, 42.313), Vector(-105.494, 41.106, 43.424), Vector(
+			-114.786, 41.094, 45.500), Vector(-85.949, 40.191, 50.977), Vector(-85.526, 40.191, 55.434), Vector(-90.228, 40.191, 56.003),
+			Vector(-80.975, 40.191, 54.009), Vector(-84.892, 40.191, 59.386), Vector(-84.105, 39.261, 66.618), Vector(-86.232, 40.179,
+			65.098), Vector(-89.551, 40.786, 70.901), Vector(-100.146, 41.108, 72.981), Vector(-108.808, 41.096, 74.962), Vector(-114.110,
+			40.106, 67.458), Vector(-114.151, 40.124, 60.542), Vector(-118.071, 40.196, 61.352), Vector(-116.006, 40.124, 60.564), Vector(
+			-117.034, 40.106, 54.250), Vector(-129.447, 40.106, 52.560), Vector(-129.927, 39.245, 54.804), Vector(-127.251, 38.414,
+			57.472), Vector(-125.491, 37.523, 57.853), Vector(-123.682, 36.582, 58.291), Vector(-121.227, 35.929, 62.441), Vector(-121.597,
+			36.532, 67.347), Vector(-123.063, 37.474, 68.523), Vector(-124.497, 38.347, 69.499), Vector(-126.408, 39.235, 72.083), Vector(
+			-124.137, 40.106, 74.756), Vector(-121.655, 40.107, 69.639), Vector(-123.051, 40.108, 55.910), Vector(-121.281, 36.203,
+			56.588), Vector(-120.707, 36.117, 51.108), Vector(-121.464, 35.271, 43.408), Vector(-119.540, 34.528, 39.927), Vector(-114.940,
+			35.575, 52.521), Vector(-110.574, 35.106, 53.620), Vector(-109.528, 35.108, 46.104), Vector(-109.570, 34.350, 43.806), Vector(
+			-102.132, 35.106, 45.462), Vector(-102.835, 34.189, 42.201), Vector(-119.088, 36.203, 67.421), Vector(-116.574, 36.117,
+			71.353), Vector(-111.938, 35.368, 67.572), Vector(-108.438, 35.106, 66.051), Vector(-114.735, 35.445, 78.943), Vector(-111.461,
+			34.588, 80.075), Vector(-100.845, 34.117, 90.505), Vector(-107.234, 34.106, 85.209), Vector(-95.209, 34.282, 83.373), Vector(
+			-99.565, 33.846, 78.390), Vector(-103.702, 34.106, 76.237), Vector(-103.931, 34.868, 73.524), Vector(-104.129, 35.106, 70.556),
+			Vector(-97.174, 35.106, 69.604), Vector(-96.603, 34.134, 73.494), Vector(-90.366, 33.822, 77.961), Vector(-88.767, 34.737,
+			75.284), Vector(-87.581, 35.548, 73.571), Vector(-86.765, 36.458, 71.405), Vector(-85.961, 37.322, 69.720), Vector(-85.173,
+			38.315, 68.151), Vector(-84.398, 38.866, 67.149), Vector(-85.768, 33.780, 80.010), Vector(-79.281, 34.106, 68.308));
+		Global.B = Array();
+	}
+}
+
+rule("Ecopoint: Antarctica")
+{
+	event
+	{
+		Subroutine;
+		Ecopoint_Antarctica;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(11.034, 9.585, 50.957), Vector(-1.072, 8.829, 54.376), Vector(-12.003, 8.550, 44.500), Vector(
+			-6.992, 8.732, 39.033), Vector(8.657, 8.992, 41.979), Vector(6.377, 8.443, 36.619), Vector(-0.206, 8.811, 33.344), Vector(
+			-7.582, 8.587, 26.293), Vector(-11.620, 8.618, 30.990), Vector(-4.982, 8.553, 22.439), Vector(-0.199, 8.950, 26.711), Vector(
+			3.731, 8.549, 31.356), Vector(7.609, 8.282, 19.267), Vector(11.207, 8.631, 23.970), Vector(8.903, 8.567, 29.661), Vector(
+			14.950, 8.970, 33.664), Vector(2.587, 8.382, 15.358), Vector(16.531, 9.941, 32.215), Vector(17.491, 10.859, 30.120), Vector(
+			17.962, 11.776, 27.499), Vector(17.841, 12.674, 24.958), Vector(13.834, 13.359, 18.782), Vector(11.576, 13.359, 16.940),
+			Vector(9.320, 13.086, 20.996), Vector(7.392, 13.094, 19.097), Vector(6.575, 13.032, 26.545), Vector(0.903, 13.170, 31.531),
+			Vector(-4.599, 13.184, 26.180), Vector(-2.200, 13.050, 21.924), Vector(2.057, 13.184, 25.297), Vector(10.211, 13.550, 12.292),
+			Vector(5.920, 13.550, 10.126), Vector(-0.653, 13.550, 9.902), Vector(2.990, 13.550, 12.285), Vector(-5.336, 13.550, 11.930),
+			Vector(-10.378, 13.550, 13.804), Vector(-15.382, 13.550, 11.639), Vector(-15.375, 12.720, 15.911), Vector(-14.653, 11.748,
+			17.854), Vector(-12.461, 10.774, 20.780), Vector(-11.256, 9.857, 22.172), Vector(-9.848, 8.935, 23.363), Vector(-4.049, 13.549,
+			3.772), Vector(-7.024, 13.549, 3.981), Vector(-10.319, 13.551, 4.221), Vector(-11.202, 13.551, 7.529), Vector(-14.312, 13.626,
+			5.963), Vector(-15.331, 13.551, 8.688), Vector(-19.386, 13.551, 8.242), Vector(-17.860, 13.638, 3.615), Vector(-19.558, 13.551,
+			-0.098), Vector(-17.918, 13.638, -3.632), Vector(-19.257, 13.551, -7.654), Vector(-14.978, 13.551, -7.847), Vector(-15.088,
+			13.649, -5.727), Vector(-10.633, 13.550, -7.814), Vector(-10.421, 13.550, -4.195), Vector(-12.082, 13.640, -3.563), Vector(
+			-10.149, 13.551, -0.213), Vector(-12.272, 13.573, 1.798), Vector(-6.105, 13.550, 0.201), Vector(-6.099, 13.550, -4.075),
+			Vector(-3.754, 13.547, -5.912), Vector(-3.918, 13.551, -0.253), Vector(-6.269, 13.551, -12.067), Vector(-15.525, 13.551,
+			-12.147), Vector(-10.804, 13.549, -14.097), Vector(-14.917, 12.738, -15.878), Vector(-9.475, 8.610, -24.417), Vector(-11.041,
+			9.514, -22.919), Vector(-12.323, 10.403, -21.687), Vector(-13.677, 11.344, -20.383), Vector(-15.022, 11.744, -17.861), Vector(
+			-14.894, 12.450, -16.446), Vector(-31.098, 10.550, -0.097), Vector(-25.603, 11.391, -0.005), Vector(-23.729, 12.326, 0.050),
+			Vector(-22.074, 13.155, 0.001), Vector(-31.102, 10.550, -5.936), Vector(-24.833, 9.608, -6.053), Vector(-22.959, 8.671,
+			-5.958), Vector(-18.652, 8.550, -6.050), Vector(-19.273, 8.550, 6.316), Vector(-24.663, 9.526, 6.025), Vector(-26.377, 10.381,
+			6.155), Vector(-30.909, 10.550, 6.071), Vector(-14.944, 8.817, 0.105), Vector(-14.781, 8.493, 10.358), Vector(-10.162, 8.012,
+			16.169), Vector(-6.768, 8.544, 20.531), Vector(-2.455, 8.574, 15.588), Vector(-9.053, 8.550, 3.722), Vector(-8.300, 8.516,
+			-4.112), Vector(-15.176, 8.585, -10.031), Vector(18.085, 13.550, 14.981), Vector(18.163, 12.657, 10.933), Vector(18.197,
+			11.758, 9.131), Vector(18.207, 10.864, 7.347), Vector(18.136, 10.550, 3.772), Vector(23.068, 10.550, 4.654), Vector(23.046,
+			9.772, 9.844), Vector(22.999, 8.825, 11.731), Vector(22.984, 7.563, 14.259), Vector(22.947, 8.308, 12.770), Vector(23.285,
+			7.561, 16.509), Vector(18.485, 7.561, 16.785), Vector(11.373, 7.752, 19.476), Vector(7.708, 8.168, 15.078), Vector(18.040,
+			7.014, 10.642), Vector(18.014, 6.103, 8.822), Vector(17.881, 5.550, 4.225), Vector(21.504, 4.941, 3.780), Vector(29.483, 4.705,
+			3.565), Vector(29.344, 4.704, -4.179), Vector(21.327, 5.028, -4.219), Vector(17.864, 5.550, -5.222), Vector(13.795, 5.546,
+			-3.749), Vector(16.038, 5.550, -0.246), Vector(13.729, 5.544, 4.228), Vector(11.571, 5.644, 0.072), Vector(28.243, 10.513,
+			2.440), Vector(28.467, 10.513, -2.097), Vector(20.441, 10.550, 0.065), Vector(9.943, 13.410, 7.517), Vector(-1.634, 13.550,
+			-10.235), Vector(1.980, 13.550, -12.257), Vector(5.878, 13.550, -10.160), Vector(10.188, 13.550, -12.298), Vector(10.352,
+			13.401, -7.495), Vector(11.017, 13.359, -17.105), Vector(13.548, 13.359, -19.647), Vector(18.449, 12.857, -11.328), Vector(
+			18.284, 11.986, -9.585), Vector(18.243, 11.113, -7.841), Vector(17.725, 10.550, -4.861), Vector(23.075, 10.550, -5.250),
+			Vector(22.660, 7.566, -15.951), Vector(22.587, 8.448, -12.487), Vector(22.598, 9.421, -10.543), Vector(22.598, 10.381, -8.623),
+			Vector(17.863, 7.566, -16.116), Vector(17.974, 6.524, -9.662), Vector(17.913, 7.261, -11.139), Vector(13.104, 7.575, -19.242),
+			Vector(10.939, 8.519, -23.480), Vector(6.676, 8.599, -20.007), Vector(8.366, 7.972, -17.596), Vector(3.881, 8.260, -14.503),
+			Vector(-0.972, 8.934, -27.343), Vector(3.805, 8.509, -32.203), Vector(8.767, 8.546, -29.767), Vector(14.647, 8.703, -34.686),
+			Vector(16.253, 9.694, -32.686), Vector(17.116, 10.574, -30.834), Vector(17.470, 11.522, -28.211), Vector(17.108, 12.409,
+			-25.549), Vector(16.210, 13.359, -22.386), Vector(7.860, 13.216, -19.015), Vector(9.435, 13.208, -20.841), Vector(2.495,
+			13.175, -25.537), Vector(4.512, 13.175, -20.144), Vector(8.331, 13.165, -24.053), Vector(5.248, 13.034, -28.656), Vector(0.975,
+			13.173, -31.261), Vector(-4.566, 13.176, -26.320), Vector(-1.474, 13.025, -22.416), Vector(11.393, 9.561, -51.349), Vector(
+			8.084, 8.610, -40.321), Vector(-1.086, 8.821, -54.225), Vector(-12.535, 8.550, -44.199), Vector(-7.616, 8.641, -39.463),
+			Vector(1.529, 8.702, -38.756), Vector(0.007, 8.764, -33.795), Vector(-5.978, 8.765, -27.815), Vector(-10.561, 8.806, -32.665),
+			Vector(-5.139, 8.556, -23.015), Vector(-1.986, 8.614, -16.810), Vector(-8.813, 8.385, -17.990), Vector(-13.467, 7.892,
+			-13.078), Vector(0.638, 7.903, -12.340), Vector(-6.037, 8.029, -4.128), Vector(-6.168, 8.069, 4.019), Vector(1.200, 7.919,
+			12.438), Vector(9.750, 5.720, 4.884), Vector(8.851, 5.766, -5.681), Vector(1.810, 7.036, 8.815), Vector(-2.754, 7.294, 5.495),
+			Vector(-2.631, 7.278, -4.631), Vector(5.201, 6.686, -7.604), Vector(5.931, 6.512, 5.368));
+		Global.B = Array();
+	}
+}
+
+rule("Château Guillard")
+{
+	event
+	{
+		Subroutine;
+		Chateau_Guillard;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(169.041, 6.550, 80.948), Vector(172.816, 6.550, 85.832), Vector(176.402, 6.550, 81.417), Vector(
+			173.032, 6.550, 76.234), Vector(173.393, 7.103, 74.197), Vector(173.364, 8.022, 72.352), Vector(173.693, 8.551, 56.178),
+			Vector(183.616, 9.549, 55.989), Vector(185.661, 9.560, 55.874), Vector(183.131, 9.550, 64.011), Vector(187.884, 9.560, 61.676),
+			Vector(190.888, 9.550, 66.030), Vector(194.022, 9.550, 63.562), Vector(193.637, 9.550, 55.174), Vector(203.209, 9.550, 53.663),
+			Vector(204.931, 9.550, 62.290), Vector(210.872, 9.550, 55.910), Vector(207.601, 9.750, 47.870), Vector(209.276, 10.697,
+			45.163), Vector(211.332, 11.727, 45.026), Vector(213.258, 12.688, 45.041), Vector(210.349, 11.260, 45.036), Vector(217.141,
+			13.550, 44.554), Vector(215.016, 13.550, 52.998), Vector(217.008, 13.814, 56.242), Vector(216.892, 14.716, 58.060), Vector(
+			216.745, 15.550, 62.216), Vector(214.764, 15.560, 62.372), Vector(223.665, 14.989, 62.482), Vector(229.119, 14.550, 63.224),
+			Vector(228.918, 13.773, 67.826), Vector(228.830, 12.779, 69.814), Vector(228.748, 11.859, 71.663), Vector(228.508, 10.976,
+			73.441), Vector(229.193, 10.550, 77.073), Vector(229.481, 10.550, 79.828), Vector(229.458, 10.550, 84.764), Vector(234.360,
+			10.547, 85.293), Vector(234.558, 10.548, 100.981), Vector(229.523, 10.548, 100.767), Vector(223.385, 9.754, 77.239), Vector(
+			219.299, 9.550, 76.040), Vector(221.246, 9.550, 73.317), Vector(221.340, 10.212, 66.992), Vector(221.142, 10.550, 62.072),
+			Vector(213.864, 10.005, 61.979), Vector(207.252, 9.550, 66.068), Vector(206.240, 10.026, 76.790), Vector(212.104, 10.550,
+			81.265), Vector(199.507, 10.550, 81.492), Vector(216.446, 9.550, 79.367), Vector(219.506, 9.550, 83.275), Vector(219.030,
+			9.550, 86.863), Vector(191.960, 9.550, 58.438), Vector(191.770, 5.256, 52.061), Vector(178.606, 1.550, 51.661), Vector(180.609,
+			2.397, 51.658), Vector(182.336, 3.253, 51.613), Vector(184.050, 4.102, 51.654), Vector(188.323, 4.550, 52.109), Vector(188.630,
+			4.550, 57.854), Vector(188.621, 3.551, 60.254), Vector(188.574, 2.588, 62.177), Vector(173.409, 8.550, 60.288), Vector(187.945,
+			2.550, 68.770), Vector(193.340, 2.550, 69.092), Vector(193.438, 2.550, 78.102), Vector(196.219, 2.550, 74.925), Vector(196.363,
+			2.550, 81.528), Vector(200.914, 1.860, 81.157), Vector(205.935, 1.590, 79.456), Vector(200.708, 1.967, 74.647), Vector(206.010,
+			1.550, 75.139), Vector(212.140, 2.151, 75.346), Vector(212.110, 2.136, 81.539), Vector(216.401, 2.550, 78.171), Vector(190.544,
+			2.550, 81.919), Vector(186.119, 2.550, 81.256), Vector(186.578, 2.549, 92.772), Vector(184.521, 3.550, 92.791), Vector(185.319,
+			3.172, 92.788), Vector(182.643, 4.528, 92.850), Vector(180.826, 5.432, 92.801), Vector(178.956, 6.364, 92.752), Vector(176.186,
+			6.550, 90.262), Vector(177.560, 6.548, 84.710), Vector(180.619, 7.403, 84.854), Vector(183.866, 7.550, 85.435), Vector(189.141,
+			7.550, 81.204), Vector(185.384, 7.550, 80.633), Vector(182.428, 7.550, 75.704), Vector(179.396, 6.760, 75.464), Vector(183.506,
+			8.073, 70.256), Vector(183.449, 8.821, 68.736), Vector(183.294, 9.550, 66.163), Vector(186.037, 7.550, 72.971), Vector(185.107,
+			7.550, 92.075), Vector(181.491, 7.550, 91.143), Vector(188.025, 7.550, 91.831), Vector(190.697, 8.444, 92.821), Vector(192.510,
+			9.344, 93.259), Vector(195.109, 9.550, 96.085), Vector(187.758, 9.550, 101.841), Vector(185.701, 10.497, 101.971), Vector(
+			181.821, 10.550, 95.374), Vector(176.555, 10.550, 95.228), Vector(179.667, 11.185, 98.164), Vector(179.586, 12.059, 96.424),
+			Vector(179.422, 10.550, 102.347), Vector(192.900, 9.550, 101.052), Vector(193.124, 10.073, 106.739), Vector(193.293, 10.550,
+			111.025), Vector(200.656, 9.995, 110.619), Vector(206.392, 9.550, 110.099), Vector(205.678, 9.578, 101.653), Vector(198.609,
+			9.550, 101.908), Vector(206.237, 10.162, 98.086), Vector(206.313, 10.578, 94.310), Vector(201.897, 10.024, 95.612), Vector(
+			211.410, 9.599, 95.229), Vector(216.555, 9.550, 95.584), Vector(216.007, 9.550, 100.666), Vector(208.923, 9.550, 102.395),
+			Vector(214.115, 9.280, 103.633), Vector(216.028, 8.326, 103.711), Vector(219.548, 7.550, 103.303), Vector(219.611, 6.840,
+			100.293), Vector(219.632, 6.098, 98.789), Vector(219.582, 5.192, 96.965), Vector(219.515, 4.294, 95.161), Vector(218.814,
+			3.550, 90.312), Vector(219.129, 2.843, 85.300), Vector(223.658, 3.550, 90.760), Vector(229.678, 3.550, 84.028), Vector(229.202,
+			3.550, 90.998), Vector(237.729, 3.550, 97.709), Vector(231.138, 3.550, 98.851), Vector(237.772, 4.526, 99.600), Vector(237.829,
+			5.361, 101.286), Vector(237.688, 5.550, 104.457), Vector(230.594, 5.550, 101.970), Vector(223.747, 7.550, 105.024), Vector(
+			226.138, 6.741, 105.305), Vector(227.760, 5.942, 105.419), Vector(229.901, 5.549, 108.035), Vector(232.128, 5.549, 115.054),
+			Vector(237.520, 5.550, 111.630), Vector(226.615, 6.017, 111.567), Vector(223.742, 6.550, 111.945), Vector(221.984, 7.256,
+			112.023), Vector(219.281, 11.550, 108.296), Vector(210.934, 9.550, 111.659), Vector(215.593, 10.560, 92.133), Vector(195.179,
+			18.050, 51.254), Vector(197.193, 18.050, 47.891), Vector(205.591, 18.050, 47.609), Vector(214.514, 18.050, 47.764), Vector(
+			196.439, 18.050, 56.488), Vector(196.305, 18.050, 68.519));
+		Global.B = Array(Vector(229.278, 14.550, 61.237), Vector(196.278, 18.050, 46.983), Vector(166.246, 6.550, 80.989), Vector(206.151,
+			1.550, 77.391), Vector(206.324, 10.550, 84.447), Vector(206.245, 10.550, 89.181), Vector(193.160, 10.550, 116.306));
+	}
+}
+
+rule("Malevento")
+{
+	event
+	{
+		Subroutine;
+		Malevento;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(-14.090, -0.718, -27.178), Vector(0.038, 3.990, 33.812), Vector(0.151, 3.051, 26.027), Vector(
+			-7.491, 3.800, 33.724), Vector(-4.624, 3.805, 33.672), Vector(-2.720, 4.587, 37.623), Vector(1.541, 5.579, 37.948), Vector(
+			4.638, 6.555, 33.698), Vector(2.497, 7.399, 30.176), Vector(-1.586, 8.337, 30.062), Vector(-4.587, 9.304, 34.326), Vector(
+			-3.073, 10.140, 37.909), Vector(0.604, 10.660, 36.908), Vector(0.155, 10.582, 41.979), Vector(5.230, 7.424, 28.314), Vector(
+			6.377, 7.370, 21.910), Vector(4.462, 7.343, 21.311), Vector(5.953, 7.050, 17.248), Vector(3.752, 7.050, 15.568), Vector(6.496,
+			7.050, 9.294), Vector(3.967, 7.050, 9.244), Vector(6.194, 7.050, 3.302), Vector(3.771, 7.843, 3.078), Vector(2.109, 8.652,
+			2.961), Vector(-1.884, 8.769, 3.044), Vector(-3.823, 7.801, 3.148), Vector(-6.672, 7.052, 3.229), Vector(-6.517, 7.052, 8.703),
+			Vector(-4.149, 7.052, 8.916), Vector(-6.194, 6.190, 13.984), Vector(-6.152, 5.131, 16.102), Vector(-6.124, 5.631, 15.146),
+			Vector(-6.167, 4.218, 17.937), Vector(-6.173, 3.552, 21.022), Vector(10.833, 5.050, 22.057), Vector(9.035, 4.203, 22.088),
+			Vector(5.539, 3.552, 21.867), Vector(-0.039, 3.052, 21.716), Vector(-9.105, 3.155, 21.837), Vector(-16.271, 2.550, 22.105),
+			Vector(1.889, 3.552, 14.659), Vector(-2.035, 3.552, 14.653), Vector(0.082, 3.552, 12.158), Vector(-6.075, 3.558, 6.666),
+			Vector(-6.146, 2.721, 5.072), Vector(-0.267, 2.552, 1.100), Vector(6.324, 3.558, 6.933), Vector(6.454, 2.697, 5.024), Vector(
+			6.284, 3.552, 14.833), Vector(6.319, 3.552, 10.097), Vector(2.586, 3.552, 9.611), Vector(0.350, 4.223, 44.966), Vector(-8.354,
+			3.550, 42.340), Vector(7.807, 5.112, 42.091), Vector(12.558, 5.550, 34.945), Vector(7.737, 6.537, 33.635), Vector(13.580,
+			5.050, 26.183), Vector(17.568, 5.050, 27.055), Vector(17.448, 4.696, 21.870), Vector(14.314, 5.050, 21.819), Vector(13.717,
+			5.050, 17.024), Vector(17.943, 4.554, 16.888), Vector(13.267, 4.554, 12.278), Vector(17.872, 4.550, 12.841), Vector(17.009,
+			5.550, 36.473), Vector(25.208, 5.550, 33.997), Vector(24.937, 4.839, 29.909), Vector(21.437, 4.550, 24.741), Vector(21.502,
+			4.550, 16.727), Vector(26.582, 4.550, 25.694), Vector(29.426, 4.550, 20.313), Vector(22.732, 4.550, 19.479), Vector(26.928,
+			5.355, 14.782), Vector(32.602, 5.133, 17.502), Vector(32.325, 4.554, 23.206), Vector(30.454, 4.689, 27.354), Vector(35.180,
+			7.550, 31.604), Vector(32.478, 6.738, 32.173), Vector(30.146, 5.954, 32.681), Vector(37.986, 8.383, 28.668), Vector(39.661,
+			8.550, 24.265), Vector(44.215, 8.550, 25.557), Vector(42.886, 8.550, 21.972), Vector(39.874, 8.550, 19.150), Vector(36.255,
+			8.549, 21.950), Vector(33.424, 9.042, 21.856), Vector(31.914, 9.042, 24.786), Vector(31.727, 9.106, 19.051), Vector(31.406,
+			9.120, 21.873), Vector(45.795, 7.784, 18.394), Vector(47.632, 6.963, 21.426), Vector(47.665, 6.030, 23.288), Vector(45.081,
+			5.207, 25.411), Vector(41.671, 4.550, 25.317), Vector(34.686, 4.550, 21.948), Vector(39.708, 4.550, 18.243), Vector(20.260,
+			10.550, 30.872), Vector(15.669, 10.587, 31.537), Vector(16.924, 10.565, 36.305), Vector(21.550, 10.574, 34.928), Vector(
+			-17.585, 3.549, 45.093), Vector(-19.937, 2.715, 45.019), Vector(-25.918, 1.590, 39.151), Vector(-21.039, 2.149, 44.910),
+			Vector(-26.162, 1.450, 33.626), Vector(-21.513, 2.387, 33.497), Vector(-16.834, 2.550, 27.485), Vector(-12.595, 3.427, 31.101),
+			Vector(-17.453, 3.180, 35.895), Vector(-10.508, 3.550, 35.228), Vector(-20.957, 2.686, 26.231), Vector(-21.458, 3.580, 24.290),
+			Vector(-22.062, 4.550, 22.516), Vector(-22.614, 5.492, 20.732), Vector(-23.558, 5.550, 16.038), Vector(-21.085, 6.242, 15.663),
+			Vector(-14.049, 6.235, 15.315), Vector(-10.097, 5.550, 13.152), Vector(-10.344, 4.577, 10.831), Vector(-10.533, 3.644, 8.955),
+			Vector(-10.674, 2.808, 7.269), Vector(-10.782, 1.870, 5.389), Vector(-10.960, 1.550, 2.919), Vector(-16.229, 1.550, 3.836),
+			Vector(-17.316, 1.550, 11.446), Vector(-17.956, 2.066, 18.226), Vector(-21.655, 1.550, 15.201), Vector(-23.840, 0.767, 15.327),
+			Vector(-27.076, 0.550, 15.025), Vector(-32.986, 0.550, 18.280), Vector(-28.908, 0.882, 30.456), Vector(-27.113, -0.111,
+			11.395), Vector(-31.066, -0.450, 3), Vector(-31.006, -0.991, -2.561), Vector(-24.574, -1.450, -4.783), Vector(-20.689, -0.538,
+			-2.799), Vector(-16.664, 1.536, 0.570), Vector(-18.712, 0.646, -0.708), Vector(-20.044, -0.074, -1.797), Vector(-20.381, 1.550,
+			8.646), Vector(-20.394, 2.341, 6.753), Vector(-20.945, 3.357, 3.609), Vector(-20.648, 3.072, 4.824), Vector(-22.272, 4.331,
+			2.181), Vector(-26.048, 4.560, -1.521), Vector(-27.123, 5.550, 3.736), Vector(-27.078, 5.550, 13.541), Vector(-29.062, 5.609,
+			15.943), Vector(-30.759, 6.300, 20.156), Vector(-35.765, 6.300, 21.677), Vector(-33.843, 6.300, 29.242), Vector(-29.738, 6.300,
+			28.301), Vector(-22.700, 3.867, -8.339), Vector(-17.874, 3.550, -16.907), Vector(-31.173, 4.559, -0.731), Vector(-26.988,
+			4.604, -4.174), Vector(-24.530, 3.560, -11.205), Vector(-21.460, 3.554, -16.410), Vector(-17.065, 3.552, -18.686), Vector(
+			-12.654, 3.604, -16.251), Vector(-11.572, 2.899, -13.658), Vector(-9.387, 2.050, -11.812), Vector(-13.023, 1.550, -5.864),
+			Vector(-10.113, 1.550, -3.849), Vector(-12.578, 1.550, -0.989), Vector(-6.358, 0.872, -5.641), Vector(-3.798, 0.550, -11.395),
+			Vector(-10.711, -0.202, -19.386), Vector(-12.455, -1.158, -20.448), Vector(-15.257, -1.450, -20.960), Vector(-19.946, -1.450,
+			-12.963), Vector(-24.410, -1.451, -15.385), Vector(-26.408, -1.451, -12.370), Vector(-22.294, -1.450, -9.971), Vector(-29.868,
+			-1.450, -7.574), Vector(-19.751, -1.450, -22.537), Vector(-16.686, -1.450, -29.608), Vector(-10.724, -1.484, -32.845), Vector(
+			1.494, -1.950, -30.581), Vector(0.298, -1.001, -26.312), Vector(-1.227, -0.268, -20.541), Vector(-3.441, 0.550, -16.403),
+			Vector(-8.257, 0.550, -16.514), Vector(3.921, 0.550, -12.777), Vector(-0.022, 0.550, -6.456), Vector(-0.096, 1.371, -4.688),
+			Vector(-0.083, 1.922, -1.017), Vector(-4.309, 1.550, -2.870), Vector(5.307, 1.310, -4.808), Vector(7.612, 2.005, -2.376),
+			Vector(11.091, 2.550, -2.526), Vector(11.059, 3.360, -5.290), Vector(11.003, 4.254, -7.088), Vector(9.115, 4.614, -12.208),
+			Vector(11.170, 4.550, -16.724), Vector(8.290, 5.497, -17.482), Vector(6.547, 6.400, -17.989), Vector(-1.456, 6.550, -20.139),
+			Vector(2.866, 6.672, -17.214), Vector(-6.905, 6.657, -19.879), Vector(-11.657, 6.656, -22.963), Vector(-10.674, 6.551,
+			-26.224), Vector(-9.807, 6.657, -30.232), Vector(-5.936, 6.551, -26.747), Vector(-0.055, 6.551, -24.792), Vector(-2.313, 6.551,
+			-29.640), Vector(1.737, 6.551, -30.847), Vector(4.550, 6.551, -27.799), Vector(2.170, 6.668, -32.281), Vector(-4.903, 6.668,
+			-32.627), Vector(6.767, 0.550, -27.636), Vector(9.378, 0.550, -27.503), Vector(7.753, 0.550, -20.193), Vector(13.501, 1.287,
+			-23.709), Vector(15.687, 2.085, -23.548), Vector(17.897, 3.066, -23.025), Vector(22.366, 3.768, -20.344), Vector(22.771, 3.569,
+			-24.496), Vector(27.928, 4.568, -22.613), Vector(30.568, 4.550, -15.952), Vector(24.267, 4.550, -14.815), Vector(13.944, 4.550,
+			-20.116), Vector(19.097, 4.550, -18.987), Vector(15.883, 2.550, -0.273), Vector(23.170, 2.550, -2.324), Vector(22.424, 3.454,
+			-5.915), Vector(21.917, 4.362, -7.667), Vector(21.392, 4.550, -11.735), Vector(27.884, 5.020, -11.747), Vector(28.279, 5.922,
+			-8.688), Vector(28.903, 6.915, -4.602), Vector(32.242, 6.553, -7.713), Vector(23.089, 7.550, -3.372), Vector(24.075, 7.550,
+			-0.145), Vector(25.052, 7.550, 2.870), Vector(29.520, 6.915, 1.323), Vector(29.126, 6.915, -1.570), Vector(20.834, 7.714,
+			3.599), Vector(12.147, 7.786, 3.335), Vector(17.180, 8.068, 5.738), Vector(16.880, 2.744, 4.942), Vector(17.396, 3.487, 7.088),
+			Vector(17.591, 4.249, 9.381), Vector(29.407, 7.183, 6.397), Vector(27.823, 7.550, 12.248), Vector(22.038, 7.562, 12.497),
+			Vector(33.655, 6.915, 4.322), Vector(32.843, 6.486, 11.941), Vector(30.480, 5.604, 14.950), Vector(40.330, 6.919, 8.702),
+			Vector(40.285, 7.552, 13.750), Vector(40.413, 8.550, 17.033));
+		Global.B = Array(Vector(0.125, 4.223, 46.576), Vector(-32.096, -1.274, -5.935), Vector(2.636, -1.955, -34.739), Vector(31.850,
+			6.550, -11.860), Vector(15.263, 2.550, -2.962), Vector(32.460, 5.050, 27.496), Vector(0.025, 3.552, 15.017), Vector(-21.998,
+			2.686, 29.371));
+	}
+}
+
+rule("Petra")
+{
+	event
+	{
+		Subroutine;
+		Petra;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(-40.310, -9.935, -12.146), Vector(-37.432, -8.971, -10.282), Vector(-31.622, -8.039, -5.607),
+			Vector(-39.408, -9.885, -8.516), Vector(-34.772, -9.008, -4.376), Vector(-37.731, -9.883, -3.518), Vector(-35.414, -10.035,
+			2.802), Vector(-35.631, -9.626, -1.550), Vector(-39.939, -10.826, -1.091), Vector(-41.685, -10.694, -5.378), Vector(-36.273,
+			-10.758, 8.969), Vector(-40.280, -10.993, 13.483), Vector(-36.823, -11.182, 17.921), Vector(-26.443, -10.417, 18.332), Vector(
+			-25.899, -10.354, 8.926), Vector(-25.712, -9.540, 2.809), Vector(-25.635, -8.636, -0.839), Vector(-21.187, -7.224, -2.190),
+			Vector(-24.470, -8.129, -2.563), Vector(-26.428, -7.768, -6.247), Vector(-34.100, -8.179, -8.728), Vector(-28.338, -7.773,
+			-9.497), Vector(-25.516, -6.956, -11.135), Vector(-22.999, -6.126, -11.422), Vector(-20.915, -5.194, -11.934), Vector(-13.689,
+			-4.450, -12.388), Vector(-5.855, -4.369, -7.250), Vector(2.137, -4.450, -11.243), Vector(1.831, -2.676, -18.437), Vector(9.753,
+			-4.369, -7.601), Vector(16.795, -4.450, -13.044), Vector(18.848, -3.525, -12.646), Vector(20.275, -2.812, -12.665), Vector(
+			24.038, -2.450, -12.752), Vector(24.572, -2.450, -1.849), Vector(20.929, -1.531, -2.457), Vector(19.515, -0.572, -2.406),
+			Vector(17.320, 0.329, -2.548), Vector(17.075, 1.223, 2.313), Vector(16.838, 1.903, 4.662), Vector(15.053, 1.174, -3.489),
+			Vector(13.312, 2.035, -4.571), Vector(12.333, 2.550, -8.765), Vector(12.342, 2.550, -16.063), Vector(10.199, 1.650, -15.945),
+			Vector(8.551, 0.825, -15.797), Vector(1.726, 0.553, -14.764), Vector(-8.403, 2.550, -16.336), Vector(-6.157, 1.629, -16.385),
+			Vector(-4.558, 0.829, -16.290), Vector(1.744, 2.550, -5.779), Vector(-9.560, 2.550, -8.789), Vector(1.924, 2.550, -10.311),
+			Vector(-16.981, 1.575, -9.520), Vector(-19.751, 1.584, -10.545), Vector(-19.197, 1.590, -14.181), Vector(-22.369, 1.636,
+			-6.669), Vector(-21.636, 1.636, -3.308), Vector(-17.691, 1.550, -1.887), Vector(-20.995, 1.635, -0.631), Vector(-16.437, 1.550,
+			8.633), Vector(-22.372, 1.636, 8.930), Vector(-11.290, 0.821, 8.946), Vector(-9.450, 0.533, 7.124), Vector(-9.082, 0.582,
+			-0.576), Vector(-4.293, 0.852, -0.828), Vector(-7.741, 1.104, 6.010), Vector(-13.354, 1.873, -9.221), Vector(-31.854, -7.470,
+			-1.768), Vector(-32.182, -6.788, 2.354), Vector(-31.037, -5.815, 0.806), Vector(-31.910, -6.016, 5.021), Vector(-29.896,
+			-5.375, 6.854), Vector(-28.507, -5.397, 3.357), Vector(-29.804, -4.382, 8.999), Vector(-29.889, -3.450, 18.125), Vector(
+			-34.061, -3.373, 18.119), Vector(-42.032, -11.349, 19.146), Vector(-25.930, -3.373, 11.836), Vector(-25.864, -4.249, 18.218),
+			Vector(-23.901, -5, 18.791), Vector(-21.522, -5.789, 19.549), Vector(-20.164, -6.672, 20.626), Vector(-18.525, -7.450, 24.664),
+			Vector(-14.046, -7.373, 21.557), Vector(-21.171, -7.423, 28.438), Vector(-17.563, -7.438, 32.411), Vector(-14.580, -7.423,
+			28.666), Vector(-21.914, -7.443, 32.013), Vector(-21.906, -6.481, 33.935), Vector(-21.844, -5.679, 35.541), Vector(-20.408,
+			-5.192, 41.410), Vector(-14.891, -4.895, 36.998), Vector(-19.813, -5.373, 38.321), Vector(-13.113, -4.007, 37.100), Vector(
+			-9.715, -3.450, 37.088), Vector(-9.802, -2.543, 30.186), Vector(-9.836, -1.702, 28.506), Vector(-6.529, -0.715, 26.140),
+			Vector(-4.679, 0.210, 26.072), Vector(-1.317, 0.550, 25.838), Vector(-1.326, 0.550, 34.251), Vector(-8.564, 0.550, 33.992),
+			Vector(5.857, 0.550, 33.489), Vector(5.930, 0.551, 25.655), Vector(2.146, 0.627, 35.528), Vector(2.071, 1.533, 40.270), Vector(
+			6.040, 1.560, 40.040), Vector(-1.951, 1.560, 39.929), Vector(5.837, 0.530, 21.200), Vector(12.864, 0.600, 21.171), Vector(
+			9.984, 0.600, 19.054), Vector(5.082, 0.610, 18.926), Vector(1.789, 0.528, 21.085), Vector(1.955, 1.285, 18.533), Vector(1.912,
+			1.326, 10.172), Vector(3.867, 1.572, 13.754), Vector(0.036, 1.591, 14.230), Vector(-1.418, 0.600, 19.280), Vector(-9.906,
+			0.562, 21.469), Vector(-10.062, 0.629, 24.293), Vector(-9.735, 0.512, 13.720), Vector(-7.411, 0.610, 13.910), Vector(1.985,
+			1.448, 4.506), Vector(0.040, 1.550, 1.450), Vector(4.113, 1.557, 1.261), Vector(1.943, 2.219, -2.337), Vector(-20.355, -10.469,
+			8.939), Vector(-18.129, -9.513, 8.908), Vector(-16.351, -8.624, 8.931), Vector(-11.068, -8.450, 9.302), Vector(-10.904, -8.328,
+			16.912), Vector(-11.560, -7.862, 21.892), Vector(-7.240, -8.830, 22.030), Vector(2.325, -9.450, 21.921), Vector(10.843, -8.779,
+			22.035), Vector(14.149, -8.476, 22.386), Vector(15.356, -8.424, 16.968), Vector(7.281, -8.415, 16.340), Vector(-2.373, -8.390,
+			16.242), Vector(-11.448, -8.191, 0.500), Vector(-4.214, -7.969, 1.533), Vector(3.127, -7.702, 1.923), Vector(9.139, -8.291,
+			2.059), Vector(14.104, -8.053, 2.195), Vector(13.787, -8.230, 7.958), Vector(3.046, -6.741, 0.437), Vector(2.932, -5.833,
+			-0.961), Vector(2.516, -4.863, -2.378), Vector(2.217, -4.450, -4.542), Vector(-0.536, -4.450, -8.217), Vector(5.157, -4.450,
+			-7.955), Vector(24.159, -4.450, 5.652), Vector(20.911, -4.450, 8.706), Vector(17.560, -4.851, 9.021), Vector(23.708, -4.450,
+			12.715), Vector(26.757, -4.450, 9.378), Vector(23.941, -3.459, 1.020), Vector(23.955, -2.680, -0.538), Vector(24.188, -5.177,
+			17.301), Vector(25.989, -6.104, 19.029), Vector(27.763, -7.022, 20.946), Vector(30.396, -7.886, 23.094), Vector(35.362, -8.327,
+			26.424), Vector(35.852, -8.790, 34.121), Vector(29.042, -8.833, 29.148), Vector(30.435, -9.256, 34.986), Vector(25.661, -9.786,
+			36.718), Vector(23.599, -8.937, 29.597), Vector(17.009, -8.827, 27.187), Vector(33.926, -9.163, 38.936), Vector(27.563, -9.883,
+			40.892), Vector(24.261, -10.765, 48.367), Vector(14.508, -11.036, 52.617), Vector(10.562, -11.485, 43.410), Vector(18.206,
+			-10.245, 39.635), Vector(18.745, -8.338, 35.222), Vector(20.551, -9.249, 35.650), Vector(18.030, -9.373, 38.061), Vector(
+			10.552, -11.182, 48.683), Vector(1.177, -10.545, 52.934), Vector(2.932, -9.665, 60.909), Vector(11.960, -10.678, 58.857),
+			Vector(7.208, -10.241, 60.428), Vector(-0.849, -9.559, 55.890), Vector(-2.981, -8.699, 58.390), Vector(-4.765, -7.835, 58.722),
+			Vector(-9.155, -6.912, 59.430), Vector(-11.498, -6.115, 59.803), Vector(-15.222, -5.275, 55.521), Vector(-12.784, -6.161,
+			54.753), Vector(-10.711, -7.042, 54.471), Vector(-8.120, -7.977, 54.215), Vector(-5.856, -8.843, 53.847), Vector(-2.989,
+			-9.753, 53.098), Vector(-20.432, -4.580, 52.673), Vector(-20.605, -4.835, 45.026), Vector(-8.089, -4.946, 43.577), Vector(
+			6.148, -11.748, 42.016), Vector(2.927, -11.361, 47.791), Vector(-1.899, -10.646, 49.896), Vector(-3.220, -11.424, 43.130),
+			Vector(2.007, -11.849, 43.286), Vector(2.248, -11.451, 37), Vector(5.883, -11.447, 37.990), Vector(-1.959, -11.449, 37.831),
+			Vector(2.044, -11.446, 33.515), Vector(1.827, -10.672, 28.443), Vector(1.789, -9.692, 26.485), Vector(18.697, 6.403, 31.743),
+			Vector(22.711, 7.874, 21.387), Vector(23.593, 7.295, 26.206), Vector(23.171, 5.899, 30.811), Vector(16.687, 6.727, 15.423),
+			Vector(14.835, 7.349, 19.784), Vector(10.609, 8.550, 22.939), Vector(3.021, 8.436, 22.883), Vector(-2.741, 9.501, 23.361),
+			Vector(-8.152, 10.137, 23.209), Vector(-6.122, 10.296, 26.646), Vector(5.341, 9.042, 26.919), Vector(0.515, 9.116, 23.711),
+			Vector(-2.423, 9.664, 25.701), Vector(10.276, 8.756, 27.437), Vector(14.244, 8.108, 26.589), Vector(18.029, 7.599, 23.597),
+			Vector(20.351, 6.805, 29.556), Vector(17.156, 7.390, 29.249), Vector(13.487, 8.218, 29.114));
+		Global.B = Array(Vector(-36.119, -10.910, 15.341), Vector(1.956, -4.450, -12.963), Vector(2.009, 2.550, -7.955), Vector(-10.853,
+			0.697, -0.802), Vector(-29.822, -5.464, 0.053), Vector(-15.320, -7.423, 32.105), Vector(2, 0.549, 32.451), Vector(27.978,
+			-4.450, 9.151), Vector(35.718, -8.511, 29.256), Vector(7.287, -11.421, 35.562), Vector(1.979, -8.428, 9.002));
+	}
+}
+
+rule("Kanezaka")
+{
+	event
+	{
+		Subroutine;
+		Kanezaka;
+	}
+
+	actions
+	{
+		Global.Path_Nodes = Array(Vector(2.466, 10.550, 4.273), Vector(10.550, 10.550, -1.450), Vector(10.569, 10.550, 4.546), Vector(
+			6.990, 10.550, 1.223), Vector(12.566, 10.550, 1.669), Vector(9.119, 9.572, 6.050), Vector(7.893, 8.662, 7.395), Vector(6.564,
+			7.696, 8.800), Vector(1.636, 7.550, 10.354), Vector(-1.896, 7.550, 6.635), Vector(-5.246, 7.390, 10.450), Vector(9.204, 9.670,
+			-2.846), Vector(7.987, 8.783, -4.135), Vector(6.852, 7.961, -5.320), Vector(3.924, 7.550, -8.718), Vector(-4.476, 7.550,
+			-7.401), Vector(-4.831, 7.390, -1.426), Vector(-11.239, 7.412, 3.566), Vector(-17.220, 7.400, 6.832), Vector(-20.748, 7.918,
+			6.179), Vector(-22.326, 8.815, 7.031), Vector(-25.070, 9.550, 8.388), Vector(-26.346, 10.299, 6.322), Vector(-27.169, 11.142,
+			4.857), Vector(-28.449, 11.550, 2.356), Vector(-22.379, 11.550, -0.700), Vector(-19.250, 11.550, 3.860), Vector(-23.410,
+			11.550, -2.769), Vector(-18.513, 11.550, -4.080), Vector(-19.945, 11.550, -6.961), Vector(-18.178, 11.550, -11.020), Vector(
+			-18.082, 11.550, -9.382), Vector(-23.199, 12.126, -10.656), Vector(-23.040, 12.093, -8.518), Vector(-26.455, 12.577, -9.681),
+			Vector(-18.429, 7.550, 11.146), Vector(-15.087, 7.553, 17.107), Vector(-7.643, 7.550, 13.765), Vector(-21.772, 7.390, 10.010),
+			Vector(-26.525, 7.390, 13.579), Vector(-26.220, 7.390, 22.049), Vector(-31.748, 7.550, 22.176), Vector(-31.769, 7.390, 25.786),
+			Vector(-26.636, 7.390, 25.940), Vector(-16.385, 7.390, 25.934), Vector(-1.357, 7.390, 16.596), Vector(0.795, 8.338, 19.641),
+			Vector(-0.194, 8.550, 23.076), Vector(-1.859, 9.446, 24.186), Vector(-3.466, 10.357, 25.040), Vector(-5.054, 11.261, 25.908),
+			Vector(-11.071, 11.550, 28.615), Vector(-10.437, 11.550, 34.304), Vector(-5.759, 11.550, 36.537), Vector(-5.908, 10.576,
+			38.683), Vector(-5.946, 9.739, 40.356), Vector(-7.877, 9.431, 44.177), Vector(-9.642, 8.548, 44.143), Vector(-11.624, 7.557,
+			44.143), Vector(-15.903, 7.550, 44.069), Vector(-17.635, 7.550, 40.156), Vector(-19.976, 6.695, 40.270), Vector(-21.807, 5.784,
+			40.245), Vector(-28.843, 5.550, 40.351), Vector(-31.994, 5.550, 40.425), Vector(-31.859, 6.357, 36.717), Vector(-31.909, 7.382,
+			34.669), Vector(-31.875, 6.932, 35.527), Vector(-31.484, 7.390, 32.021), Vector(-21.062, 7.390, 27.365), Vector(-16.431, 7.550,
+			34.260), Vector(-25.641, 7.550, 32.858), Vector(-36.920, 7.550, 33.678), Vector(-37.959, 7.550, 26.901), Vector(-42.603, 7.550,
+			30.658), Vector(-10.668, 11.550, 39.049), Vector(-13.037, 11.579, 39.195), Vector(-8.342, 11.550, 26.240), Vector(-12.512,
+			12.033, 23.564), Vector(-8.986, 12.033, 21.335), Vector(-12.034, 12.050, 19.828), Vector(-19.467, 12.050, 19.216), Vector(
+			-21.621, 12.356, 13.515), Vector(-15.908, 12.702, 16.732), Vector(-26.768, 11.550, 23.992), Vector(-26.721, 11.550, 17.452),
+			Vector(-27.605, 11.550, 21.992), Vector(-35.959, 10.821, 21.832), Vector(-32.015, 11.550, 23.893), Vector(-36.655, 10.472,
+			24.103), Vector(-41.570, 8.516, 24.025), Vector(-37.945, 9.828, 21.865), Vector(-40.584, 9.007, 21.932), Vector(-42.302, 8.148,
+			22.014), Vector(-45.571, 7.550, 22.088), Vector(-45.544, 7.550, 26.038), Vector(-47.431, 8.435, 31.937), Vector(-49.178, 9.303,
+			32.011), Vector(-52.550, 9.550, 32.323), Vector(-48.377, 8.531, 22.271), Vector(-51.870, 9.085, 22.266), Vector(-51.540, 9.550,
+			12.815), Vector(-47.308, 9.550, 9.028), Vector(-51.644, 9.550, 6.172), Vector(-54.577, 9.550, 9.565), Vector(-51.580, 10.432,
+			3.825), Vector(-47.031, 10.550, 3.859), Vector(-48.924, 10.550, -1.523), Vector(-51.100, 10.550, -7.476), Vector(-55.051,
+			10.550, -1.978), Vector(-45.880, 10.550, -6.520), Vector(-43.944, 9.550, -6.491), Vector(-44.769, 10.085, -6.600), Vector(
+			-42.091, 8.730, -6.533), Vector(-40.512, 8.550, -6.254), Vector(-40.501, 7.788, -0.199), Vector(-41.479, 7.550, 9.061), Vector(
+			-45.435, 8.648, 8.889), Vector(-43.555, 7.712, 8.855), Vector(-42.829, 10.586, 4.624), Vector(-33.329, 7.370, 12.946), Vector(
+			-36.091, 7.396, 3.493), Vector(-51.275, 11.479, -9.515), Vector(-51.345, 12.391, -11.342), Vector(-44.818, 12.550, -13.835),
+			Vector(-58.143, 12.550, -14.029), Vector(-57.880, 12.550, -23.176), Vector(-61.077, 13.425, -23.665), Vector(-63.578, 13.550,
+			-27.429), Vector(-60.351, 13.567, -27.580), Vector(-60.351, 13.102, -27.580), Vector(-60.292, 13.032, -31.633), Vector(-57.395,
+			12.550, -30.721), Vector(-57.537, 12.550, -35.992), Vector(-50.395, 12.550, -35.703), Vector(-50.612, 13.483, -33.101), Vector(
+			-51.598, 14.550, -23.455), Vector(-53.948, 13.663, -23.807), Vector(-55.602, 12.836, -23.812), Vector(-50.218, 14.059,
+			-31.943), Vector(-49.032, 14.550, -25.504), Vector(-44.643, 14.550, -22.471), Vector(-44.616, 13.870, -19.212), Vector(-44.528,
+			12.942, -17.350), Vector(-39.398, 12.630, -10.213), Vector(-38.761, 12.640, -11.938), Vector(-35.652, 12.614, -9.933), Vector(
+			-30.128, 12.407, -5.986), Vector(-31.082, 12.441, -13.671), Vector(-31.988, 12.467, -9.798), Vector(-24.762, 11.550, -2.292),
+			Vector(-27.477, 11.255, -2.076), Vector(-32.684, 11.255, 0.951), Vector(-36.939, 7.390, -0.225), Vector(-40.548, 8.550,
+			-13.665), Vector(-38.621, 8.121, -10.044), Vector(-38.642, 8.121, -5.010), Vector(-36.103, 7.390, -6.563), Vector(-35.918,
+			7.390, -14.512), Vector(-37.966, 8.052, -15.430), Vector(-35.711, 7.975, -18.842), Vector(-39.054, 8.550, -20.178), Vector(
+			-34.337, 8.550, -21.940), Vector(-32.524, 9.405, -21.974), Vector(-30.771, 10.277, -21.957), Vector(-29.075, 11.114, -21.936),
+			Vector(-25.536, 11.550, -21.934), Vector(-25.701, 11.550, -17.970), Vector(-20.442, 11.568, -16.080), Vector(-21.077, 11.550,
+			-19.150), Vector(-19.813, 11.550, -27.349), Vector(-34.802, 11.547, -29.554), Vector(-36.687, 11.547, -32.959), Vector(-36.945,
+			11.580, -26.505), Vector(-33.161, 10.955, -33.597), Vector(-31.883, 10.038, -34.925), Vector(-29.862, 9.550, -36.612), Vector(
+			-34.093, 8.851, -37.307), Vector(-37.399, 8.550, -37.294), Vector(-37.810, 8.050, -30.459), Vector(-38.027, 8.552, -24.635),
+			Vector(-26.657, 9.585, -34.454), Vector(-27.246, 9.085, -34.207), Vector(-24.076, 8.550, -33.712), Vector(-23.508, 8.550,
+			-38.789), Vector(-32.399, 8.550, -42.088), Vector(-38.922, 11.617, -30.051), Vector(-42.620, 11.850, -32.318), Vector(-42.570,
+			12.550, -35.872), Vector(-46.716, 12.550, -36.817), Vector(-46.322, 12.550, -42.260), Vector(-39.791, 12.605, -40.673), Vector(
+			-51.966, 12.550, -38.937), Vector(-45.606, 12.550, -48.338), Vector(-43.934, 11.550, -50.178), Vector(-44.615, 12.106,
+			-49.305), Vector(-42.604, 10.698, -51.217), Vector(-40.142, 10.553, -52.543), Vector(-38.317, 9.753, -52.093), Vector(-34.957,
+			8.961, -50.208), Vector(-30.887, 8.550, -45.788), Vector(-38.259, 10.550, -55.238), Vector(-33.689, 10.550, -55.405), Vector(
+			-31.244, 10.573, -50.923), Vector(-29.319, 10.573, -52.598), Vector(-25.966, 10.596, -54.708), Vector(-33.767, 8.550, -46.938),
+			Vector(-34.827, 9.540, -46.345), Vector(-35.589, 10.489, -45.770), Vector(-37.082, 11.120, -43.472), Vector(-28.414, 8.551,
+			-49.368), Vector(-21.397, 8.558, -49.732), Vector(-16.448, 8.560, -54.430), Vector(-13.107, 8.550, -51.433), Vector(-16.551,
+			8.600, -47.964), Vector(-9.669, 8.550, -48.526), Vector(-11.703, 7.722, -46.639), Vector(-13.063, 6.855, -45.527), Vector(
+			-14.923, 6.479, -42.732), Vector(-17.696, 7.166, -39.798), Vector(-19.693, 8.044, -37.541), Vector(-23.345, 6.501, -45.311),
+			Vector(-25.939, 7.177, -45.369), Vector(-27.767, 8.085, -45.398), Vector(-7.087, 9.241, -48.969), Vector(-4.234, 10.071,
+			-48.234), Vector(-1.082, 10.550, -45.908), Vector(-3.721, 11.409, -43.511), Vector(-7.082, 11.550, -40.167), Vector(0.442,
+			11.589, -39.777), Vector(-7.207, 11.589, -47.199), Vector(2.271, 9.963, -43.814), Vector(3.452, 8.984, -39.067), Vector(9.662,
+			9.550, -39.388), Vector(13.063, 9.079, -33.659), Vector(10.214, 8.557, -27.785), Vector(6.791, 8.550, -24.855), Vector(4.107,
+			8.550, -31.048), Vector(2.308, 8.550, -36.516), Vector(0.222, 7.776, -34.858), Vector(-1.259, 6.810, -33.606), Vector(-3.506,
+			6.496, -31.548), Vector(-9.533, 6.478, -38.483), Vector(-6.866, 11.891, -35.489), Vector(-11.858, 11.899, -40.286), Vector(
+			-12.504, 11.561, -34.748), Vector(-7.722, 11.595, -29.491), Vector(-6.979, 11.843, -32.209), Vector(-9.221, 11.594, -30.438),
+			Vector(-10.929, 10.803, -28.223), Vector(-12.156, 9.893, -26.944), Vector(-13.696, 9.550, -25.341), Vector(-11.393, 8.805,
+			-23.182), Vector(-10.106, 7.827, -21.698), Vector(-8.060, 7.550, -20.054), Vector(-5.678, 7.550, -27.936), Vector(-11.253,
+			7.550, -32.937), Vector(-13.752, 7.550, -35.576), Vector(-20.554, 7.550, -29.991), Vector(-22.626, 8.182, -32.236), Vector(
+			-17.697, 7.550, -27.305), Vector(-5.100, 7.108, -30.100), Vector(-1.343, 6.482, -25.781), Vector(-0.735, 7.099, -15.210),
+			Vector(-4.729, 7.550, -13.805), Vector(-13.817, 11.561, -27.541), Vector(-16.645, 11.561, -30.960), Vector(-19.776, 11.591,
+			-33.971), Vector(-15.803, 11.591, -37.863), Vector(-29.204, 11.550, -27.820), Vector(10.154, 8.230, -21.043), Vector(8.669,
+			7.550, -12.955), Vector(3.586, 8.550, -22.077), Vector(3.980, 7.747, -17.124), Vector(3.328, 7.550, -13.300), Vector(1.828,
+			8.600, -26.877), Vector(-4.144, 7.550, -18.894), Vector(-32.142, 7.390, -15.555), Vector(-25.171, 7.390, -13.827), Vector(
+			-24.955, 7.390, -4.782), Vector(-33, 7.390, -1.717), Vector(-29.364, 8.129, -9.741), Vector(-25.021, 7.390, -9.610), Vector(
+			-30.194, 7.719, -5.497), Vector(-20.840, 7.547, -12.878), Vector(-12.679, 7.550, -13.564), Vector(-8.930, 7.550, -16.357),
+			Vector(-44.957, 14.550, -4.038), Vector(-42.656, 14.550, -1.714), Vector(-42.628, 14.560, 1.015), Vector(-44.260, 14.560,
+			3.059));
+		Global.B = Array(Vector(-29.062, 5.550, 44.376), Vector(-4.276, 7.390, 21.022), Vector(-44.016, 10.550, 4.135), Vector(-30.757,
+			12.444, -9.578), Vector(-61.528, 13.550, -27.523), Vector(-9.307, 11.886, -37.850), Vector(-31.352, 10.550, -53.389), Vector(
+			13.697, 7.550, -15.103));
+	}
+}
+
+rule("Gamertags")
+{
+	event
+	{
+		Subroutine;
+		Gamertags;
+	}
+
+	actions
+	{
+		Global.Gamertags = Array(Custom String("Spiderman318"), Custom String("Spiderman423"), Custom String("Hollywoof423"),
+			Custom String("Hollywoof318"), Custom String("Sunpatches"), Custom String("Sunpatches77"), Custom String("Sk366in"),
+			Custom String("Breggers537"), Custom String("GenjiMain2019"), Custom String("BastionMain2021"), Custom String("MercyUWU794"),
+			Custom String("WorkshopGamer2022"), Custom String("Spiderman31807"), Custom String("Hollywoof31807"), Custom String(
+			"MineralMiner2681"), Custom String("CallMeDave2291"), Custom String("GenericDude4378"), Custom String("GirlyGamerXOXO91876"),
+			Custom String("ImBatman"), Custom String("Deadpool"), Custom String("Not_Ur_Friend6719"), Custom String("Comp4Life"),
+			Custom String("Overwatch2_When5456"), Custom String("Jakey_Bakey"), Custom String("The_BarStool45219"), Custom String(
+			"TeamFortressWatch"), Custom String("AI"), Custom String("Robot"), Custom String("Bot"), Custom String(
+			"Artificial Intelligence"), Custom String("Dummy2"), Custom String("Sussy_Baka"), Custom String("Patchie"), Custom String(
+			"OhhhWhoLivesUnderMyBed"), Custom String("Terminater"), Custom String("Prototype C"), Custom String("OilyWater"),
+			Custom String("BlueBlood"), Custom String("FallDude546"), Custom String("KillerMain2022"), Custom String(
+			"Toxic_Friendship_GoBye"), Custom String("Toxic_Waste_Disposal"), Custom String("Toxic_DumpSite"), Custom String(
+			"Xx_Mercy_xX"), Custom String("CallMeDaddy"), Custom String("CallMeMommy"), Custom String("CallMeSus"), Custom String(
+			"CallMe01100010"), Custom String("CallMeAt_18006745210"), Custom String("Stranger_Fans_4"), Custom String(
+			"Idk Im Writing 100 of these?!?!"), Custom String("Send Help Plz"), Custom String("ProNoob69"), Custom String("YuffyDuffy329"),
+			Custom String("Aimbot4You"), Custom String("HackerMan-801"), Custom String("Slenderdude"), Custom String("Iron_Catto"),
+			Custom String("AEG_Rain"), Custom String("Name.EXE"), Custom String("Error 404"), Custom String("Kill.EXE"), Custom String(
+			"EXE-Failed"), Custom String("WasteOfSpace"), Custom String("Tangey_Blue3191"), Custom String("DragonDogma"), Custom String(
+			"PlayStation5Boii"), Custom String("PS4_4_Life"), Custom String("Clash-Royal4319"), Custom String("Ark.Survival.Dino"),
+			Custom String("UnrealEngine5Pog"), Custom String("OW2_Beta_2026"), Custom String("LamarDavis6969"), Custom String(
+			"GamerTag.EXE"), Custom String("FunkeyMonk"), Custom String("CoCo"), Custom String("GabeRed"), Custom String("HelenPeg630"),
+			Custom String("Friendo3464"), Custom String("DoiKnowYou"), Custom String("SurvivorMain2018"), Custom String("Virgo-Cutie2964"),
+			Custom String("Minecrafter-54791"), Custom String("LetsHateThisGame"), Custom String("Humon Disguise"), Custom String(
+			"Disguised AI"), Custom String("UrMomGay666"), Custom String("DemonChild666"), Custom String("Angelic555Transcend"),
+			Custom String("Super.. Hot.."), Custom String("Well Done Gregory!"), Custom String("Meme5481"), Custom String(
+			"PleaseLaugh4700"), Custom String("Tini-TheCat"), Custom String("Kitto-Catto-5471"), Custom String("BoardHouse444"),
+			Custom String("IHaveNoFriends"), Custom String("Rick&Morty-S6?"), Custom String("ItsAFriday6682"), Custom String(
+			"Triple0-Double2-54"), Custom String("IronBaby420"), Custom String("SpiderBastion42307"), Custom String("X_Simp318"),
+			Custom String("YuffBoi2020"), Custom String("BatMan318"), Custom String("FreakVessel22"), Custom String("FunBastion8910"),
+			Custom String("ImFreaky2020"), Custom String("SpiderMuffy8910"), Custom String("NickBoi34768"), Custom String("TimeMan_XX"),
+			Custom String("IronBlue_XX"), Custom String("NickGamer37481"), Custom String("FunFace6969"), Custom String("Its_Bastion555"),
+			Custom String("TheMuffy_XX"), Custom String("TheVessel420"), Custom String("GoodMan001"), Custom String("TheDaddy37481"),
+			Custom String("FreakPatch9910"), Custom String("SunTimes423"), Custom String("X_Gamer42307"), Custom String("FreakMan31423"),
+			Custom String("FreakVessel005"), Custom String("TheFunny999"), Custom String("FunGamer1891"), Custom String("FunMercy0420"),
+			Custom String("GoodMercy666"), Custom String("IronFace37481"), Custom String("Virgo40420"), Custom String("GoodBastion92"),
+			Custom String("CallmeName9910"), Custom String("BatPatch.EXE"), Custom String("Error40442307"), Custom String(
+			"SpiderDaddy31807"), Custom String("GamerMan37481"), Custom String("ErrorBoi37481"), Custom String("GoodLúcio420"),
+			Custom String("AEG_Vessel423"), Custom String("GoodLuffy9910"), Custom String("GamerFreaky_XX"), Custom String("X_Mercy555"),
+			Custom String("Its_Baby999"), Custom String("IronFreaky420"), Custom String("TheLúcio69"), Custom String("SunPatch.EXE"),
+			Custom String("TimePlease6969"), Custom String("VirgoFreaky34768"), Custom String("CallmeMuffy31807"), Custom String(
+			"FiveSimp555"), Custom String("GamerBlue31423"), Custom String("BatDaddy005"), Custom String("ErrorVessel37481"),
+			Custom String("Its_Simp31423"), Custom String("CallmeBastion42307"), Custom String("GoodMercy318"), Custom String(
+			"JauneMuffy.EXE"), Custom String("XX_Tuffy420"), Custom String("ImBaby_X"), Custom String("ErrorBoi31807"), Custom String(
+			"X_Bastion22"), Custom String("DuffyUWU_X"), Custom String("ProUWU_XX"), Custom String("VirgoRain1891"), Custom String(
+			"InsymGamer555"), Custom String("GamerPatch555"), Custom String("Its_Funny_X"), Custom String("FiveLuffy.EXE"), Custom String(
+			"ImUWU2020"), Custom String("IronFunny720"), Custom String("ErrorMuffy420"), Custom String("FiveDaddy005"), Custom String(
+			"TimeMan555"), Custom String("Jaune4048910"), Custom String("VirgoLúcio87431"), Custom String("JauneFunny31807"),
+			Custom String("X_Man.EXE"), Custom String("X_Luffy_X"), Custom String("BuffyBoi42307"), Custom String("X_Muffy6969"),
+			Custom String("XX_Face_XX"), Custom String("IronGenji37481"), Custom String("NickSimp001"), Custom String("BatVessel22"),
+			Custom String("FreakName.EXE"), Custom String("NightBoi6969"), Custom String("XX_Bastion666"), Custom String("GoodLúcio42307"),
+			Custom String("NightMercy_XX"), Custom String("XX_Mommy22"), Custom String("NightBoi9910"), Custom String("InsymBoi0420"),
+			Custom String("GamerMuffy720"), Custom String("YuffTuffy555"), Custom String("YuffMommy92"), Custom String("SpiderSimp555"),
+			Custom String("TheSimp1891"), Custom String("FiveBaby999"), Custom String("VirgoPlease_XX"), Custom String("TimeBlue37481"),
+			Custom String("GoodGamer42307"), Custom String("IronMuffy420"), Custom String("GamerDaddy555"), Custom String("ImBastion720"),
+			Custom String("FunPatch666"), Custom String("CallmeBaby666"), Custom String("TimeMommy420"), Custom String("TimeMan420"),
+			Custom String("ProBaby1891"), Custom String("VirgoGenji22"), Custom String("X_Times1891"), Custom String("YuffSimp31423"),
+			Custom String("RedFace92"), Custom String("YuffBastion31807"), Custom String("VirgoUWU31807"), Custom String("SpiderMuffy78"),
+			Custom String("GamerName0420"), Custom String("IronFace92"), Custom String("GamerFreaky6969"), Custom String("NickMan999"),
+			Custom String("XX_Funny92"), Custom String("Sun404005"), Custom String("DuffyDaddy720"), Custom String("FiveBastion42307"),
+			Custom String("TimeBastion.EXE"), Custom String("NightBastion666"), Custom String("VirgoPlease42307"));
+	}
+}
+
+rule("Hero Set Variables")
+{
+	event
+	{
+		Subroutine;
+		Hero_Variables;
+	}
+
+	actions
+	{
+		Event Player.Can_Change_Arc = True;
+		Event Player.Current_Hero = Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player);
+		Event Player.Primary_Max = Global.Primary_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Primary_Min = Global.Primary_Min[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Secondary_Max = Global.Secondary_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Secondary_Min = Global.Secondary_Min[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Aim_Arc = Global.Primary_Arc[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ability1_Max = Global.Ability1_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Mobility_Distance = Global.Mobility_Distance[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Charging_Time = Global.Charge_Time[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ultimate_Duration = Global.Ultimate_Duration[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Use_Ultimate_Max = Global.Use_Ultimate_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ability1_Min = Global.Ability1_Min[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ability2_Max = Global.Ability2_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ultimate_Health = Global.Ultimate_Health[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ability2_Min = Global.Ability2_Min[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Ultimate_Max = Global.Ultimate_Max[Index Of Array Value(Global.All_Heros, Event Player.Current_Hero)];
+		Event Player.Alternative_Form = Empty Array;
+		Event Player.Offensive = Empty Array;
+		Event Player.Defensive = Empty Array;
+		Event Player.Mobility = Empty Array;
+		Event Player.Healing = Empty Array;
+		Event Player.Secondary_Fire = Empty Array;
+		Event Player.Secondary_Offensive = Empty Array;
+		Event Player.Use_If_Shield = Empty Array;
+		Event Player.Secondary_Defensive = Empty Array;
+		Event Player.Secondary_Healing = Empty Array;
+		Event Player.Hold = Empty Array;
+		Event Player.Confirm = Empty Array;
+		Event Player.Toggle = Empty Array;
+		Event Player.Cooldown = Empty Array;
+		Event Player.Charge = Empty Array;
+		Event Player.Resource = Empty Array;
+		Event Player.Charging = Empty Array;
+		Event Player.Heal_Friendlys = Empty Array;
+		If(Is True For Any(Array(Hero(Brigitte), Hero(Doomfist), Hero(Genji), Hero(Junkrat), Hero(Reinhardt), Hero(Roadhog), Hero(Bastion),
+			Hero(Hanzo), Hero(Winston), Hero(Junker Queen), Hero(Ramattra)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Offensive, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Ana), Hero(Ashe), Hero(Mercy), Hero(Moira), Hero(Orisa), Hero(Reaper), Hero(Sigma), Hero(Zarya)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Defensive, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Cassidy), Hero(Echo), Hero(Soldier: 76), Hero(Tracer), Hero(Widowmaker), Hero(Winston), Hero(
+			Wrecking Ball), Hero(D.Va), Hero(Sombra), Hero(Sojourn)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Mobility, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Ashe), Hero(Cassidy), Hero(D.Va), Hero(Doomfist), Hero(Echo), Hero(Junkrat), Hero(Moira), Hero(
+			Reinhardt), Hero(Sigma), Hero(Widowmaker), Hero(Hanzo), Hero(Zenyatta), Hero(Ana), Hero(Orisa), Hero(Junker Queen), Hero(
+			Ramattra), Hero(Sojourn)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Offensive, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Baptiste), Hero(Genji), Hero(Pharah), Hero(Sombra), Hero(Winston), Hero(Wrecking Ball), Hero(
+			Torbjörn), Hero(Mei), Hero(Doomfist), Hero(Orisa)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Defensive, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Reaper), Hero(Lúcio)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Mobility, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Baptiste), Hero(Mei)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Healing, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Ana), Hero(Roadhog), Hero(Soldier: 76), Hero(Tracer), Hero(Kiriko)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Healing, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Cassidy), Hero(Genji), Hero(Mei), Hero(Roadhog), Hero(Symmetra), Hero(Torbjörn), Hero(Zarya), Hero(
+			Zenyatta), Hero(Kiriko), Hero(Lifeweaver), Hero(Winston)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Secondary_Fire, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Doomfist), Hero(Echo), Hero(Junkrat), Hero(Lúcio), Hero(Soldier: 76), Hero(Sombra), Hero(
+			Junker Queen), Hero(Bastion), Hero(Orisa), Hero(Sojourn)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Secondary_Offensive, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Secondary_Defensive, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Secondary_Healing, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Lúcio)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Confirm, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Bastion), Hero(Mei), Hero(Reaper), Hero(Sombra), Hero(Wrecking Ball), Hero(Hanzo), Hero(Mercy), Hero(
+			D.Va), Hero(Soldier: 76), Hero(Ramattra), Hero(Orisa)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Toggle, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Mei), Hero(Reaper), Hero(Ashe)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Confirm, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Genji), Hero(Moira), Hero(Tracer), Hero(Widowmaker), Hero(Wrecking Ball), Hero(Hanzo), Hero(Mei),
+			Hero(Orisa)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Toggle, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Doomfist), Hero(Sombra), Hero(Symmetra), Hero(Zenyatta), Hero(Lifeweaver), Hero(Winston)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Confirm, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Toggle, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Ultimate));
+		End;
+		If(Is True For Any(Array(Hero(Baptiste), Hero(Cassidy), Hero(Junkrat), Hero(Sigma), Hero(Symmetra), Hero(Lifeweaver), Hero(Orisa)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Confirm, Append To Array, Button(Ultimate));
+		End;
+		If(Is True For Any(Array(Hero(Ramattra)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Toggle, Append To Array, Button(Ultimate));
+		End;
+		If(Is True For All(Array(Hero(Bastion), Hero(Junkrat), Hero(Lúcio), Hero(Soldier: 76), Hero(Symmetra), Hero(Tracer), Hero(
+			Wrecking Ball), Hero(Zenyatta)), Event Player.Current_Hero != Current Array Element));
+			Modify Player Variable(Event Player, Cooldown, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For All(Array(Hero(Bastion), Hero(Brigitte), Hero(Zenyatta)), Event Player.Current_Hero != Current Array Element));
+			Modify Player Variable(Event Player, Cooldown, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Brigitte), Hero(Doomfist), Hero(Echo), Hero(Orisa), Hero(Reinhardt), Hero(Sigma), Hero(Soldier: 76),
+			Hero(Sombra), Hero(Bastion), Hero(Junker Queen)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Cooldown, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Junkrat), Hero(Symmetra), Hero(Tracer)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charge, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(Hero(Brigitte)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charge, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charge, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Resource, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Resource, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(D.Va), Hero(Pharah)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Resource, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charging, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charging, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For Any(Array(Hero(Doomfist), Hero(Sigma), Hero(Symmetra), Hero(Zenyatta), Hero(Winston)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charging, Append To Array, Button(Secondary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Cassidy), Hero(Orisa)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charging, Append To Array, Button(Ultimate));
+		End;
+		If(Is True For Any(Array(Hero(Ashe), Hero(Hanzo)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Charging, Append To Array, Button(Primary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Hanzo)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Primary Fire));
+		End;
+		If(Is True For Any(Array(Hero(Ana), Hero(Ashe), Hero(Baptiste), Hero(Bastion), Hero(Brigitte), Hero(Cassidy), Hero(D.Va), Hero(
+			Moira), Hero(Reinhardt), Hero(Soldier: 76), Hero(Sombra), Hero(Symmetra), Hero(Tracer), Hero(Widowmaker), Hero(Winston), Hero(
+			Wrecking Ball), Hero(Zarya), Hero(Hanzo), Hero(Junker Queen)), Event Player.Current_Hero == Current Array Element));
+			Event Player.Aim_Predict = 0.050;
+		End;
+		If(Is True For Any(Array(Hero(Doomfist), Hero(Echo), Hero(Genji), Hero(Lúcio), Hero(Mei), Hero(Orisa), Hero(Sigma), Hero(Torbjörn),
+			Hero(Zenyatta), Hero(Mercy), Hero(Sojourn), Hero(Ramattra), Hero(Kiriko), Hero(Lifeweaver)),
+			Event Player.Current_Hero == Current Array Element));
+			Event Player.Aim_Predict = 0.225;
+		End;
+		If(Is True For Any(Array(Hero(Pharah), Hero(Junkrat)), Event Player.Current_Hero == Current Array Element));
+			Event Player.Aim_Predict = 0.400;
+		End;
+		If(Is True For Any(Array(Hero(Bastion), Hero(Lúcio), Hero(Wrecking Ball), Hero(Ramattra)),
+			Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Alternative_Form, Append To Array, Button(Ability 1));
+		End;
+		If(Is True For Any(Array(), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Alternative_Form, Append To Array, Button(Ability 2));
+		End;
+		If(Is True For All(Array(Hero(Ashe)), Event Player.Current_Hero != Current Array Element));
+			Modify Player Variable(Event Player, Hold, Append To Array, Button(Primary Fire));
+		End;
+		If(Is True For Any(Array(Hero(D.Va)), Event Player.Current_Hero == Current Array Element));
+			Modify Player Variable(Event Player, Alternative_Form, Append To Array, Custom String("Passive"));
+		End;
+	}
+}
+
+rule("Start AI Facing")
+{
+	event
+	{
+		Subroutine;
+		AI_Start_Facing;
+	}
+
+	actions
+	{
+		If(Global.Aim_Type == 0);
+			Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player),
+				Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS) ? Direction Towards(Eye Position(Event Player),
+				Eye Position(First Of(Event Player.Target_Order))) : Direction From Angles(Horizontal Angle From Direction(Direction Towards(
+				Eye Position(Event Player), Event Player.Pathing_Node)), 0), Is True For Any(Array(Has Status(Event Player, Knocked Down),
+				Has Status(Event Player, Asleep), Has Status(Event Player, Frozen), Has Status(Event Player, Stunned)),
+				Current Array Element == True) ? 0 : (Magnitude Of(Throttle Of(Event Player)) == 0 && !Entity Exists(First Of(
+				Event Player.Target_Order)) ? 0 : Global.Turn_Speed), To World, Direction and Turn Rate);
+		Else If(Global.Aim_Type == 1);
+			Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player),
+				Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS) ? Direction From Angles(
+				Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))
+				+ Velocity Of(First Of(Event Player.Target_Order)) * Event Player.Aim_Predict * (Distance Between(Event Player, First Of(
+				Event Player.Target_Order)) / 10))), Vertical Angle From Direction(Direction Towards(Eye Position(Event Player), Eye Position(
+				First Of(Event Player.Target_Order))))) : Direction From Angles(Horizontal Angle From Direction(Direction Towards(Eye Position(
+				Event Player), Event Player.Pathing_Node)), 0), Is True For Any(Array(Has Status(Event Player, Knocked Down), Has Status(
+				Event Player, Asleep), Has Status(Event Player, Frozen), Has Status(Event Player, Stunned)), Current Array Element == True)
+				? 0 : (Magnitude Of(Throttle Of(Event Player)) == 0 && !Entity Exists(First Of(Event Player.Target_Order))
+				? 0 : Global.Turn_Speed), To World, Direction and Turn Rate);
+		Else If(Global.Aim_Type == 2);
+			Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player),
+				Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS) ? Direction From Angles(
+				Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player), Eye Position(First Of(
+				Event Player.Target_Order)))), Vertical Angle From Direction(Direction Towards(Eye Position(Event Player),
+				Event Player.Aim_Arc > 0 ? First Of(Event Player.Target_Order) : Eye Position(First Of(Event Player.Target_Order))))
+				+ Distance Between(Event Player, First Of(Event Player.Target_Order)) * Event Player.Aim_Arc * -1) : Direction From Angles(
+				Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player), Event Player.Pathing_Node)), 0), Is True For Any(
+				Array(Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player, Frozen), Has Status(
+				Event Player, Stunned)), Current Array Element == True) ? 0 : (Magnitude Of(Throttle Of(Event Player)) == 0 && !Entity Exists(
+				First Of(Event Player.Target_Order)) ? 0 : Global.Turn_Speed), To World, Direction and Turn Rate);
+		Else;
+			Start Facing(Event Player, Entity Exists(First Of(Event Player.Target_Order)) && Is In Line of Sight(Eye Position(Event Player),
+				Eye Position(First Of(Event Player.Target_Order)), Barriers Do Not Block LOS) ? Direction From Angles(
+				Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player), Eye Position(First Of(Event Player.Target_Order))
+				+ Velocity Of(First Of(Event Player.Target_Order)) * Event Player.Aim_Predict * (Distance Between(Event Player, First Of(
+				Event Player.Target_Order)) / 10))), Vertical Angle From Direction(Direction Towards(Eye Position(Event Player),
+				Event Player.Aim_Arc > 0 ? First Of(Event Player.Target_Order) : Eye Position(First Of(Event Player.Target_Order))))
+				+ Distance Between(Event Player, First Of(Event Player.Target_Order)) * Event Player.Aim_Arc * -1) : Direction From Angles(
+				Horizontal Angle From Direction(Direction Towards(Eye Position(Event Player), Event Player.Pathing_Node)), 0), Is True For Any(
+				Array(Has Status(Event Player, Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player, Frozen), Has Status(
+				Event Player, Stunned)), Current Array Element == True) ? 0 : (Magnitude Of(Throttle Of(Event Player)) == 0 && !Entity Exists(
+				First Of(Event Player.Target_Order)) ? 0 : Global.Turn_Speed), To World, Direction and Turn Rate);
+		End;
+	}
+}
+
+rule("Difficulty")
+{
+	event
+	{
+		Subroutine;
+		Difficulty;
+	}
+
+	actions
+	{
+		If(Global.Difficulty == 1);
+			Global.Aim_Type = 0;
+			Global.Invisible_Targeting = 3;
+			Global.Targeting_Type = 0;
+			Global.Turn_Speed = 100;
+			Global.Can_Hear = False;
+			Global.Complex_Abilitys = False;
+			Global.Ignore_Abilitys = True;
+		Else If(Global.Difficulty == 2);
+			Global.Aim_Type = 2;
+			Global.Invisible_Targeting = 1;
+			Global.Targeting_Type = 1;
+			Global.Turn_Speed = 225;
+			Global.Can_Hear = False;
+			Global.Complex_Abilitys = False;
+			Global.Ignore_Abilitys = True;
+		Else If(Global.Difficulty == 2);
+			Global.Aim_Type = 3;
+			Global.Invisible_Targeting = 0;
+			Global.Targeting_Type = 3;
+			Global.Turn_Speed = 320;
+			Global.Can_Hear = True;
+			Global.Complex_Abilitys = True;
+			Global.Ignore_Abilitys = False;
+		End;
+	}
+}
+
+disabled rule("----------------------------------- Subroutine ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+disabled rule("----------------------------------- Infection ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Start Round")
+{
+	event
+	{
+		Subroutine;
+		New_Round;
+	}
+
+	actions
+	{
+		Global.Round_Starting = True;
+		Wait(0.150, Ignore Condition);
+		Go To Assemble Heroes;
+		Set Match Time(Workshop Setting Integer(Custom String("Game"), Custom String("Assemble Time"), 5, 0, 30, 1) + 5);
+		Set Player Allowed Heroes(All Players(All Teams), Global.Hero_Pool);
+		All Players(All Teams).Randomise_Hero = True;
+		Global.Living_Heros = Empty Array;
+		Wait(15, Ignore Condition);
+		Global.Round_Starting = False;
+	}
+}
+
+rule("Finish Round")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Global.Living_Heros) == 1;
+		Count Of(Filtered Array(All Players(All Teams), Has Spawned(Current Array Element))) > 4;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Wait(1, Abort When False);
+		Global.Round += 1;
+		Big Message(All Players(All Teams), Custom String("{0} {1} WINS - {2}", Hero Icon String(First Of(Global.Living_Heros)), First Of(
+			Global.Living_Heros), Count Of(Global.Hero_Pool) <= 2 || Global.Round > Global.Max_Rounds ? Custom String("Game Over")
+			: Custom String("Next Round")));
+		Modify Player Score(Filtered Array(All Players(All Teams), Current Array Element.Orgin_Hero == First Of(Global.Living_Heros)), 1);
+		Wait(2.500, Ignore Condition);
+		Modify Global Variable(Hero_Pool, Remove From Array By Value, First Of(Global.Living_Heros));
+		If(Count Of(Global.Hero_Pool) <= 2 || Global.Round > Global.Max_Rounds);
+			Global.Heighest_Score = Last Of(Sorted Array(All Players(All Teams), Score Of(Current Array Element)));
+			Declare Player Victory(Last Of(Sorted Array(Filtered Array(All Players(All Teams), Score Of(Current Array Element) == Score Of(
+				Global.Heighest_Score)), Player Stat(Current Array Element, Eliminations) / (Player Stat(Current Array Element, Deaths)
+				+ 1))));
+		Else;
+			Start Rule(New_Round, Restart Rule);
+		End;
+	}
+}
+
+rule("Setup New Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Chase Player Variable At Rate(Event Player, Ultimate_Points, Event Player.Ultimate_Cost, Is Using Ultimate(Event Player) ? 0 : 5,
+			Destination and Rate);
+		Skip If(Is Dummy Bot(Event Player), 2);
+		Create HUD Text(Event Player, Null, Custom String("Ultimate Points {0}", Round To Integer(Event Player.Ultimate_Points, Down)),
+			Custom String("Kill Death Ratio {0}", Player Stat(Event Player, Eliminations) / (Player Stat(Event Player, Deaths) + 1)),
+			Right, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Event Player, Null, Event Player.Orgin_Hero != Null ? Custom String("Orgin {0} {1}", Hero Icon String(
+			Event Player.Orgin_Hero), Array Contains(Global.Living_Heros, Event Player.Orgin_Hero) ? Custom String("Alive")
+			: Custom String("Eliminated")) : Custom String(""), Custom String("Team {0} {1}", Hero Icon String(Hero Of(Event Player)),
+			Count Of(Players On Hero(Hero Of(Event Player), All Teams))), Top, 0, Color(White), Color(White), Color(White),
+			Visible To and String, Default Visibility);
+		Create Icon(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) != Hero Of(Event Player)
+			&& Global.Is_Final_3 && !Is In Line of Sight(Eye Position(Current Array Element), Eye Position(Event Player),
+			Barriers Do Not Block LOS)), Event Player, Arrow: Down, Visible To and Position, Color(Red), True);
+		Set Player Allowed Heroes(All Players(All Teams),
+			Is Game In Progress && !Global.Round_Starting ? Global.Living_Heros : Global.Hero_Pool);
+		Start Damage Modification(Players On Hero(Hero Of(Event Player), All Teams), Players On Hero(Hero Of(Event Player), All Teams), 0,
+			Receivers and Damagers);
+		While(True);
+			Wait Until(Event Player.Randomise_Hero, 99999);
+			Start Forcing Player To Be Hero(Event Player, Random Value In Array(Global.Hero_Pool));
+			Stop Forcing Player To Be Hero(Event Player);
+			Event Player.Hero = Random Value In Array(Global.Hero_Pool);
+			Event Player.Randomise_Hero = False;
+		End;
+	}
+}
+
+rule("Convert Player")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Converted_To = Hero Of(Attacker);
+		Wait(1, Ignore Condition);
+		Event Player.Ultimate_Cost = Global.Ultimate_Cost[Index Of Array Value(Global.All_Heros, Event Player.Converted_To)];
+		Event Player.Ultimate_Points = Min(Event Player.Ultimate_Cost, Event Player.Ultimate_Points * (
+			Global.Retain_Points_Converted / 100));
+		Skip If(!Event Was Environment, 1);
+		Teleport(Victim, Nearest Walkable Position(Victim));
+		Start Forcing Player To Be Hero(Event Player, Event Player.Converted_To);
+		Stop Forcing Player To Be Hero(Event Player);
+		If(Is Dummy Bot(Event Player));
+			Event Player.Hero = Event Player.Converted_To;
+			Event Player.Walk_To_Max = Min(Event Player.Primary_Max - Event Player.Primary_Max / 2,
+				Event Player.Secondary_Max - Event Player.Secondary_Max / 2);
+			Event Player.Walk_To_Min = Min(Event Player.Primary_Min - Event Player.Primary_Min / 2, Min(
+				Event Player.Secondary_Min - Event Player.Secondary_Min / 2, 3.500));
+			Victim.Target_Order = Empty Array;
+			Victim.Pathing_Location = Null;
+			Call Subroutine(Hero_Variables);
+			Call Subroutine(AI_Start_Facing);
+		End;
+		Start Rule(Update_Leaderboard, Restart Rule);
+		Attacker.Target_Order = Empty Array;
+		Attacker.Pathing_Location = Position Of(Attacker);
+	}
+}
+
+rule("Prevent Friendly Fire")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Victim) == Hero Of(Attacker);
+	}
+
+	actions
+	{
+		Set Player Health(Victim, Health(Victim) + Event Damage);
+	}
+}
+
+rule("Prevent Friendly Kills (Enviornment)")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Victim) == Hero Of(Attacker);
+		Attacker != Victim;
+		Event Was Environment == True;
+	}
+
+	actions
+	{
+		Teleport(Victim, Nearest Walkable Position(Victim));
+		Resurrect(Victim);
+		Set Player Health(Victim, Event Damage);
+	}
+}
+
+rule("Walk Through Friendlys")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(Remove From Array(Players On Hero(Hero Of(Event Player), All Teams), Event Player), Distance Between(Event Player,
+			Current Array Element) < 2) == True;
+		Workshop Setting Toggle(Custom String("Game"), Custom String("Disable Collision With Friendlys"), True, 0) == True;
+	}
+
+	actions
+	{
+		Disable Movement Collision With Players(Event Player);
+		Wait Until(Is True For All(Remove From Array(Players On Hero(Hero Of(Event Player), All Teams), Event Player), Distance Between(
+			Event Player, Current Array Element) > 2), 99999);
+		Enable Movement Collision With Players(Event Player);
+	}
+}
+
+rule("Setup Player On Spawn")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Rule(Update_Leaderboard, Do Nothing);
+		Event Player.Orgin_Hero = Is Game In Progress && !Global.Round_Starting ? Null : (Is Dummy Bot(Event Player)
+			? Event Player.Hero : Hero Of(Event Player));
+		Event Player.Ultimate_Cost = Global.Ultimate_Cost[Index Of Array Value(Global.All_Heros, Event Player.Orgin_Hero)];
+		Event Player.Ultimate_Points = Min(Event Player.Ultimate_Cost, Event Player.Ultimate_Points * (
+			Global.Retain_Points_New_Round / 100));
+		Abort If(Distance Between(Event Player, Closest Player To(Event Player, All Teams)) > 4);
+		Wait(Random Real(0, 2), Ignore Condition);
+		Abort If(Distance Between(Event Player, Closest Player To(Event Player, All Teams)) > 4);
+		Teleport(Event Player, Random Value In Array(Filtered Array(Spawn Points(All Teams), Distance Between(Current Array Element,
+			Closest Player To(Current Array Element, All Teams)) > 4)));
+	}
+}
+
+rule("Prevent Bot Not Spawning")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) != True;
+	}
+
+	actions
+	{
+		Wait(1, Abort When False);
+		Event Player.Hero = Random Value In Array(Global.Round_Starting ? Remove From Array(Global.Hero_Pool, Global.Living_Heros)
+			: Global.Living_Heros);
+		Start Forcing Player To Be Hero(Event Player, Event Player.Hero);
+	}
+}
+
+rule("AI Hero Unadvailable")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Array Contains(Global.Hero_Pool, Event Player.Hero) != True;
+	}
+
+	actions
+	{
+		Event Player.Hero = Random Value In Array(Global.Round_Starting ? Remove From Array(Global.Hero_Pool, Global.Living_Heros)
+			: Global.Living_Heros);
+		Start Forcing Player To Be Hero(Event Player, Event Player.Hero);
+		Event Player.Walk_To_Max = Min(Event Player.Primary_Max - Event Player.Primary_Max / 2,
+			Event Player.Secondary_Max - Event Player.Secondary_Max / 2);
+		Event Player.Walk_To_Min = Min(Event Player.Primary_Min - Event Player.Primary_Min / 2, Min(
+			Event Player.Secondary_Min - Event Player.Secondary_Min / 2, 3.500));
+		Event Player.Target_Order = Empty Array;
+		Event Player.Pathing_Location = Position Of(Event Player);
+		Call Subroutine(Hero_Variables);
+		Call Subroutine(AI_Start_Facing);
+		Call Subroutine(Update_Leaderboard);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Fix Current Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Hero Of(Event Player) != Event Player.Hero;
+	}
+
+	actions
+	{
+		Start Forcing Player To Be Hero(Event Player, Event Player.Hero);
+		Call Subroutine(Hero_Variables);
+		Call Subroutine(Update_Leaderboard);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Update Leaderboard")
+{
+	event
+	{
+		Subroutine;
+		Update_Leaderboard;
+	}
+
+	actions
+	{
+		Abort If(!Is Game In Progress);
+		Global.Temp_Leaderboard = Empty Array;
+		Modify Global Variable(Temp_Leaderboard, Append To Array, Sorted Array(All Heroes, Count Of(Players On Hero(Current Array Element,
+			All Teams)) * (0 - 1))[0]);
+		Modify Global Variable(Temp_Leaderboard, Append To Array, Sorted Array(All Heroes, Count Of(Players On Hero(Current Array Element,
+			All Teams)) * (0 - 1))[1]);
+		Modify Global Variable(Temp_Leaderboard, Append To Array, Sorted Array(All Heroes, Count Of(Players On Hero(Current Array Element,
+			All Teams)) * (0 - 1))[2]);
+		Global.Leaderboard = Global.Temp_Leaderboard;
+		Call Subroutine(Update_Living);
+		Skip If(Global.Round_Starting, 1);
+		Set Player Allowed Heroes(Filtered Array(All Players(All Teams), !Has Spawned(Current Array Element)), Global.Living_Heros);
+		If(Count Of(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) != First Of(Global.Leaderboard))) <= 3);
+			Global.Is_Final_3 = True;
+		Else;
+			Global.Is_Final_3 = False;
+		End;
+	}
+}
+
+rule("Update Living Heros")
+{
+	event
+	{
+		Subroutine;
+		Update_Living;
+	}
+
+	actions
+	{
+		Global.Temp_Living = Global.Living_Heros;
+		Global.Living_Heros = Filtered Array(All Heroes, Count Of(Players On Hero(Current Array Element, All Teams)) > 0);
+		Abort If(Global.Round_Starting);
+		If(Count Of(Global.Temp_Living) > Count Of(Global.Living_Heros));
+			Global.Died = First Of(Remove From Array(Global.Temp_Living, Global.Living_Heros));
+			Small Message(All Players(All Teams), Custom String("{0}{1} Eliminated", Hero Icon String(Global.Died), Global.Died));
+		End;
+	}
+}
+
+rule("Adaptive Shield Ingore Friendlys")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Damage(Event Player, Null, (Count Of(Filtered Array(Players Within Radius(Event Player, 10, All Teams,
+			Surfaces And Enemy Barriers), Hero Of(Current Array Element) == Hero Of(Event Player) && Is Alive(Current Array Element)))
+			- Count Of(Filtered Array(Players Within Radius(Event Player, 10, All Teams, Surfaces And Enemy Barriers), Hero Of(
+			Current Array Element) != Hero Of(Event Player) && Is Alive(Current Array Element)))) * 100);
+	}
+}
+
+rule("Reset Ultimate Points - Used Ultimate")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Ultimate_Points = 0;
+	}
+}
+
+rule("Get Ultimate - Damge Dealt")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) != True;
+		Event Player.Ultimate_Points < Event Player.Ultimate_Cost;
+		Hero Of(Attacker) != Hero Of(Victim);
+	}
+
+	actions
+	{
+		Event Player.Ultimate_Points += Min(Event Damage, Event Player.Ultimate_Cost - Event Player.Ultimate_Points);
+	}
+}
+
+rule("Get Ultimate - Healing Dealt")
+{
+	event
+	{
+		Player Dealt Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) != True;
+		Event Player.Ultimate_Points < Event Player.Ultimate_Cost;
+	}
+
+	actions
+	{
+		Event Player.Ultimate_Points += Min(Event Healing, Event Player.Ultimate_Cost - Event Player.Ultimate_Points);
+	}
+}
+
+rule("Update Ultimate Charge")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Ultimate Charge Percent(Event Player) != Event Player.Ultimate_Points / (Event Player.Ultimate_Cost / 100);
+	}
+
+	actions
+	{
+		Set Ultimate Charge(Event Player, Event Player.Ultimate_Points / (Event Player.Ultimate_Cost / 100));
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("----------------------------------- Infection ------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
