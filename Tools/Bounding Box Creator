@@ -1,0 +1,480 @@
+settings
+{
+	main
+	{
+		Description: "Comes will all 39 heros (current hero amount)\npre-done + has baby D.Va bounding box as well\n\nHowever the reason you would be here is most\nlikey to edit said bounding boxs."
+		Mode Name: "Bounding Box Tool - JCJWS"
+	}
+
+	lobby
+	{
+		Max Team 1 Players: 1
+		Max Team 2 Players: 0
+	}
+
+	modes
+	{
+		disabled Assault
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Bounty Hunter
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Capture the Flag
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Deathmatch
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Elimination
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Lúcioball
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Practice Range
+		{
+			Game Mode Start: Immediately
+		}
+
+		Skirmish
+		{
+			Game Mode Start: Immediately
+
+			disabled maps
+			{
+				Blizzard World
+				Runasapi
+			}
+		}
+
+		disabled Team Deathmatch
+		{
+			Game Mode Start: Immediately
+		}
+
+		disabled Winston's Beach Volleyball
+		{
+			Game Mode Start: Immediately
+		}
+
+		General
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			D.Va
+			{
+				Spawn With Ultimate Ready: On
+			}
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: All_Heros
+		1: Dimenions
+
+	player:
+		0: Dimenions
+		1: Change_Vector
+		2: Change_Corner
+		3: Update
+}
+
+rule("Display")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[0], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[0], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[2], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[1], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[2], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[3], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[3], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[2], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[5], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[4], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[6], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[5], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[6], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[6], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[1], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[0], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[7], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Grapple Beam, World Vector Of(Event Player.Dimenions[5], Event Player,
+			Rotation And Translation), World Vector Of(Event Player.Dimenions[4], Event Player, Rotation And Translation), Color(White),
+			Visible To Position and Radius);
+	}
+}
+
+rule("Change Vector")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ability 2)) == True;
+	}
+
+	actions
+	{
+		If(Event Player.Change_Vector == Custom String("X"));
+			Event Player.Change_Vector = Custom String("Y");
+		Else If(Event Player.Change_Vector == Custom String("Y"));
+			Event Player.Change_Vector = Custom String("Z");
+		Else;
+			Event Player.Change_Vector = Custom String("X");
+		End;
+		Wait(0.100, Ignore Condition);
+	}
+}
+
+rule("Change Corner")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ability 1)) == True;
+	}
+
+	actions
+	{
+		If(Event Player.Change_Corner >= 7);
+			Event Player.Change_Corner = 0;
+		Else;
+			Event Player.Change_Corner += 1;
+		End;
+		Wait(0.100, Ignore Condition);
+	}
+}
+
+rule("Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, Custom String("{1}, {0}", Event Player.Change_Corner, Event Player.Change_Vector), Null, Null, Left,
+			0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Event Player.Change_Vector = Custom String("X");
+		Create HUD Text(Event Player, Custom String("{0}, Change Vector", Input Binding String(Button(Ability 2))), Null, Null, Left, 0,
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("{0}, Change Index", Input Binding String(Button(Ability 1))), Null, Null, Left, 0,
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("{0}, Modify+ Corner", Input Binding String(Button(Primary Fire))), Null, Null, Left,
+			0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("{0}, Modify- Corner", Input Binding String(Button(Secondary Fire))), Null, Null, Left,
+			0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Event Player.Dimenions = Array(Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0,
+			0), Vector(0, 0, 0), Vector(0, 0, 0));
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Create HUD Text(Event Player, Custom String("{0}, Save Hero\n{1}, Load Hero (for you and dummy)\n{2}, Spawn Dummy",
+			Input Binding String(Button(Interact)), Input Binding String(Button(Reload)), Input Binding String(Button(Melee))), Null, Null,
+			Top, -1, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("Corner {0}, {1}, {2}", X Component Of(
+			Event Player.Dimenions[Event Player.Change_Corner]), Y Component Of(Event Player.Dimenions[Event Player.Change_Corner]),
+			Z Component Of(Event Player.Dimenions[Event Player.Change_Corner])), Null, Null, Right, 0, Color(White), Color(White), Color(
+			White), Visible To and String, Default Visibility);
+	}
+}
+
+rule("Modify+ Corner")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Primary Fire)) == True;
+	}
+
+	actions
+	{
+		Event Player.Update = Event Player.Dimenions[Event Player.Change_Corner];
+		If(Event Player.Change_Vector == Custom String("X"));
+			Event Player.Update = Vector(X Component Of(Event Player.Update) + 0.010, Y Component Of(Event Player.Update), Z Component Of(
+				Event Player.Update));
+		Else If(Event Player.Change_Vector == Custom String("Y"));
+			Event Player.Update = Vector(X Component Of(Event Player.Update), Y Component Of(Event Player.Update) + 0.010, Z Component Of(
+				Event Player.Update));
+		Else;
+			Event Player.Update = Vector(X Component Of(Event Player.Update), Y Component Of(Event Player.Update), Z Component Of(
+				Event Player.Update) + 0.010);
+		End;
+		Event Player.Dimenions[Event Player.Change_Corner] = Event Player.Update;
+		Wait(0.100, Ignore Condition);
+	}
+}
+
+rule("Modify- Corner")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Secondary Fire)) == True;
+	}
+
+	actions
+	{
+		Event Player.Update = Event Player.Dimenions[Event Player.Change_Corner];
+		If(Event Player.Change_Vector == Custom String("X"));
+			Event Player.Update = Vector(X Component Of(Event Player.Update) - 0.010, Y Component Of(Event Player.Update), Z Component Of(
+				Event Player.Update));
+		Else If(Event Player.Change_Vector == Custom String("Y"));
+			Event Player.Update = Vector(X Component Of(Event Player.Update), Y Component Of(Event Player.Update) - 0.010, Z Component Of(
+				Event Player.Update));
+		Else;
+			Event Player.Update = Vector(X Component Of(Event Player.Update), Y Component Of(Event Player.Update), Z Component Of(
+				Event Player.Update) - 0.010);
+		End;
+		Event Player.Dimenions[Event Player.Change_Corner] = Event Player.Update;
+		Wait(0.100, Ignore Condition);
+	}
+}
+
+rule("Save Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Global.Dimenions[Index Of Array Value(Global.All_Heros, Hero Of(Event Player))] = Event Player.Dimenions;
+	}
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.All_Heros = Array(Hero(Reaper), Hero(Tracer), Hero(Mercy), Hero(Hanzo), Hero(Torbjörn), Hero(Reinhardt), Hero(Pharah), Hero(
+			Winston), Hero(Widowmaker), Hero(Bastion), Hero(Symmetra), Hero(Zenyatta), Hero(Genji), Hero(Roadhog), Hero(Cassidy), Hero(
+			Junkrat), Hero(Zarya), Hero(Soldier: 76), Hero(Lúcio), Hero(D.Va), Hero(Mei), Hero(Sombra), Hero(Doomfist), Hero(Ana), Hero(
+			Orisa), Hero(Brigitte), Hero(Moira), Hero(Wrecking Ball), Hero(Sojourn), Hero(Ashe), Hero(Echo), Hero(Baptiste), Hero(Kiriko),
+			Hero(Junker Queen), Hero(Sigma), Hero(Ramattra), Hero(Lifeweaver), Hero(Illari), Hero(Mauga), Hero(Venture));
+		Global.Dimenions = Array(Array(Vector(0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(-0.800, 0, 0.800), Vector(-0.800, 0,
+			-0.800), Vector(-0.800, 2.350, -0.800), Vector(-0.800, 2.350, 0.800), Vector(0.800, 2.350, -0.800), Vector(0.800, 2.350,
+			0.800)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(
+			-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(
+			0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550),
+			Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550),
+			Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550,
+			2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0,
+			-0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550),
+			Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(
+			-0.800, 0, 0.800), Vector(-0.800, 0, -0.800), Vector(-0.800, 2.550, -0.800), Vector(-0.800, 2.550, 0.800), Vector(0.800, 2.550,
+			-0.800), Vector(0.800, 2.550, 0.800)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550),
+			Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(
+			0.550, 2.050, 0.550)), Array(Vector(0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(-0.800, 0, 0.800), Vector(-0.800, 0,
+			-0.800), Vector(-0.800, 2.550, -0.800), Vector(-0.800, 2.550, 0.800), Vector(0.800, 2.550, -0.800), Vector(0.800, 2.550,
+			0.800)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(
+			-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(
+			0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(-0.800, 0, 0.800), Vector(-0.800, 0, -0.800), Vector(-0.800, 2.400, -0.800),
+			Vector(-0.800, 2.400, 0.800), Vector(0.800, 2.400, -0.800), Vector(0.800, 2.400, 0.800)), Array(Vector(0.550, 0, 0.550),
+			Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550,
+			2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0,
+			-0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550),
+			Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(
+			-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050,
+			-0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(-0.800, 0, 0.800),
+			Vector(-0.800, 0, -0.800), Vector(-0.800, 2.400, -0.800), Vector(-0.800, 2.400, 0.800), Vector(0.800, 2.400, -0.800), Vector(
+			0.800, 2.400, 0.800)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0,
+			-0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050,
+			0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(
+			-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(
+			0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550),
+			Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550),
+			Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550,
+			2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0,
+			-0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550),
+			Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(
+			-0.800, 0, 0.800), Vector(-0.800, 0, -0.800), Vector(-0.800, 2.100, -0.800), Vector(-0.800, 2.100, 0.800), Vector(0.800, 2.100,
+			-0.800), Vector(0.800, 2.100, 0.800)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550),
+			Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(
+			0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0,
+			-0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050,
+			0.550)), Array(Vector(0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(-0.800, 0, 0.800), Vector(-0.800, 0, -0.800), Vector(
+			-0.800, 2.550, -0.800), Vector(-0.800, 2.550, 0.800), Vector(0.800, 2.550, -0.800), Vector(0.800, 2.550, 0.800)), Array(Vector(
+			0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550),
+			Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), 0, Array(Vector(0.550, 0, 0.550),
+			Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550,
+			2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0,
+			-0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550),
+			Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(
+			-0.800, 0, 0.800), Vector(-0.800, 0, -0.800), Vector(-0.800, 2.550, -0.800), Vector(-0.800, 2.550, 0.800), Vector(0.800, 2.550,
+			-0.800), Vector(0.800, 2.550, 0.800)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550),
+			Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(
+			0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0,
+			-0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050,
+			0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(
+			-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(
+			0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550),
+			Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550),
+			Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550,
+			2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0,
+			-0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550),
+			Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(
+			-0.800, 0, 0.800), Vector(-0.800, 0, -0.800), Vector(-0.800, 2.550, -0.800), Vector(-0.800, 2.550, 0.800), Vector(0.800, 2.550,
+			-0.800), Vector(0.800, 2.550, 0.800)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550),
+			Vector(-0.550, 0, -0.550), Vector(-0.550, 2.200, -0.550), Vector(-0.550, 2.200, 0.550), Vector(0.550, 2.200, -0.550), Vector(
+			0.550, 2.200, 0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0,
+			-0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050,
+			0.550)), Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0, -0.550), Vector(
+			-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050, 0.550)), Array(Vector(
+			0.800, 0, 0.800), Vector(0.800, 0, -0.800), Vector(-0.800, 0, 0.800), Vector(-0.800, 0, -0.800), Vector(-0.800, 2.350, -0.800),
+			Vector(-0.800, 2.350, 0.800), Vector(0.800, 2.350, -0.800), Vector(0.800, 2.350, 0.800)), Array(Vector(0.750, 0, 0.750),
+			Vector(0.750, 0, -0.750), Vector(-0.750, 0, 0.750), Vector(-0.750, 0, -0.750), Vector(-0.750, 2.350, -0.750), Vector(-0.750,
+			2.350, 0.750), Vector(0.750, 2.350, -0.750), Vector(0.750, 2.350, 0.750)));
+		Log To Inspector(Custom String("Hero's: {0}\nBox's: {1}", Count Of(Global.All_Heros), Count Of(Global.Dimenions)));
+	}
+}
+
+rule("Load Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Host Player, Button(Reload)) == True;
+	}
+
+	actions
+	{
+		Event Player.Dimenions = Global.Dimenions[Index Of Array Value(Global.All_Heros, Hero Of(Event Player))];
+	}
+}
+
+rule("Create Dummy")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Melee)) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero Of(Event Player), Team Of(Event Player), Slot Of(Event Player) + 1, Position Of(Event Player),
+			Facing Direction Of(Event Player));
+	}
+}
+
+rule("Baby D.Va Dimenions")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		D.Va;
+	}
+
+	conditions
+	{
+		Is In Alternate Form(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Dimenions = Array(Vector(0.550, 0, 0.550), Vector(0.550, 0, -0.550), Vector(-0.550, 0, 0.550), Vector(-0.550, 0,
+			-0.550), Vector(-0.550, 2.050, -0.550), Vector(-0.550, 2.050, 0.550), Vector(0.550, 2.050, -0.550), Vector(0.550, 2.050,
+			0.550));
+	}
+}
