@@ -1,0 +1,269 @@
+settings
+{
+	main
+	{
+		Mode Name: "Lúcio Crossfade"
+	}
+
+	modes
+	{
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+}
+
+variables
+{
+	player:
+		0: Cross_Fade_Stats
+		1: Cross_Fade_Index
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		"Value 2 Is Binding Type, Vaild Strings {Toggle, Default Speed, Default Healing}"
+		Event Player.Cross_Fade_Stats = Array(Custom String("Speed"), True, Custom String("Toggle"), Empty Array, Empty Array,
+			Empty Array);
+		Skip If(Event Player.Cross_Fade_Stats[2] != Custom String("Default Healing"), 1);
+		Event Player.Cross_Fade_Stats[0] = Custom String("Healing");
+		Create Effect(Filtered Array(All Players(All Teams), Event Player.Cross_Fade_Stats[1] == True), Ring,
+			Event Player.Cross_Fade_Stats[0] == Custom String("Speed") ? Color(Green) : Color(Yellow), Ray Cast Hit Position(Position Of(
+			Event Player) + Up, Position Of(Event Player) - Vector(0, 99, 0), Null, Event Player, False) + Up * 0.100, 12,
+			Visible To Position Radius and Color);
+	}
+}
+
+rule("Cross Fade Hacked")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Status(Event Player, Hacked) == True;
+	}
+
+	actions
+	{
+		Event Player.Cross_Fade_Stats[1] = False;
+		Wait(1.500, Ignore Condition);
+		Event Player.Cross_Fade_Stats[1] = True;
+	}
+}
+
+rule("Cross Fade Toggle")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Event Player.Cross_Fade_Stats[1] == True;
+		Event Player.Cross_Fade_Stats[2] == Custom String("Toggle");
+	}
+
+	actions
+	{
+		Wait(0.192, Ignore Condition);
+		Event Player.Cross_Fade_Stats[0] = Event Player.Cross_Fade_Stats[0] == Custom String("Speed") ? Custom String("Healing")
+			: Custom String("Speed");
+		Wait(0.380, Ignore Condition);
+	}
+}
+
+rule("Cross Fade Hold (Default Speed)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Event Player.Cross_Fade_Stats[0] == Custom String("Speed");
+		Event Player.Cross_Fade_Stats[1] == True;
+		Event Player.Cross_Fade_Stats[2] == Custom String("Default Speed");
+	}
+
+	actions
+	{
+		Wait(0.192, Ignore Condition);
+		Event Player.Cross_Fade_Stats[0] = Custom String("Healing");
+		Wait(0.380, Ignore Condition);
+		Wait Until(!Is Button Held(Event Player, Button(Interact)), 99999);
+		Wait(0.192, Ignore Condition);
+		Event Player.Cross_Fade_Stats[0] = Custom String("Speed");
+		Wait(0.380, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Cross Fade Hold (Default Healing)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Event Player.Cross_Fade_Stats[0] == Custom String("Healing");
+		Event Player.Cross_Fade_Stats[1] == True;
+		Event Player.Cross_Fade_Stats[2] == Custom String("Default Healing");
+	}
+
+	actions
+	{
+		Wait(0.192, Ignore Condition);
+		Event Player.Cross_Fade_Stats[0] = Custom String("Speed");
+		Wait(0.380, Ignore Condition);
+		Wait Until(!Is Button Held(Event Player, Button(Interact)), 99999);
+		Wait(0.192, Ignore Condition);
+		Event Player.Cross_Fade_Stats[0] = Custom String("Healing");
+		Wait(0.380, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Cross Fade Targets")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Cross_Fade_Stats[1] == True;
+	}
+
+	actions
+	{
+		Event Player.Cross_Fade_Stats[4] = Players Within Radius(Event Player, 12, Team Of(Event Player), Surfaces And Enemy Barriers);
+		Modify Player Variable At Index(Event Player, Cross_Fade_Stats, 3, Append To Array, Filtered Array(
+			Event Player.Cross_Fade_Stats[4], !Array Contains(Event Player.Cross_Fade_Stats[3], Current Array Element)));
+		Event Player.Cross_Fade_Stats[5] = Empty Array;
+		For Player Variable(Event Player, Cross_Fade_Index, 0, Count Of(Event Player.Cross_Fade_Stats[3]), 1);
+			If(Array Contains(Event Player.Cross_Fade_Stats[4], Event Player.Cross_Fade_Stats[3][Event Player.Cross_Fade_Index]) == True);
+				Modify Player Variable At Index(Event Player, Cross_Fade_Stats, 5, Append To Array, 1);
+			Else;
+				Modify Player Variable At Index(Event Player, Cross_Fade_Stats, 5, Append To Array,
+					Event Player.Cross_Fade_Stats[6][Event Player.Cross_Fade_Index] - 0.100);
+			End;
+		End;
+		Event Player.Cross_Fade_Stats[6] = Event Player.Cross_Fade_Stats[5];
+		Modify Player Variable At Index(Event Player, Cross_Fade_Stats, 3, Remove From Array By Value, Filtered Array(
+			Event Player.Cross_Fade_Stats[3], Event Player.Cross_Fade_Stats[6][Current Array Index] <= 0));
+		Modify Player Variable At Index(Event Player, Cross_Fade_Stats, 6, Remove From Array By Value, Filtered Array(
+			Event Player.Cross_Fade_Stats[6], Current Array Element <= 0));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Cross Fade Speed")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Players(Team Of(Event Player)), Array Contains(Current Array Element.Cross_Fade_Stats[3], Event Player)
+			&& Current Array Element.Cross_Fade_Stats[0] == Custom String("Speed") && Current Array Element.Cross_Fade_Stats[1] == True)
+			== True;
+	}
+
+	actions
+	{
+		Set Move Speed(Event Player, 125);
+		Wait Until(Is True For All(All Players(Team Of(Event Player)), !Array Contains(Current Array Element.Cross_Fade_Stats[3],
+			Event Player) || Current Array Element.Cross_Fade_Stats[0] != Custom String("Speed")
+			|| Current Array Element.Cross_Fade_Stats[1] == False), 99999);
+		Set Move Speed(Event Player, 100);
+	}
+}
+
+rule("Cross Fade Healing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Players(Team Of(Event Player)), Array Contains(Current Array Element.Cross_Fade_Stats[3], Event Player)
+			&& Current Array Element.Cross_Fade_Stats[0] == Custom String("Healing") && Current Array Element.Cross_Fade_Stats[1] == True)
+			== True;
+	}
+
+	actions
+	{
+		While(Is True For Any(All Players(Team Of(Event Player)), Array Contains(Current Array Element.Cross_Fade_Stats[3], Event Player)
+			&& Current Array Element.Cross_Fade_Stats[0] == Custom String("Healing")
+			&& Current Array Element.Cross_Fade_Stats[1] == True));
+			If(First Of(Filtered Array(All Players(Team Of(Event Player)), Array Contains(Current Array Element.Cross_Fade_Stats[3],
+				Event Player) && Current Array Element.Cross_Fade_Stats[0] == Custom String("Healing")
+				&& Current Array Element.Cross_Fade_Stats[1] == True)) == Event Player && Count Of(Filtered Array(All Players(Team Of(
+				Event Player)), Array Contains(Current Array Element.Cross_Fade_Stats[3], Event Player)
+				&& Current Array Element.Cross_Fade_Stats[0] == Custom String("Healing") && Current Array Element.Cross_Fade_Stats[1] == True))
+				== 1);
+				Heal(Event Player, Event Player, 1);
+			Else;
+				Heal(Event Player, Filtered Array(All Players(Team Of(Event Player)), Array Contains(Current Array Element.Cross_Fade_Stats[3],
+					Event Player) && Current Array Element.Cross_Fade_Stats[0] == Custom String("Healing")
+					&& Current Array Element.Cross_Fade_Stats[1] == True), 1.600);
+			End;
+			Wait(0.100, Ignore Condition);
+		End;
+	}
+}
