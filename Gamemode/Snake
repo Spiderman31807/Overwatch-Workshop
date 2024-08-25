@@ -1,0 +1,582 @@
+settings
+{
+	main
+	{
+		Description: "Default Board Size 10x10 (100 Grid Tiles)\nBoard Size Is Rounded To Even Values\n\nThe Max Array Size Is 1000 In Overwatch\nThe Board Will Brake If Size Is Set To Values\nThat Add Up To More Then 1000\n\n32x32 Is 1024, And 31x31 Is 961\n\nSubmit Your Score By Commenting Your Score\nAnd Username (Battletag Number Not Required)\nAt Workshop.Codes/2MQ85Y"
+		Mode Name: "Snake - 2MQ85Y"
+	}
+
+	lobby
+	{
+		Max FFA Players: 1
+		Max Spectators: 0
+	}
+
+	modes
+	{
+		disabled Assault
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Bounty Hunter
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Capture the Flag
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Control
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		Deathmatch
+		{
+			Game Length In Minutes: 15
+			Score To Win: 5000
+			Self Initiated Respawn: Off
+			Tank Role Passive Health Bonus: Disabled
+
+			enabled maps
+			{
+				Workshop Expanse 972777519512063901
+			}
+		}
+
+		disabled Escort
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Hybrid
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Practice Range
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Push
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Skirmish
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		disabled Team Deathmatch
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+
+		General
+		{
+			Allow Hero Switching: Off
+			Enemy Health Bars: Off
+			Game Mode Start: Immediately
+			Hero Limit: Off
+			Kill Cam: Off
+			Kill Feed: Off
+			Limit Roles: 2 Of Each Role Per Team
+			Respawn As Random Hero: On
+			Skins: Off
+			Spawn Health Packs: Disabled
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Ana
+			{
+				Biotic Grenade: Off
+				No Automatic Fire: On
+				No Scope: On
+				Primary Fire: Off
+				Quick Melee: Off
+				Sleep Dart: Off
+				Ultimate Ability Nano Boost: Off
+			}
+
+			enabled heroes
+			{
+				Ana
+			}
+		}
+	}
+
+	workshop
+	{
+		Movement Speed Tiles: 1.000
+	}
+
+	extensions
+	{
+		Beam Effects
+		Beam Sounds
+		Buff Status Effects
+		Debuff Status Effects
+		Buff and Debuff Sounds
+		Energy Explosion Effects
+		Kinetic Explosion Effects
+		Explosion Sounds
+		Play More Effects
+		Spawn More Dummy Bots
+		Projectiles
+	}
+}
+
+variables
+{
+	global:
+		0: Apple_Array
+		1: Board_SizeX
+		2: Board_SizeY
+		3: Grid_Array
+		4: Grid_IndexX
+		5: Grid_IndexY
+		6: Camera_Height
+		7: Apple_Amount
+		8: Snake_Start_Random
+		9: Snake_StartingX
+		10: Snake_StartingY
+		11: Apple_Increase_Amount
+		12: Apple_Increase_Requirement
+		13: Snake_Movement_Speed
+		14: Is_Ready
+		15: Snake_Increase_Requirement
+		16: Board_Edge_Left
+		17: Board_Edge_Right
+		18: High_Score_Array
+		19: Player_Array
+
+	player:
+		0: Snake_Position_Array
+		1: Snake_Direction
+		2: From_Direction
+		3: Move_To_Tile
+		4: Move_Index
+		5: From_Tile_Array
+		6: Apples_Eaten1
+		7: Apples_Eaten2
+}
+
+subroutines
+{
+	0: Create_Apple
+	1: Increase_Snake_Length
+	2: Move_Snake
+	3: Eat_Apple
+	4: Died
+}
+
+rule("Create Board Grid")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Is_Ready = False;
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Please Wait, Board Generating{0}", Array(Custom String(""),
+			Custom String("."), Custom String(".."), Custom String("..."))[Round To Integer(Total Time Elapsed % 4, Down)]), Top, 0, Color(
+			White), Color(White), Color(Black), Visible To and String, Default Visibility);
+		Global.Board_SizeX = Workshop Setting Integer(Custom String("Board"), Custom String("Size Left/Right"), 10, 5, 40, 1);
+		Global.Board_SizeY = Workshop Setting Integer(Custom String("Board"), Custom String("Size Up/Down"), 10, 5, 40, 0);
+		If(Global.Board_SizeX % 2 != 0);
+			Global.Board_SizeX += 1;
+		End;
+		If(Global.Board_SizeY % 2 != 0);
+			Global.Board_SizeY += 1;
+		End;
+		Global.Camera_Height = Max(Global.Board_SizeX * 1.750, Global.Board_SizeY * 3);
+		Create Beam Effect(All Players(All Teams), Bad Beam, First Of(Global.Grid_Array) + Vector(-2, -0.500, -2),
+			Global.Grid_Array[Global.Board_SizeX - 1] + Vector(2, -0.500, -2), Color(Green), Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, Last Of(Global.Grid_Array) + Vector(2, -0.500, 2),
+			Global.Grid_Array[Global.Board_SizeX - 1] + Vector(2, -0.500, -2), Color(Green), Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, Last Of(Global.Grid_Array) + Vector(2, -0.500, 2), Global.Grid_Array[(
+			Global.Board_SizeX - 1) * Global.Board_SizeY] + Vector(-2, -0.500, 2), Color(Green), Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, First Of(Global.Grid_Array) + Vector(-2, -0.500, -2), Global.Grid_Array[(
+			Global.Board_SizeX - 1) * Global.Board_SizeY] + Vector(-2, -0.500, 2), Color(Green), Visible To Position and Radius);
+		Global.Grid_Array = Empty Array;
+		Global.Board_Edge_Left = Empty Array;
+		Global.Board_Edge_Right = Empty Array;
+		For Global Variable(Grid_IndexY, Global.Board_SizeY * -0.500, Global.Board_SizeY * 0.500, 1);
+			For Global Variable(Grid_IndexX, Global.Board_SizeX * -0.500, Global.Board_SizeX * 0.500, 1);
+				Modify Global Variable(Grid_Array, Append To Array, Vector(2 + 4 * Global.Grid_IndexX, 0.500, 2 + 4 * Global.Grid_IndexY));
+				Wait(0.010, Ignore Condition);
+			End;
+		End;
+		For Global Variable(Grid_IndexX, 0, Global.Board_SizeX * Global.Board_SizeY, Global.Board_SizeX);
+			Modify Global Variable(Board_Edge_Right, Append To Array, Global.Grid_Array[Global.Grid_IndexX]);
+			Wait(0.010, Ignore Condition);
+		End;
+		For Global Variable(Grid_IndexX, 0, Count Of(Global.Board_Edge_Right), 1);
+			Modify Global Variable(Board_Edge_Left, Append To Array, Vector(X Component Of(Global.Board_Edge_Right[Global.Grid_IndexX]) * -1,
+				0.500, Z Component Of(Global.Board_Edge_Right[Global.Grid_IndexX])));
+			Wait(0.010, Ignore Condition);
+		End;
+		Destroy All HUD Text;
+		Play Effect(All Players(All Teams), Buff Impact Sound, Color(White), Vector(0, Global.Camera_Height, 0), 75);
+		Call Subroutine(Create_Apple);
+		Global.Is_Ready = True;
+	}
+}
+
+rule("Setup Global")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Apple_Array = Empty Array;
+		Disable Built-In Game Mode Completion;
+		Disable Built-In Game Mode Announcer;
+		Disable Built-In Game Mode Music;
+		Set Match Time(0);
+		Global.Apple_Amount = Workshop Setting Integer(Custom String("Apple"), Custom String("Starting Amount"), 1, 1, 5, 0);
+		Global.Apple_Increase_Amount = Workshop Setting Integer(Custom String("Apple"), Custom String(
+			"Increase Amount (How Many Apples Are Added)"), 1, 0, 5, 1);
+		Global.Apple_Increase_Requirement = Workshop Setting Integer(Custom String("Apple"), Custom String(
+			"Increase Requirement (How Many Apples Are Required Before Adding Apples)"), 5, 1, 25, 2);
+		Global.Snake_Start_Random = Workshop Setting Toggle(Custom String("Snake"), Custom String(
+			"Start At Random Position (And Direction)"), True, 0);
+		Global.Snake_StartingY = Workshop Setting Integer(Custom String("Snake"), Custom String(
+			"Starting Y Position (Ignored If Random Position On)"), 0, -20, 20, 1);
+		Global.Snake_StartingX = Workshop Setting Integer(Custom String("Snake"), Custom String(
+			"Starting X Position (Ignored If Random Position On)"), 0, -20, 20, 2);
+		Global.Snake_Movement_Speed = Workshop Setting Real(Custom String("Snake"), Custom String("Movement Speed Tile/s"), 1, 0.500, 3,
+			3);
+		Global.Snake_Increase_Requirement = Workshop Setting Integer(Custom String("Snake"), Custom String(
+			"Apples Needed To Increase Length"), 1, 1, 25, 4);
+	}
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Start Forcing Player Position(Event Player, Vector(0, Global.Camera_Height, 0), True);
+		Set Invisible(Event Player, All);
+		Disable Hero HUD(Event Player);
+		Disable Game Mode HUD(Event Player);
+		Disable Scoreboard(Event Player);
+		Start Camera(Event Player, Vector(0, Global.Camera_Height, 0), Vector(0, 0, 0.100), 0);
+		Wait Until(Global.Is_Ready, 99999);
+		Create HUD Text(Event Player, Custom String("Score {0}\nSnake Length {2}\n\nHigh Score {1}", Score Of(Event Player), Max(Score Of(
+			Event Player), Global.High_Score_Array[Index Of Array Value(Global.Player_Array, Custom String("{0}", Event Player))]),
+			Count Of(Event Player.Snake_Position_Array)), Null, Null, Left, 0, Color(White), Color(White), Color(White),
+			Visible To and String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("Leaderboard\n1. {0}\n2. {1}\n3. {2}", Custom String("{0} : {1}",
+			Global.Player_Array[Index Of Array Value(Global.High_Score_Array, Global.High_Score_Array[0])], Global.High_Score_Array[0]),
+			Custom String("{0} : {1}", Global.Player_Array[Index Of Array Value(Global.High_Score_Array, Global.High_Score_Array[1])],
+			Global.High_Score_Array[1]), Custom String("{0} : {1}", Global.Player_Array[Index Of Array Value(Global.High_Score_Array,
+			Global.High_Score_Array[2])], Global.High_Score_Array[2])), Null, Null, Right, 0, Color(White), Color(White), Color(White),
+			Visible To and String, Default Visibility);
+		Event Player.Snake_Position_Array = Global.Snake_Start_Random ? Random Value In Array(Filtered Array(Global.Grid_Array,
+			!Array Contains(Global.Apple_Array, Current Array Element))) : First Of(Sorted Array(Global.Grid_Array, Distance Between(
+			Current Array Element, Vector(Global.Snake_StartingX, 0, Global.Snake_StartingY))));
+		Event Player.Snake_Direction = Random Value In Array(Array(Forward, Backward, Left, Right));
+		Event Player.From_Direction = First Of(Event Player.Snake_Direction) * -1;
+		Event Player.Move_To_Tile = Array(-1, 1, Global.Board_SizeX * -1, Global.Board_SizeX)[Index Of Array Value(Array(Left, Right,
+			Forward, Backward), First Of(Event Player.Snake_Direction))];
+		Event Player.From_Tile_Array = Global.Grid_Array[Index Of Array Value(Global.Grid_Array, First Of(
+			Event Player.Snake_Position_Array)) + Event Player.Move_To_Tile];
+		Create Effect(All Players(All Teams), Sphere, Color(Green), Event Player.Snake_Position_Array[Evaluate Once(Count Of(
+			Event Player.Snake_Position_Array) - 0)], 1, Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Color(Red), First Of(Event Player.Snake_Position_Array) + First Of(
+			Event Player.Snake_Direction), 0.300, Visible To Position and Radius);
+		Call Subroutine(Increase_Snake_Length);
+		Wait(2, Ignore Condition);
+		Start Rule(Move_Snake, Restart Rule);
+	}
+}
+
+rule("Create Apple")
+{
+	event
+	{
+		Subroutine;
+		Create_Apple;
+	}
+
+	actions
+	{
+		Modify Global Variable(Apple_Array, Append To Array, Random Value In Array(Filtered Array(Global.Grid_Array, !Array Contains(
+			Global.Apple_Array, Current Array Element) && !Array Contains(Event Player.Snake_Position_Array, Current Array Element)))
+			+ Vector(0, -0.500, 0));
+		Create Projectile Effect(All Players(All Teams), Echo Sticky Bomb, Null, Global.Apple_Array[Evaluate Once(Count Of(
+			Global.Apple_Array) - 1)], Down, 0.200, Visible To Position Direction and Size);
+	}
+}
+
+rule("Increase Snake Length")
+{
+	event
+	{
+		Subroutine;
+		Increase_Snake_Length;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Snake_Position_Array, Append To Array, Last Of(Event Player.From_Tile_Array));
+		Modify Player Variable(Event Player, From_Tile_Array, Append To Array, Null);
+		Create Effect(All Players(All Teams), Sphere, Color(Green), Event Player.Snake_Position_Array[Evaluate Once(Count Of(
+			Event Player.Snake_Position_Array) - 1)], 1, Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Orisa Halt Tendril Beam, Event Player.Snake_Position_Array[Evaluate Once(Count Of(
+			Event Player.Snake_Position_Array) - 1)], Event Player.Snake_Position_Array[Evaluate Once(Count Of(
+			Event Player.Snake_Position_Array) - 2)], Color(Team 1), Visible To Position and Radius);
+	}
+}
+
+rule("Movement Snake")
+{
+	event
+	{
+		Subroutine;
+		Move_Snake;
+	}
+
+	actions
+	{
+		Wait(Max(Global.Snake_Movement_Speed, 0.500), Ignore Condition);
+		If((First Of(Event Player.Snake_Direction) == Left && Array Contains(Global.Board_Edge_Left, First Of(
+			Event Player.Snake_Position_Array))) || (First Of(Event Player.Snake_Direction) == Right && Array Contains(
+			Global.Board_Edge_Right, First Of(Event Player.Snake_Position_Array))));
+			Start Rule(Died, Do Nothing);
+		Else;
+			Event Player.Move_To_Tile = Array(1, -1, Global.Board_SizeX, Global.Board_SizeX * -1)[Index Of Array Value(Array(Left, Right,
+				Forward, Backward), First Of(Event Player.Snake_Direction))];
+			If(Global.Grid_Array[Index Of Array Value(Global.Grid_Array, First Of(Event Player.Snake_Position_Array))
+				+ Event Player.Move_To_Tile] <= Count Of(Global.Grid_Array) || Global.Grid_Array[Index Of Array Value(Global.Grid_Array,
+				First Of(Event Player.Snake_Position_Array)) + Event Player.Move_To_Tile] < 0 || Is True For Any(
+				Event Player.Snake_Position_Array, Global.Grid_Array[Index Of Array Value(Global.Grid_Array, First Of(
+				Event Player.Snake_Position_Array)) + Event Player.Move_To_Tile] == Current Array Element));
+				Start Rule(Died, Do Nothing);
+			Else;
+				Event Player.From_Tile_Array[0] = First Of(Event Player.Snake_Position_Array);
+				Event Player.Snake_Position_Array[0] = Global.Grid_Array[Index Of Array Value(Global.Grid_Array, First Of(
+					Event Player.Snake_Position_Array)) + Event Player.Move_To_Tile];
+				Event Player.From_Direction[0] = First Of(Event Player.Snake_Direction) * -1;
+				For Player Variable(Event Player, Move_Index, 1, Count Of(Event Player.Snake_Position_Array), 1);
+					Event Player.From_Tile_Array[Event Player.Move_Index] = Event Player.Snake_Position_Array[Event Player.Move_Index];
+					Event Player.Snake_Position_Array[Event Player.Move_Index] = Event Player.From_Tile_Array[Event Player.Move_Index - 1];
+				End;
+				Call Subroutine(Eat_Apple);
+				Start Rule(Move_Snake, Restart Rule);
+			End;
+		End;
+	}
+}
+
+rule("Snake Direction - Up")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Round To Integer(Z Component Of(Throttle Of(Event Player)), To Nearest) == 1;
+	}
+
+	actions
+	{
+		Abort If(First Of(Event Player.Snake_Direction) == Forward || First Of(Event Player.From_Direction) == Forward);
+		Event Player.Snake_Direction[0] = Forward;
+	}
+}
+
+rule("Snake Direction - Down")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Round To Integer(Z Component Of(Throttle Of(Event Player)), To Nearest) == -1;
+	}
+
+	actions
+	{
+		Abort If(First Of(Event Player.Snake_Direction) == Backward || First Of(Event Player.From_Direction) == Backward);
+		Event Player.Snake_Direction[0] = Backward;
+	}
+}
+
+rule("Snake Direction - Left")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Round To Integer(X Component Of(Throttle Of(Event Player)), To Nearest) == 1;
+	}
+
+	actions
+	{
+		Abort If(First Of(Event Player.Snake_Direction) == Left || First Of(Event Player.From_Direction) == Left);
+		Event Player.Snake_Direction[0] = Left;
+	}
+}
+
+rule("Snake Direction - Right")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Round To Integer(X Component Of(Throttle Of(Event Player)), To Nearest) == -1;
+	}
+
+	actions
+	{
+		Abort If(First Of(Event Player.Snake_Direction) == Right || First Of(Event Player.From_Direction) == Right);
+		Event Player.Snake_Direction[0] = Right;
+	}
+}
+
+disabled rule("Force Increase Length Debug")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+	}
+
+	actions
+	{
+		Call Subroutine(Increase_Snake_Length);
+	}
+}
+
+disabled rule("Force Add Apple Debug")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Reload)) == True;
+	}
+
+	actions
+	{
+		Call Subroutine(Create_Apple);
+	}
+}
+
+rule("Check For Eat Apple")
+{
+	event
+	{
+		Subroutine;
+		Eat_Apple;
+	}
+
+	actions
+	{
+		If(Distance Between(First Of(Event Player.Snake_Position_Array), First Of(Sorted Array(Global.Apple_Array, Distance Between(
+			Current Array Element, First Of(Event Player.Snake_Position_Array))))) <= 1);
+			Modify Player Score(Event Player, 1);
+			Global.Apple_Array[Index Of Array Value(Global.Apple_Array, First Of(Sorted Array(Global.Apple_Array, Distance Between(
+				Current Array Element, First Of(Event Player.Snake_Position_Array)))))] = Random Value In Array(Filtered Array(
+				Global.Grid_Array, !Array Contains(Global.Apple_Array, Current Array Element) && !Array Contains(
+				Event Player.Snake_Position_Array, Current Array Element))) + Vector(0, -0.500, 0);
+			disabled Play Effect(Event Player, Symmetra Teleporter Reappear Sound, Color(White), Position Of(Event Player), 100);
+			Event Player.Apples_Eaten1 += 1;
+			Event Player.Apples_Eaten2 += 1;
+			If(Event Player.Apples_Eaten1 >= Global.Apple_Increase_Requirement);
+				Call Subroutine(Create_Apple);
+				Event Player.Apples_Eaten1 = 0;
+			End;
+			If(Event Player.Apples_Eaten2 >= Global.Snake_Increase_Requirement);
+				Call Subroutine(Increase_Snake_Length);
+				Event Player.Apples_Eaten2 = 0;
+			End;
+		End;
+	}
+}
+
+rule("Snake Died")
+{
+	event
+	{
+		Subroutine;
+		Died;
+	}
+
+	actions
+	{
+		Play Effect(All Players(All Teams), Debuff Impact Sound, Color(White), Event Player, 100);
+		Big Message(All Players(All Teams), Custom String("You Died"));
+		Wait(1.500, Ignore Condition);
+		While(True == True);
+			Restart Match;
+			Wait(0.100, Ignore Condition);
+		End;
+	}
+}
+
+rule("Leaderboard")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Player_Array = Array(Custom String("Spiderman318"));
+		Global.High_Score_Array = Array(43);
+	}
+}
