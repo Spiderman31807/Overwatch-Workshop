@@ -1,0 +1,342 @@
+settings
+{
+	main
+	{
+		Mode Name: "Pathfinder 2.0"
+	}
+
+	modes
+	{
+		Assault
+		{
+			enabled maps
+			{
+				Paris 972777519512068292
+			}
+		}
+
+		disabled Capture the Flag
+		{
+			Flag Dropped Lock Time: 5.0
+			Flag Return Time: 4.0
+			Flag Score Respawn Time: 15.0
+		}
+
+		Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+
+			enabled maps
+			{
+			}
+		}
+
+		disabled Deathmatch
+		{
+			Game Mode Start: Immediately
+			Limit Roles: 2 Of Each Role Per Team
+			Spawn Health Packs: Disabled
+		}
+
+		Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+
+			enabled maps
+			{
+			}
+		}
+
+		Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+
+			enabled maps
+			{
+			}
+		}
+
+		Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+
+			enabled maps
+			{
+			}
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: Path_Nodes
+		5: Objective1_Node
+		6: Objective2_Node
+		8: Chokepoint
+
+	player:
+		0: Pathing_Location
+		11: Player_Test
+		118: Filter_Nodes
+		119: From
+		120: Explored_Nodes
+		121: Current_Node
+		122: Starting_Node
+		123: Previous_Node
+		124: Path
+		125: Path_Index
+		126: Is_Pathing
+		127: Path_Goal
+}
+
+subroutines
+{
+	0: Find_Path
+	1: Next_Node
+	2: Follow_Path
+}
+
+rule("Test System")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Destroy All HUD Text;
+		Destroy All Dummy Bots;
+		If(Is Button Held(Event Player, Button(Melee)));
+			Event Player.Pathing_Location = Position Of(Event Player);
+			Respawn(Event Player);
+			Event Player.Player_Test = True;
+			Wait Until(Event Player.Is_Pathing, 99999);
+			Wait Until(!Event Player.Is_Pathing, 99999);
+			Event Player.Player_Test = False;
+		Else;
+			Create Dummy Bot(Hero(Ana), Team Of(Event Player), 5, Spawn Points(Team Of(Event Player)), Vector(0, 0, 0));
+			Last Created Entity.Pathing_Location = Position Of(Event Player);
+		End;
+	}
+}
+
+rule("Start Pathfinding")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Dummy Bot(Event Player) || Event Player.Player_Test) == True;
+		Has Spawned(Event Player) == True;
+		Event Player.Pathing_Location != Null;
+		Distance Between(Event Player, Event Player.Pathing_Location) > 3;
+		Event Player.Is_Pathing != True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Rule(Find_Path, Restart Rule);
+	}
+}
+
+rule("Find Path")
+{
+	event
+	{
+		Subroutine;
+		Find_Path;
+	}
+
+	actions
+	{
+		Event Player.Is_Pathing = True;
+		Event Player.Starting_Node = First Of(Sorted Array(Filtered Array(Global.Path_Nodes, Is In Line of Sight(Eye Position(
+			Event Player), Current Array Element, Barriers Do Not Block LOS)), Distance Between(Event Player, Current Array Element)));
+		Event Player.Path = Event Player.Starting_Node;
+		Event Player.Current_Node = Event Player.Starting_Node;
+		Event Player.Explored_Nodes = Event Player.Starting_Node;
+		Event Player.Filter_Nodes = Distance Between(Event Player, Event Player.Starting_Node);
+		Event Player.From = Position Of(Event Player);
+		Start Rule(Follow_Path, Restart Rule);
+		Call Subroutine(Next_Node);
+		While(Event Player.Current_Node != First Of(Sorted Array(Append To Array(Global.Path_Nodes, Append To Array(Global.Objective1_Node,
+			Append To Array(Global.Objective2_Node, Global.Chokepoint))), Distance Between(Event Player.Pathing_Location,
+			Current Array Element))));
+			Modify Player Variable(Event Player, Explored_Nodes, Append To Array, Event Player.Current_Node);
+			Modify Player Variable(Event Player, Filter_Nodes, Append To Array, Distance Between(Event Player.Current_Node,
+				Event Player.Previous_Node));
+			Modify Player Variable(Event Player, From, Append To Array, Event Player.Previous_Node);
+			Modify Player Variable(Event Player, Path, Append To Array, Event Player.Current_Node);
+			Call Subroutine(Next_Node);
+			Skip If(Event Player.Current_Node == Null, 1);
+		End;
+	}
+}
+
+rule("Follow Path")
+{
+	event
+	{
+		Subroutine;
+		Follow_Path;
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Event Player.Path[Event Player.Path_Index]),
+			1, To World, Replace existing throttle, Direction and Magnitude);
+		Event Player.Path_Index = 0;
+		While(Event Player.Path_Index >= 0 && Event Player.Path_Index <= Count Of(Event Player.Path));
+			Wait(0.100, Ignore Condition);
+			Wait Until(Is True For Any(Filtered Array(Event Player.Path, Current Array Index >= Event Player.Path_Index && Is In Line of Sight(
+				Eye Position(Event Player), Current Array Element, Barriers Do Not Block LOS)), Distance Between(Event Player,
+				Current Array Element) <= 2), Distance Between(Event Player, Event Player.Path[Event Player.Path_Index]) / Speed Of(
+				Event Player));
+			Event Player.Path_Index = Max(Index Of Array Value(Event Player.Path, First Of(Sorted Array(Filtered Array(Event Player.Path,
+				Current Array Index > Event Player.Path_Index && Is In Line of Sight(Eye Position(Event Player), Current Array Element,
+				Barriers Do Not Block LOS)), Current Array Index * (0 - 1)))), Event Player.Path_Index + 1);
+			Skip If(Event Player.Path_Index >= Count Of(Event Player.Path) && Distance Between(Event Player.Pathing_Location, Event Player)
+				<= 10, 5);
+			If(Is True For All(Filtered Array(Event Player.Path, Current Array Index >= Event Player.Path_Index), !Is In Line of Sight(
+				Eye Position(Event Player), Current Array Element, Barriers Do Not Block LOS)));
+				Stop Throttle In Direction(Event Player);
+				Start Rule(Find_Path, Restart Rule);
+				Abort;
+			End;
+		End;
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player, Event Player.Pathing_Location), 1, To World,
+			Replace existing throttle, Direction and Magnitude);
+		Wait Until(Distance Between(Event Player, Event Player.Pathing_Location) <= 2, 2);
+		Stop Throttle In Direction(Event Player);
+		Event Player.Is_Pathing = False;
+	}
+}
+
+rule("Next Node")
+{
+	event
+	{
+		Subroutine;
+		Next_Node;
+	}
+
+	actions
+	{
+		Event Player.Path_Goal = Distance Between(Event Player.Pathing_Location, Event Player.Current_Node) - 0 > Distance Between(
+			Event Player.Pathing_Location, First Of(Sorted Array(Global.Chokepoint, Distance Between(Event Player.Current_Node,
+			Current Array Element)))) ? First Of(Sorted Array(Global.Chokepoint, Distance Between(Event Player.Current_Node,
+			Current Array Element))) : Event Player.Pathing_Location;
+		Event Player.Previous_Node = Event Player.Current_Node;
+		Event Player.Filter_Nodes = Filtered Array(Remove From Array(Append To Array(Global.Path_Nodes, Append To Array(
+			Global.Objective1_Node, Append To Array(Global.Objective2_Node, Global.Chokepoint))), Event Player.Explored_Nodes),
+			Distance Between(Event Player.Current_Node, Current Array Element) <= 30);
+		Event Player.Filter_Nodes = Filtered Array(Event Player.Filter_Nodes, Is In Line of Sight(Event Player.Current_Node,
+			Current Array Element, Barriers Do Not Block LOS));
+		Event Player.Filter_Nodes = Filtered Array(Event Player.Filter_Nodes, Y Component Of(Event Player.Current_Node)
+			+ 1.200 > Y Component Of(Current Array Element));
+		Event Player.Filter_Nodes = Filtered Array(Event Player.Filter_Nodes, Distance Between(Ray Cast Hit Position(
+			Event Player.Current_Node + Direction Towards(Event Player.Current_Node, Current Array Element) * (Distance Between(
+			Event Player.Current_Node, Current Array Element) / 2), Event Player.Current_Node + Direction Towards(
+			Event Player.Current_Node, Current Array Element) * (Distance Between(Event Player.Current_Node, Current Array Element) / 2)
+			+ Vector(0, -99, 0), Null, All Players(All Teams), False), Event Player.Current_Node + Direction Towards(
+			Event Player.Current_Node, Current Array Element) * (Distance Between(Event Player.Current_Node, Current Array Element) / 2))
+			< Max(Y Component Of(Event Player.Current_Node) - Y Component Of(Current Array Element), 2));
+		Event Player.Filter_Nodes = Filtered Array(Event Player.Filter_Nodes, Distance Between(Ray Cast Hit Position(
+			Event Player.Current_Node + Direction Towards(Event Player.Current_Node, Current Array Element) * (Distance Between(
+			Event Player.Current_Node, Current Array Element) / 4), Event Player.Current_Node + Direction Towards(
+			Event Player.Current_Node, Current Array Element) * (Distance Between(Event Player.Current_Node, Current Array Element) / 4)
+			+ Vector(0, -99, 0), Null, All Players(All Teams), False), Event Player.Current_Node + Direction Towards(
+			Event Player.Current_Node, Current Array Element) * (Distance Between(Event Player.Current_Node, Current Array Element) / 4))
+			< Max(Y Component Of(Event Player.Current_Node) - Y Component Of(Current Array Element), 2));
+		Event Player.Filter_Nodes = Filtered Array(Event Player.Filter_Nodes, Distance Between(Ray Cast Hit Position(
+			Event Player.Current_Node + Direction Towards(Event Player.Current_Node, Current Array Element) * (Distance Between(
+			Event Player.Current_Node, Current Array Element) / 1.200), Event Player.Current_Node + Direction Towards(
+			Event Player.Current_Node, Current Array Element) * (Distance Between(Event Player.Current_Node, Current Array Element)
+			/ 1.200) + Vector(0, -99, 0), Null, All Players(All Teams), False), Event Player.Current_Node + Direction Towards(
+			Event Player.Current_Node, Current Array Element) * (Distance Between(Event Player.Current_Node, Current Array Element)
+			/ 1.200)) < Max(Y Component Of(Event Player.Current_Node) - Y Component Of(Current Array Element), 2));
+		Event Player.Filter_Nodes = Sorted Array(Event Player.Filter_Nodes, Distance Between(Event Player.Current_Node,
+			Current Array Element) + Distance Between(Event Player.Path_Goal, Current Array Element));
+		Event Player.Current_Node = First Of(Event Player.Filter_Nodes);
+		Wait(0.100, Ignore Condition);
+	}
+}
+
+rule("Anti-Stuck Jump/Melee")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Dummy Bot(Event Player) || Event Player.Player_Test) == True;
+		Has Spawned(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Speed Of(Event Player) < 2;
+		Magnitude Of(Throttle Of(Event Player)) != Null;
+	}
+
+	actions
+	{
+		Wait(0.250, Abort When False);
+		Press Button(Event Player, Button(Jump));
+		Wait(0.250, Abort When False);
+		Press Button(Event Player, Button(Melee));
+		Loop If Condition Is True;
+	}
+}
+
+rule("Debug")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Dummy Bot(Event Player) || Event Player.Player_Test) == True;
+		Has Spawned(Event Player) == True;
+		Is Button Held(Host Player, Button(Reload)) == True;
+	}
+
+	actions
+	{
+		Create HUD Text(All Players(All Teams), Custom String("Target Position {0}\nExplored Nodes {1}\nIs Pathfinding {2}",
+			Event Player.Pathing_Location, Count Of(Event Player.Explored_Nodes), Event Player.Is_Pathing), Null, Null, Left, 0, Color(
+			White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Custom String("Walking Position {0}\nPath Nodes {1}\nPath Index {2}",
+			Event Player.Path[Event Player.Path_Index], Count Of(Event Player.Path), Event Player.Path_Index), Null, Null, Left, 0, Color(
+			White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Custom String("Nodes {0}\nUnexplored Nodes {1}\nCurrent Node {2}", Count Of(
+			Global.Path_Nodes), Count Of(Remove From Array(Global.Path_Nodes, Event Player.Explored_Nodes)), Event Player.Current_Node),
+			Null, Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Custom String("Is Goal Chokepoint {0}\nClosest Chokepoint {1}\nCurrent Goal {2}",
+			Array Contains(Global.Chokepoint, Event Player.Path_Goal), First Of(Sorted Array(Global.Chokepoint, Distance Between(
+			Event Player.Current_Node, Current Array Element))), Event Player.Path_Goal), Null, Null, Left, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Wait Until(!Is Dummy Bot(Event Player) && !Event Player.Player_Test, 99999);
+	}
+}
