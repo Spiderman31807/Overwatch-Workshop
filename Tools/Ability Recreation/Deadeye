@@ -1,0 +1,282 @@
+settings
+{
+	main
+	{
+		Mode Name: "Cassidy Deadeye"
+	}
+
+	lobby
+	{
+		Map Rotation: After A Game
+		Match Voice Chat: Enabled
+		Return To Lobby: Never
+	}
+
+	modes
+	{
+		disabled Assault
+		{
+			Game Mode Start: Immediately
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+
+		Control
+
+		Escort
+
+		Hybrid
+
+		Push
+
+		General
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Spawn With Ultimate Ready: On
+			Ultimate Generation: 500%
+			Ultimate Generation - Combat: 500%
+			Ultimate Generation - Passive: 500%
+		}
+	}
+
+	extensions
+	{
+		Energy Explosion Effects
+		Projectiles
+	}
+}
+
+variables
+{
+	player:
+		0: Deadeye_Timer
+		1: Deadeye_Damage_Array
+		2: Deadeye_Target_Array
+		3: Deadeye_Index
+		4: Deadeye_Time_Array
+		5: Is_Invis
+}
+
+rule("Use Deadeye")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Disallow Button(Event Player, Button(Ultimate));
+		Set Jump Enabled(Event Player, False);
+		Set Crouch Enabled(Event Player, False);
+		Set Melee Enabled(Event Player, False);
+		Set Reload Enabled(Event Player, False);
+		Cancel Primary Action(Event Player);
+		Set Ammo(Event Player, 0, Max Ammo(Event Player, 0));
+		Set Ammo(Event Player, 1, Max Ammo(Event Player, 1));
+		Set Damage Received(Event Player, 60);
+		Set Move Speed(Event Player, 30);
+		Event Player.Deadeye_Timer = 7;
+		Chase Player Variable At Rate(Event Player, Deadeye_Timer, 0, 1, Destination and Rate);
+		Event Player.Deadeye_Damage_Array = Empty Array;
+		Event Player.Deadeye_Target_Array = Empty Array;
+		Event Player.Deadeye_Time_Array = Empty Array;
+		Wait(0.200, Ignore Condition);
+		While(Is True For All(Array(Event Player.Deadeye_Timer == 0, (Update Every Frame(Is Button Held(Event Player, Button(
+			Secondary Fire))) || Update Every Frame(Is Button Held(Event Player, Button(Primary Fire))) || Update Every Frame(
+			Is Button Held(Event Player, Button(Ultimate)))) && Event Player.Deadeye_Timer <= 6.300, Has Status(Event Player,
+			Knocked Down), Has Status(Event Player, Asleep), Has Status(Event Player, Frozen), Has Status(Event Player, Stunned), Is Dead(
+			Event Player)), !Current Array Element));
+			Modify Player Variable(Event Player, Deadeye_Target_Array, Append To Array, Filtered Array(All Living Players(Opposite Team Of(
+				Team Of(Event Player))), !Array Contains(Event Player.Deadeye_Target_Array, Current Array Element) && Distance Between(
+				Event Player, Current Array Element) <= 200 && Is In Line of Sight(Eye Position(Event Player), Eye Position(
+				Current Array Element), Barriers Do Not Block LOS) && Is In View Angle(Event Player, Eye Position(Current Array Element), 105)
+				&& Current Array Element.Is_Invis != True));
+			For Player Variable(Event Player, Deadeye_Index, 0, Count Of(Event Player.Deadeye_Target_Array), 1);
+				Skip If(Is True For Any(Array(Distance Between(Event Player, Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index]) > 200,
+					!Is In Line of Sight(Eye Position(Event Player), Eye Position(Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index]),
+					Barriers Do Not Block LOS), !Is In View Angle(Event Player, Eye Position(
+					Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index]), 105), Is Dead(
+					Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index]),
+					Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index].Is_Invis == True), Current Array Element), 2);
+				Event Player.Deadeye_Time_Array[Event Player.Deadeye_Index] += 0.100;
+				Event Player.Deadeye_Damage_Array[Event Player.Deadeye_Index] += Event Player.Deadeye_Time_Array[Event Player.Deadeye_Index] < 2 ? 13 : 26;
+			End;
+			Wait(0.100, Ignore Condition);
+		End;
+		Stop Chasing Player Variable(Event Player, Deadeye_Timer);
+		Event Player.Deadeye_Timer = 0;
+		Set Damage Received(Event Player, 100);
+		If((Update Every Frame(Is Button Held(Event Player, Button(Primary Fire))) || Update Every Frame(Is Button Held(Event Player,
+			Button(Ultimate)))) && Is True For All(Array(Is Dead(Event Player), Has Status(Event Player, Knocked Down), Has Status(
+			Event Player, Asleep), Has Status(Event Player, Frozen), Has Status(Event Player, Stunned)), !Current Array Element));
+			For Player Variable(Event Player, Deadeye_Index, 0, Count Of(Event Player.Deadeye_Target_Array), 1);
+				Set Status(Event Player, Null, Rooted, 0.112);
+				Skip If(Is True For Any(Array(Distance Between(Event Player, Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index]) > 200,
+					!Is In Line of Sight(Eye Position(Event Player), Eye Position(Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index]),
+					Barriers Do Not Block LOS), !Is In View Angle(Event Player, Eye Position(
+					Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index]), 105), Is Dead(
+					Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index]),
+					Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index].Is_Invis == True), Current Array Element), 3);
+				Create Projectile(Roadhog Scrap, Event Player, Eye Position(Event Player), Direction Towards(Eye Position(Event Player),
+					World Vector Of(Vector(0, Distance Between(Eye Position(Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index]),
+					Position Of(Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index])) / 1.600, 0),
+					Event Player.Deadeye_Target_Array[Event Player.Deadeye_Index], Rotation And Translation)), To World, Damage, Opposite Team Of(
+					Team Of(Event Player)), Event Player.Deadeye_Damage_Array[Event Player.Deadeye_Index], 1, 0,
+					Brigitte Repair Pack Impact Effect, Ring Explosion Sound, 0, 1000, 5, 0, 0, 0);
+				Set Ammo(Event Player, 0, Ammo(Event Player, 0) - 1);
+				Wait(0.112, Ignore Condition);
+			End;
+			Wait(0.300, Ignore Condition);
+			Set Move Speed(Event Player, 100);
+			Set Ability 1 Enabled(Event Player, True);
+			Set Ability 2 Enabled(Event Player, True);
+			Allow Button(Event Player, Button(Ultimate));
+			Set Jump Enabled(Event Player, True);
+			Set Crouch Enabled(Event Player, True);
+			Set Melee Enabled(Event Player, True);
+			Set Reload Enabled(Event Player, True);
+			Set Primary Fire Enabled(Event Player, True);
+			Set Secondary Fire Enabled(Event Player, True);
+		Else;
+			Wait(0.300, Ignore Condition);
+			Set Move Speed(Event Player, 100);
+			Set Ability 1 Enabled(Event Player, True);
+			Set Ability 2 Enabled(Event Player, True);
+			Allow Button(Event Player, Button(Ultimate));
+			Set Jump Enabled(Event Player, True);
+			Set Crouch Enabled(Event Player, True);
+			Set Melee Enabled(Event Player, True);
+			Set Reload Enabled(Event Player, True);
+			Wait(0.400, Ignore Condition);
+			Set Primary Fire Enabled(Event Player, True);
+			Set Secondary Fire Enabled(Event Player, True);
+		End;
+	}
+}
+
+rule("Setup Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Create Effect(Filtered Array(All Players(All Teams), Event Player.Deadeye_Timer > 0), Good Aura, Team Of(Event Player)
+			== Team 1 ? Color(Team 1) : Color(Team 2), Event Player, Distance Between(Eye Position(Event Player), Position Of(
+			Event Player)) / 1.600, Visible To Position Radius and Color);
+		Create Progress Bar In-World Text(Filtered Array(Event Player, Event Player.Deadeye_Timer > 0), Event Player.Deadeye_Timer / 0.070,
+			Null, Update Every Frame(Eye Position(Event Player) + 100 * (0 * -1 / 2 * Cross Product(Facing Direction Of(Event Player),
+			Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(
+			Facing Direction Of(Event Player)) - 90)) + (-0.500 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(
+			Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)
+			+ 3 * Facing Direction Of(Event Player))), 0.800, Do Not Clip, Color(White), Color(White), Visible To Position and Values,
+			Default Visibility);
+		Create In-World Text(Filtered Array(Event Player, Event Player.Deadeye_Timer > 0), Custom String("Fire {0} |",
+			Input Binding String(Button(Primary Fire))), Update Every Frame(Eye Position(Event Player) + 100 * (
+			2.250 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(
+			Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (
+			0.300 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+			Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 1.750,
+			Do Not Clip, Visible To Position and String, Color(White), Default Visibility);
+		Create In-World Text(Filtered Array(Event Player, Event Player.Deadeye_Timer > 0), Custom String("| {0} Cancel",
+			Input Binding String(Button(Secondary Fire))), Update Every Frame(Eye Position(Event Player) + 100 * (
+			-2.250 * -1 / 2 * Cross Product(Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(
+			Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (
+			0.300 / 2 - 0.200) * Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+			Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 1.750,
+			Do Not Clip, Visible To Position and String, Color(White), Default Visibility);
+		Create In-World Text(Filtered Array(Event Player, Event Player.Deadeye_Timer > 0), Custom String("{0}s", Round To Integer(
+			Event Player.Deadeye_Timer, Up)), Update Every Frame(Eye Position(Event Player) + 100 * (0 * -1 / 2 * Cross Product(
+			Facing Direction Of(Event Player), Direction From Angles(Horizontal Angle From Direction(Facing Direction Of(Event Player)),
+			Vertical Angle From Direction(Facing Direction Of(Event Player)) - 90)) + (-0.200 / 2 - 0.200) * Direction From Angles(
+			Horizontal Angle From Direction(Facing Direction Of(Event Player)), Vertical Angle From Direction(Facing Direction Of(
+			Event Player)) - 90) + 3 * Facing Direction Of(Event Player))), 1.750, Do Not Clip, Visible To Position and String, Color(
+			White), Default Visibility);
+		Create Icon(Filtered Array(Event Player,
+			Event Player.Deadeye_Timer > 0 && Event Player.Deadeye_Target_Array[0].Is_Invis != True && Entity Exists(
+			Event Player.Deadeye_Target_Array[0]) && Is Alive(Event Player.Deadeye_Target_Array[0])), World Vector Of(Vector(0,
+			Distance Between(Eye Position(Event Player.Deadeye_Target_Array[0]), Position Of(Event Player.Deadeye_Target_Array[0])) / (
+			Distance Between(Event Player, Event Player.Deadeye_Target_Array[0]) * 10), 0), Event Player.Deadeye_Target_Array[0],
+			Rotation And Translation), Skull, Visible To Position and Color, Custom Color(255, 255 - 255 * (
+			Event Player.Deadeye_Damage_Array[0] / Health(Event Player.Deadeye_Target_Array[0])), 255 - 255 * (
+			Event Player.Deadeye_Damage_Array[0] / Health(Event Player.Deadeye_Target_Array[0])), 255), False);
+		Create Icon(Filtered Array(Event Player,
+			Event Player.Deadeye_Timer > 0 && Event Player.Deadeye_Target_Array[1].Is_Invis != True && Entity Exists(
+			Event Player.Deadeye_Target_Array[1]) && Is Alive(Event Player.Deadeye_Target_Array[1])), World Vector Of(Vector(0,
+			Distance Between(Eye Position(Event Player.Deadeye_Target_Array[1]), Position Of(Event Player.Deadeye_Target_Array[1])) / (
+			Distance Between(Event Player, Event Player.Deadeye_Target_Array[1]) * 10), 0), Event Player.Deadeye_Target_Array[1],
+			Rotation And Translation), Skull, Visible To Position and Color, Custom Color(255, 255 - 255 * (
+			Event Player.Deadeye_Damage_Array[1] / Health(Event Player.Deadeye_Target_Array[1])), 255 - 255 * (
+			Event Player.Deadeye_Damage_Array[1] / Health(Event Player.Deadeye_Target_Array[1])), 255), False);
+		Create Icon(Filtered Array(Event Player,
+			Event Player.Deadeye_Timer > 0 && Event Player.Deadeye_Target_Array[2].Is_Invis != True && Entity Exists(
+			Event Player.Deadeye_Target_Array[2]) && Is Alive(Event Player.Deadeye_Target_Array[2])), World Vector Of(Vector(0,
+			Distance Between(Eye Position(Event Player.Deadeye_Target_Array[2]), Position Of(Event Player.Deadeye_Target_Array[2])) / (
+			Distance Between(Event Player, Event Player.Deadeye_Target_Array[2]) * 10), 0), Event Player.Deadeye_Target_Array[2],
+			Rotation And Translation), Skull, Visible To Position and Color, Custom Color(255, 255 - 255 * (
+			Event Player.Deadeye_Damage_Array[2] / Health(Event Player.Deadeye_Target_Array[2])), 255 - 255 * (
+			Event Player.Deadeye_Damage_Array[2] / Health(Event Player.Deadeye_Target_Array[2])), 255), False);
+		Create Icon(Filtered Array(Event Player,
+			Event Player.Deadeye_Timer > 0 && Event Player.Deadeye_Target_Array[3].Is_Invis != True && Entity Exists(
+			Event Player.Deadeye_Target_Array[3]) && Is Alive(Event Player.Deadeye_Target_Array[3])), World Vector Of(Vector(0,
+			Distance Between(Eye Position(Event Player.Deadeye_Target_Array[3]), Position Of(Event Player.Deadeye_Target_Array[3])) / (
+			Distance Between(Event Player, Event Player.Deadeye_Target_Array[3]) * 10), 0), Event Player.Deadeye_Target_Array[3],
+			Rotation And Translation), Skull, Visible To Position and Color, Custom Color(255, 255 - 255 * (
+			Event Player.Deadeye_Damage_Array[3] / Health(Event Player.Deadeye_Target_Array[3])), 255 - 255 * (
+			Event Player.Deadeye_Damage_Array[3] / Health(Event Player.Deadeye_Target_Array[3])), 255), False);
+		Create Icon(Filtered Array(Event Player,
+			Event Player.Deadeye_Timer > 0 && Event Player.Deadeye_Target_Array[4].Is_Invis != True && Entity Exists(
+			Event Player.Deadeye_Target_Array[4]) && Is Alive(Event Player.Deadeye_Target_Array[4])), World Vector Of(Vector(0,
+			Distance Between(Eye Position(Event Player.Deadeye_Target_Array[4]), Position Of(Event Player.Deadeye_Target_Array[4])) / (
+			Distance Between(Event Player, Event Player.Deadeye_Target_Array[4]) * 10), 0), Event Player.Deadeye_Target_Array[4],
+			Rotation And Translation), Skull, Visible To Position and Color, Custom Color(255, 255 - 255 * (
+			Event Player.Deadeye_Damage_Array[4] / Health(Event Player.Deadeye_Target_Array[4])), 255 - 255 * (
+			Event Player.Deadeye_Damage_Array[4] / Health(Event Player.Deadeye_Target_Array[4])), 255), False);
+	}
+}
+
+rule("Track Invisibility")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)) == Hero(Sombra);
+		(Is Using Ability 1(Event Player) && !Is Firing Secondary(Event Player)) == True;
+	}
+
+	actions
+	{
+		Event Player.Is_Invis = True;
+		Wait Until(Is True For Any(Array((Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player))
+			!= Hero(Sombra), !Is Using Ability 1(Event Player), Is Firing Secondary(Event Player)), Current Array Element), 99999);
+		Event Player.Is_Invis = False;
+	}
+}
