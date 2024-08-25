@@ -1,0 +1,146 @@
+settings
+{
+	main
+	{
+		Mode Name: "Stats Hud"
+	}
+
+	modes
+	{
+		Control
+
+		Escort
+
+		Hybrid
+
+		Push
+
+		General
+		{
+			Game Mode Start: Immediately
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: Stats_Categroy_List
+
+	player:
+		0: Stat_Category
+}
+
+rule("Player Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Stat_Category = First Of(Global.Stats_Categroy_List);
+		Create HUD Text(Filtered Array(Event Player, Event Player.Stat_Category == Custom String("damage")), Custom String(
+			"All Damage : {0}\nBarrier Damage : {1}\nHero Damage : {2}", Update Every Frame(Player Hero Stat(Event Player, Hero Of(
+			Event Player), All Damage Dealt) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player),
+			Barrier Damage Dealt) + 0), Custom String("{0}\nDamage Blocked : {1}\nDamage Taken : {2}", Update Every Frame(Player Hero Stat(
+			Event Player, Hero Of(Event Player), Hero Damage Dealt) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(
+			Event Player), Damage Blocked) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Damage Taken)
+			+ 0))), Null, Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Event Player.Stat_Category == Custom String("accuracy")), Custom String(
+			"Weapon Accuracy : {0}\nScoped Accuracy : {1}\nCritical Hit Accuracy : {2}", Update Every Frame(Player Hero Stat(Event Player,
+			Hero Of(Event Player), Weapon Accuracy) * 100), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player),
+			Scoped Accuracy) * 100), Custom String("{0}\nScoped Cirtical Hit Accuracy : {1}", Update Every Frame(Player Hero Stat(
+			Event Player, Hero Of(Event Player), Critical Hit Accuracy) * 100), Update Every Frame(Player Hero Stat(Event Player, Hero Of(
+			Event Player), Scoped Critical Hit Accuracy) * 100))), Null, Null, Left, 0, Color(White), Color(White), Color(White),
+			Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Event Player.Stat_Category == Custom String("kills")), Custom String(
+			"Environmental Kills : {0}\nMultikill Best : {1}\nMultikills : {2}", Update Every Frame(Player Hero Stat(Event Player, Hero Of(
+			Event Player), Environmental Kills) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player),
+			Multikill Best) + 0), Custom String("{0}\nObjective Kills : {1}\nScoped Critical Hit Kills : {2}", Update Every Frame(
+			Player Hero Stat(Event Player, Hero Of(Event Player), Multikills) + 0), Update Every Frame(Player Hero Stat(Event Player,
+			Hero Of(Event Player), Objective Kills) + 0), Custom String("{0}\nSolo Kills : {1}", Update Every Frame(Player Hero Stat(
+			Event Player, Hero Of(Event Player), Scoped Critical Hit Kills) + 0), Update Every Frame(Player Hero Stat(Event Player,
+			Hero Of(Event Player), Solo Kills) + 0)))), Null, Null, Left, 0, Color(White), Color(White), Color(White),
+			Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Event Player.Stat_Category == Custom String("eliminations")), Custom String(
+			"Eliminations : {0}\nFinal Blows : {1}\nDefence Assists : {2}", Update Every Frame(Player Hero Stat(Event Player, Hero Of(
+			Event Player), Eliminations) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Final Blows) + 0),
+			Custom String("{0}\nOffence Assists : {1}", Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player),
+			Defensive Assists) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Offensive Assists) + 0))),
+			Null, Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Event Player.Stat_Category == Custom String("shots")), Custom String(
+			"Scoped Shots : {0}\nShots Fired : {1}\nShots Hit : {2}", Update Every Frame(Player Hero Stat(Event Player, Hero Of(
+			Event Player), Scoped Shots) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Shots Fired) + 0),
+			Custom String("{0}\nShots Missed : {1}\nCirtical Hits : {2}", Update Every Frame(Player Hero Stat(Event Player, Hero Of(
+			Event Player), Shots Hit) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Shots Missed) + 0),
+			Custom String("{0}\nScoped Critical Hits : {1}\nScoped Hits : {2}", Update Every Frame(Player Hero Stat(Event Player, Hero Of(
+			Event Player), Critical Hits) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player),
+			Scoped Critical Hits) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Scoped Hits) + 0)))),
+			Null, Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Event Player.Stat_Category == Custom String("deaths")), Custom String(
+			"Deaths : {0}\nEnvironmental Deaths : {1}", Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Deaths)
+			+ 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Environmental Deaths) + 0)), Null, Null, Left,
+			0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Event Player.Stat_Category == Custom String("ultimate")), Custom String(
+			"Ultimates Earned : {0}\nUltimates Used : {1}", Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player),
+			Ultimates Earned) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Ultimates Used) + 0)), Null,
+			Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Event Player.Stat_Category == Custom String("healing")), Custom String(
+			"Healing Dealt : {0}\nHealing Received : {1}\nSelf Healing : {2}", Update Every Frame(Player Hero Stat(Event Player, Hero Of(
+			Event Player), Healing Dealt) + 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Healing Received)
+			+ 0), Update Every Frame(Player Hero Stat(Event Player, Hero Of(Event Player), Self Healing) + 0)), Null, Null, Left, 0, Color(
+			White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Event Player, Null, Null, Custom String("Category {0}/{1} Cycle With {2} While Crouching", Index Of Array Value(
+			Global.Stats_Categroy_List, Event Player.Stat_Category) + 1, Count Of(Global.Stats_Categroy_List), Input Binding String(Button(
+			Interact))), Left, 1, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+	}
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Stats_Categroy_List = Array(Custom String("damage"), Custom String("healing"), Custom String("accuracy"), Custom String(
+			"kills"), Custom String("eliminations"), Custom String("shots"), Custom String("deaths"), Custom String("ultimate"));
+		Wait Until(Is Assembling Heroes, 99999);
+		Set Match Time(0);
+		Wait Until(Is In Setup, 99999);
+		Set Match Time(0);
+		Wait Until(Is Game In Progress, 99999);
+		Pause Match Time;
+	}
+}
+
+rule("Cycle Stat Menus")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Crouching(Event Player) == True;
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Event Player.Stat_Category = Event Player.Stat_Category != Last Of(Global.Stats_Categroy_List)
+			? Global.Stats_Categroy_List[Index Of Array Value(Global.Stats_Categroy_List, Event Player.Stat_Category) + 1] : First Of(
+			Global.Stats_Categroy_List);
+		Play Effect(Event Player, Ring Explosion Sound, Color(White), Event Player, 20);
+	}
+}
