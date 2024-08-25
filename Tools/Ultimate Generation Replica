@@ -1,0 +1,312 @@
+settings
+{
+	main
+	{
+		Description: "This Mode Perfectly Mimics The Overwatch\nUltimate Generation With A Single Exeptions\n\nMercy Boost Doesn't Give Ultimate Charge\nDue To The Fact Its Impossible To Detect\n\nCode - 28G90"
+		Mode Name: "Ultimate Generation Replica"
+	}
+
+	modes
+	{
+		Control
+		{
+			disabled maps
+			{
+				Samoa
+			}
+		}
+
+		Escort
+
+		Hybrid
+		{
+			disabled maps
+			{
+				Midtown
+			}
+		}
+
+		Push
+
+		General
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Ultimate Generation: 10%
+			Ultimate Generation - Combat: 0%
+			Ultimate Generation - Passive: 0%
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: Ultimate_Costs
+
+	player:
+		0: Stored_Hero
+		1: Ultimate_Cost
+		2: Ultimate_Points
+		3: Stored_Mech_Points
+		4: Valid_Healing
+		5: Stored_Self_Healing_Stat
+		6: Stored_Health
+}
+
+rule("Setup : Global                         (Based On Update In April 16, 2024) Works Best When Ultimate Generation Set To Lowest")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Ultimate_Costs = Array(2125, 1375, 2000, 1850, 2350, 1800, 2200, 2050, 1550, 2500, 2025, 2550, 2125, 3050, 2000, 2100, 2500,
+			2750, 2650, 1700, 1925, 1825, 2145, 2300, 2150, 2900, 2900, 1850, 2300, 2450, 1850, 2550, 2525, 2700, 2300, 2300, 2200, 2650,
+			2650, 2125);
+	}
+}
+
+rule("Setup : Player")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Ultimate_Points = Null;
+		Event Player.Ultimate_Cost = Null;
+		Chase Player Variable At Rate(Event Player, Ultimate_Points, Is Using Ultimate(Event Player) ? 0 : Event Player.Ultimate_Cost,
+			Is Using Ultimate(Event Player) ? 9999 : (Is Game In Progress ? 5 : 0), Destination and Rate);
+		Event Player.Valid_Healing = 0;
+	}
+}
+
+rule("Swap : Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Has Spawned(Event Player) && (Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)
+			!= Event Player.Stored_Hero)) == True;
+	}
+
+	actions
+	{
+		Event Player.Stored_Hero = Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player);
+		Event Player.Ultimate_Cost = Global.Ultimate_Costs[Index Of Array Value(All Heroes, Event Player.Stored_Hero)];
+		Modify Player Variable(Event Player, Ultimate_Points, Min, Event Player.Ultimate_Cost * 0.300);
+		Skip If(!Is Duplicating(Event Player), 1);
+		Event Player.Ultimate_Cost /= 5;
+	}
+}
+
+rule("Swap : Baby Dva                                  (Dont Try To Use Self Destruct Right After Re-meching, It Will Break Your Hero)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Has Spawned(Event Player) && (Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)
+			== Event Player.Stored_Hero)) == True;
+		Event Player.Stored_Hero == Hero(D.Va);
+		Is In Alternate Form(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Ultimate_Cost = 280;
+		Event Player.Stored_Mech_Points = Event Player.Ultimate_Points;
+		Event Player.Ultimate_Points = 0;
+		Skip If(!Is Duplicating(Event Player), 1);
+		Event Player.Ultimate_Cost /= 5;
+		Wait Until(Is True For Any(Array(Event Player.Stored_Hero != Hero(D.Va), Is In Alternate Form(Event Player) != True),
+			Current Array Element), 99999);
+		Wait(0.100, Ignore Condition);
+		Abort If(Event Player.Stored_Hero != Hero(D.Va));
+		Event Player.Ultimate_Cost = Global.Ultimate_Costs[Index Of Array Value(All Heroes, Hero(D.Va))];
+		Event Player.Ultimate_Points = Event Player.Stored_Mech_Points;
+		Skip If(!Is Duplicating(Event Player), 1);
+		Event Player.Ultimate_Cost /= 5;
+	}
+}
+
+rule("Charge : Update")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Ultimate Charge Percent(Event Player) != Event Player.Ultimate_Points / (Event Player.Ultimate_Cost / 100);
+	}
+
+	actions
+	{
+		Set Ultimate Charge(Event Player, Event Player.Ultimate_Points / (Event Player.Ultimate_Cost / 100));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Charge : Damage")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Attacker.Ultimate_Points < Attacker.Ultimate_Cost;
+		Is Using Ultimate(Attacker) != True;
+		Team Of(Attacker) != Team Of(Victim);
+		Event Ability != Button(Ultimate);
+	}
+
+	actions
+	{
+		Abort If(Victim.Stored_Health - Max Health(Victim) * Normalized Health(Victim) <= 0);
+		Attacker.Ultimate_Points += Min((Victim.Stored_Health - Max Health(Victim) * Normalized Health(Victim)) * (Array Contains(
+			All Tank Heroes, Victim.Stored_Hero) ? 0.700 : 1), Attacker.Ultimate_Cost - Attacker.Ultimate_Points);
+		Victim.Valid_Healing += Event Damage;
+	}
+}
+
+rule("Charge : Healing (Others)")
+{
+	event
+	{
+		Player Dealt Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Healer.Ultimate_Points < Healer.Ultimate_Cost;
+		Is Using Ultimate(Healer) != True;
+		Event Ability != Null;
+		Event Ability != Button(Ultimate);
+		Healee != Healer;
+		Event Was Health Pack != True;
+		Healee.Valid_Healing > 0;
+	}
+
+	actions
+	{
+		Healer.Ultimate_Points += Min(Min(Event Healing * (Array Contains(All Tank Heroes, Healee.Stored_Hero) ? 0.700 : 1),
+			Healee.Valid_Healing), Healer.Ultimate_Cost - Healer.Ultimate_Points);
+	}
+}
+
+rule("Charge : Healing (Self)")
+{
+	event
+	{
+		Player Dealt Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Healer.Ultimate_Points < Healer.Ultimate_Cost;
+		Is Using Ultimate(Healer) != True;
+		Event Ability != Null;
+		Event Ability != Button(Ultimate);
+		Healee == Healer;
+		Event Was Health Pack != True;
+		Healee.Valid_Healing > 0;
+	}
+
+	actions
+	{
+		Abort If(Player Hero Stat(Event Player, Hero Of(Event Player), Self Healing) == Event Player.Stored_Self_Healing_Stat);
+		Healer.Ultimate_Points += Min(Min((Player Hero Stat(Event Player, Hero Of(Event Player), Self Healing)
+			- Event Player.Stored_Self_Healing_Stat) * (Array Contains(All Tank Heroes, Healee.Stored_Hero) ? 0.700 : 1),
+			Healee.Valid_Healing), Healer.Ultimate_Cost - Healer.Ultimate_Points);
+		Event Player.Stored_Self_Healing_Stat = Player Hero Stat(Event Player, Hero Of(Event Player), Self Healing);
+	}
+}
+
+rule("Subtract : Vaild Healing")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Healee.Valid_Healing -= Min(Event Healing, Event Player.Valid_Healing);
+	}
+}
+
+rule("Reset : Vaild Healing")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Valid_Healing = 0;
+	}
+}
+
+rule("Store Health")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+		Event Player.Stored_Health != Health(Event Player);
+	}
+
+	actions
+	{
+		Wait(0.010, Ignore Condition);
+		Event Player.Stored_Health = Max Health(Event Player) * Normalized Health(Event Player);
+	}
+}
