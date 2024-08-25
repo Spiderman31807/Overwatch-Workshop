@@ -1,0 +1,649 @@
+settings
+{
+	main
+	{
+		Mode Name: "Custom Roles"
+	}
+
+	modes
+	{
+		Control
+
+		Escort
+
+		Flashpoint
+
+		Hybrid
+
+		Push
+
+		General
+		{
+			Tank Role Passive Health Bonus: Disabled
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Ultimate Generation: 10%
+			Ultimate Generation - Combat: 0%
+			Ultimate Generation - Passive: 0%
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: Roles_List
+		1: Default_Roles
+		2: Overrides_Heros
+		3: Overrides_Roles
+		4: Hero_Roles
+		5: Index
+		6: Roles_Limits
+		7: Limit_Affects
+		8: Passive_List
+		9: Passive_Roles
+		10: Use_Example
+		11: Ultimate_Cost
+
+	player:
+		0: Hero
+		1: Role
+		2: Index
+		3: Allowed_Heros
+		4: Added_Health
+		5: Reboot_Passives
+		6: Damage_Passive_Fake
+		7: Damage_Passive_Counter
+		8: Passives
+		9: Ultimate_Cost
+		10: Ultimate_Points
+		11: Stored_Mech_Points
+		12: Stored_Health
+		13: Stored_Self_Healing_Stat
+		14: Valid_Healing
+		15: Stored_Hero
+}
+
+subroutines
+{
+	0: Setup_Roles
+}
+
+rule("-------------------------- Roles -----------------------          <------ Edit Here")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		"List of Roles, Please Leave Basic 3 (Tank, Damage & Support) as Defaults for Unset Hero's"
+		Global.Roles_List = Array(Custom String("Tank"), Custom String("Damage"), Custom String("Support"));
+		"The Max Number of players on a Role before that Role gets Locked for Teamates (Match Index to the Role of choice in Roles_List)"
+		Global.Roles_Limits = Array(1, 2, 2);
+		"Hero Overrides: just a list of heros so the Overrides_Role array knows which heros to change the Roles of"
+		Global.Overrides_Heros = Array();
+		"Role Overrides: for a heros role, Leave the role list index of choice, in the same Overrides_Heros index as the array for the hero you want to change"
+		Global.Overrides_Roles = Array();
+		Call Subroutine(Setup_Roles);
+	}
+}
+
+rule("-------------------------- Roles -----------------------          EXAMPLES")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.Use_Example = Workshop Setting Combo(Custom String("Settings"), Custom String("Example"), 0, Array(Custom String("None"),
+			Custom String("Off/Main Roles + Old Defence Role"), Custom String("Sub Roles"), Custom String("All Passives"), Custom String(
+			"No Passives")), 0);
+		If(Global.Use_Example == 1);
+			Global.Roles_List = Array(Custom String("Main-Tank"), Custom String("Off-Tank"), Custom String("Offence"), Custom String(
+				"Defence"), Custom String("Main-Support"), Custom String("Off-Support"));
+			Global.Roles_Limits = Array(2, 1, 2, 2, 2, 1);
+			Global.Overrides_Heros = Array(Hero(Reaper), Hero(Tracer), Hero(Mercy), Hero(Hanzo), Hero(Torbjörn), Hero(Reinhardt), Hero(Pharah),
+				Hero(Winston), Hero(Widowmaker), Hero(Bastion), Hero(Symmetra), Hero(Zenyatta), Hero(Genji), Hero(Roadhog), Hero(Cassidy),
+				Hero(Junkrat), Hero(Zarya), Hero(Soldier: 76), Hero(Lúcio), Hero(D.Va), Hero(Mei), Hero(Sombra), Hero(Doomfist), Hero(Ana),
+				Hero(Orisa), Hero(Brigitte), Hero(Moira), Hero(Wrecking Ball), Hero(Sojourn), Hero(Ashe), Hero(Echo), Hero(Baptiste), Hero(
+				Kiriko), Hero(Junker Queen), Hero(Sigma), Hero(Ramattra), Hero(Lifeweaver), Hero(Mauga), Hero(Illari));
+			Global.Overrides_Roles = Array(2, 2, 4, 3, 3, 0, 2, 1, 3, 3, 3, 5, 2, 1, 2, 3, 1, 2, 5, 1, 3, 2, 2, 4, 0, 5, 4, 1, 2, 3, 2, 4, 4,
+				1, 0, 0, 4, 0, 4);
+			Wait(0.050, Ignore Condition);
+			Global.Passive_Roles = Array(Array(0, 1), Array(2, 3), Array(4, 5));
+		"Role List is AI Generated"
+		Else If(Global.Use_Example == 2);
+			Global.Roles_List = Array(Custom String("Brawler"), Custom String("Barrier"), Custom String("Disruptor"), Custom String(
+				"Frontline"), Custom String("Sniper"), Custom String("Flanker"), Custom String("Healer"), Custom String("Utility"));
+			Global.Roles_Limits = Array(1, 1, 1, 2, 1, 1, 2, 1, 1);
+			Global.Overrides_Heros = Array(Hero(Reaper), Hero(Tracer), Hero(Mercy), Hero(Hanzo), Hero(Torbjörn), Hero(Reinhardt), Hero(Pharah),
+				Hero(Winston), Hero(Widowmaker), Hero(Bastion), Hero(Symmetra), Hero(Zenyatta), Hero(Genji), Hero(Roadhog), Hero(Cassidy),
+				Hero(Junkrat), Hero(Zarya), Hero(Soldier: 76), Hero(Lúcio), Hero(D.Va), Hero(Mei), Hero(Sombra), Hero(Doomfist), Hero(Ana),
+				Hero(Orisa), Hero(Brigitte), Hero(Moira), Hero(Wrecking Ball), Hero(Sojourn), Hero(Ashe), Hero(Echo), Hero(Baptiste), Hero(
+				Kiriko), Hero(Junker Queen), Hero(Sigma), Hero(Ramattra), Hero(Lifeweaver), Hero(Mauga), Hero(Illari));
+			Global.Overrides_Roles = Array(5, 5, 6, 4, 3, 1, 3, 2, 4, 3, 3, 6, 5, 0, 3, 3, 0, 3, 7, 1, 3, 5, 0, 6, 0, 6, 6, 2, 3, 4, 3, 6, 6,
+				0, 1, 1, 6, 0, 6);
+			Wait(0.050, Ignore Condition);
+			Global.Passive_Roles = Array(Array(0, 1, 2), Array(3, 4, 5), Array(6, 7));
+		Else If(Global.Use_Example == 3);
+			Wait(0.050, Ignore Condition);
+			Global.Passive_Roles = Array(Array(0, 1, 2), Array(0, 1, 2), Array(0, 1, 2));
+		Else If(Global.Use_Example == 4);
+			Wait(0.050, Ignore Condition);
+			Global.Passive_Roles = Array(Array(), Array(), Array());
+		End;
+	}
+}
+
+rule("Player Left")
+{
+	event
+	{
+		Player Left Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		All Players(Team Of(Event Player)).Allowed_Heros = True;
+	}
+}
+
+rule("Setup Roles")
+{
+	event
+	{
+		Subroutine;
+		Setup_Roles;
+	}
+
+	actions
+	{
+		Global.Passive_List = Array(Custom String("Tank"), Custom String("Damage"), Custom String("Support"));
+		Global.Passive_Roles = Array(Array(0), Array(1), Array(2));
+		Wait(0.100, Ignore Condition);
+		Create HUD Text(Filtered Array(Local Player, Is In Spawn Room(Current Array Element)), Custom String("Passive\n\n{0}{1}{2}",
+			Count Of(Local Player.Passives) > 0 ? Local Player.Passives[0] : Custom String("None"), Count Of(Local Player.Passives)
+			> 1 ? Custom String("\n{0}", Local Player.Passives[1]) : Custom String(""), Count Of(Local Player.Passives)
+			> 2 ? Custom String("\n{0}", Local Player.Passives[2]) : Custom String("")), Null, Null, Left, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Local Player, Is In Spawn Room(Current Array Element)), Custom String("Role: {0}, Limit: {1}",
+			Global.Roles_List[Local Player.Role], Global.Roles_Limits[Local Player.Role]), Null, Null, Top, 0, Color(White), Color(White),
+			Color(White), Visible To and String, Default Visibility);
+		Global.Ultimate_Cost = Array(1930, 1260, 1820, 1680, 2142, 1650, 2000, 1850, 1400, 2310, 1680, 2310, 1932, 2800, 1850, 1925, 2270,
+			2100, 2420, 1540, 1750, 2500, 1950, 2100, 1950, 2700, 2660, 1675, 1665, 2240, 1691, 2310, 2300, 2450, 2100, 2100, 2000, 2400,
+			2420);
+		For Global Variable(Index, Count Of(Global.Ultimate_Cost), Count Of(All Heroes), 1);
+			Modify Global Variable(Ultimate_Cost, Append To Array, 1602);
+		End;
+		Global.Limit_Affects = Workshop Setting Toggle(Custom String("Settings"), Custom String(
+			"Role Limit Is 'Per Game' (Otherwise) 'Per Team'"), False, 0);
+		Global.Default_Roles = Mapped Array(All Heroes, Array Contains(All Tank Heroes, Current Array Element) ? 0 : (Array Contains(
+			All Damage Heroes, Current Array Element) ? 1 : 2));
+		Global.Hero_Roles = Global.Default_Roles;
+		For Global Variable(Index, 0, Count Of(Global.Overrides_Heros), 1);
+			Global.Hero_Roles[Index Of Array Value(All Heroes, Global.Overrides_Heros[Global.Index])] = Global.Overrides_Roles[Global.Index];
+		End;
+	}
+}
+
+rule("Setup Players")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Allowed_Heros = True;
+		Event Player.Ultimate_Points = Null;
+		Event Player.Ultimate_Cost = Null;
+		Chase Player Variable At Rate(Event Player, Ultimate_Points, Is Using Ultimate(Event Player) ? 0 : Event Player.Ultimate_Cost,
+			Is Using Ultimate(Event Player) ? 9999 : (Is Game In Progress || Is Waiting For Players ? 5 : 0), Destination and Rate);
+		Event Player.Valid_Healing = 0;
+		Wait Until(Is Between Rounds, 99999);
+		Wait Until(!Is Between Rounds, 99999);
+		Start Forcing Player To Be Hero(Event Player, Remove From Array(All Heroes, Hero Of(Event Player)));
+		Stop Forcing Player To Be Hero(Event Player);
+		Loop;
+	}
+}
+
+rule("Update Allowed Heros")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Allowed_Heros == True;
+	}
+
+	actions
+	{
+		Event Player.Allowed_Heros = All Heroes;
+		For Player Variable(Event Player, Index, 0, Count Of(Global.Roles_List), 1);
+			Skip If(Has Spawned(Event Player) && Event Player.Role == Event Player.Index, 2);
+			Skip If(Count Of(Filtered Array(Remove From Array(All Players(Global.Limit_Affects ? All Teams : Team Of(Event Player)),
+				Event Player), Current Array Element.Role == Event Player.Index)) < Global.Roles_Limits[Event Player.Index], 1);
+			Modify Player Variable(Event Player, Allowed_Heros, Remove From Array By Value, Filtered Array(All Heroes,
+				Global.Hero_Roles[Current Array Index] == Event Player.Index));
+		End;
+		Set Player Allowed Heroes(Event Player, Event Player.Allowed_Heros);
+		Call Subroutine(Sub1);
+		Event Player.Allowed_Heros = False;
+	}
+}
+
+rule("Update Hero/Role")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Event Player.Hero;
+	}
+
+	actions
+	{
+		Remove Health Pool From Player(Event Player.Added_Health);
+		Event Player.Hero = Hero Of(Event Player);
+		Event Player.Ultimate_Cost = Global.Ultimate_Cost[Index Of Array Value(All Heroes, Event Player.Hero)];
+		Event Player.Role = Global.Hero_Roles[Index Of Array Value(All Heroes, Event Player.Hero)];
+		Remove From Array(All Players(Global.Limit_Affects ? All Teams : Team Of(Event Player)), Event Player).Allowed_Heros = True;
+		Event Player.Passives = Filtered Array(Global.Passive_List, Array Contains(Global.Passive_Roles[Current Array Index],
+			Event Player.Role));
+		Event Player.Reboot_Passives = True;
+		Wait(0.100, Ignore Condition);
+		Event Player.Reboot_Passives = False;
+	}
+}
+
+rule("Remove Passive: Tank                    (Knockback/HP)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(All Tank Heroes, Event Player.Hero) == True;
+		!Array Contains(Event Player.Passives, Custom String("Tank")) == True;
+		Event Player.Reboot_Passives == True;
+	}
+
+	actions
+	{
+		Set Knockback Received(Event Player, 130);
+	}
+}
+
+rule("Add Passive: Tank                           (Knockback/HP)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Event Player.Passives, Custom String("Tank")) == True;
+		Event Player.Reboot_Passives == True;
+	}
+
+	actions
+	{
+		Set Knockback Received(Event Player, Array Contains(All Tank Heroes, Event Player.Hero) ? 100 : 70);
+		Add Health Pool To Player(Event Player, Health, 150, True, True);
+		Event Player.Added_Health = Last Created Health Pool;
+	}
+}
+
+rule("Remove Passive: Damage")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(All Damage Heroes, Attacker.Hero) == True;
+		!Array Contains(Event Player.Passives, Custom String("Damage")) == True;
+	}
+
+	actions
+	{
+		Event Player.Damage_Passive_Counter = True;
+		Set Healing Received(Event Player, Event Player.Damage_Passive_Fake ? 100 : 120);
+		Wait(2, Restart When True);
+		Set Healing Received(Event Player, Event Player.Damage_Passive_Fake ? 80 : 100);
+		Event Player.Damage_Passive_Counter = False;
+	}
+}
+
+rule("Add Passive: Damage")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(All Damage Heroes, Event Player.Hero) != True;
+		Array Contains(Event Player.Passives, Custom String("Damage")) == True;
+	}
+
+	actions
+	{
+		Event Player.Damage_Passive_Fake = True;
+		Set Healing Received(Event Player, Event Player.Damage_Passive_Counter ? 100 : 80);
+		Wait(2, Restart When True);
+		Set Healing Received(Event Player, Event Player.Damage_Passive_Counter ? 120 : 100);
+		Event Player.Damage_Passive_Fake = False;
+	}
+}
+
+rule("Remove Passive: Support")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(All Support Heroes, Event Player.Hero) == True;
+		!Array Contains(Event Player.Passives, Custom String("Support")) == True;
+	}
+
+	actions
+	{
+		Wait(2.400, Restart When True);
+		Damage(Event Player, Null, 1);
+		Set Player Health(Event Player, Health(Event Player) + 1);
+		Wait(0.016, Ignore Condition);
+	}
+}
+
+rule("Add Passive: Support")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(All Support Heroes, Event Player.Hero) != True;
+		Array Contains(Event Player.Passives, Custom String("Support")) == True;
+	}
+
+	actions
+	{
+		Stop All Heal Over Time(Event Player);
+		Wait(2.500, Restart When True);
+		Start Heal Over Time(Event Player, Null, 2.500, 20);
+	}
+}
+
+disabled rule("------------------------------------------------------ Ultimate Generation Replica ---------------------------------------------")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Swap : Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Has Spawned(Event Player) && (Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)
+			!= Event Player.Stored_Hero)) == True;
+	}
+
+	actions
+	{
+		Event Player.Stored_Hero = Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player);
+		Event Player.Ultimate_Cost = Global.Ultimate_Cost[Index Of Array Value(All Heroes, Event Player.Stored_Hero)];
+		Modify Player Variable(Event Player, Ultimate_Points, Min, Event Player.Ultimate_Cost * 0.300);
+		Skip If(!Is Duplicating(Event Player), 1);
+		Event Player.Ultimate_Cost /= 5;
+	}
+}
+
+rule("Swap : Baby Dva                                  (Dont Try To Use Self Destruct Right After Re-meching, It Will Break Your Hero)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		(Has Spawned(Event Player) && (Is Duplicating(Event Player) ? Hero Being Duplicated(Event Player) : Hero Of(Event Player)
+			== Event Player.Stored_Hero)) == True;
+		Event Player.Stored_Hero == Hero(D.Va);
+		Is In Alternate Form(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Ultimate_Cost = 280;
+		Event Player.Stored_Mech_Points = Event Player.Ultimate_Points;
+		Event Player.Ultimate_Points = 0;
+		Skip If(!Is Duplicating(Event Player), 1);
+		Event Player.Ultimate_Cost /= 5;
+		Wait Until(Is True For Any(Array(Event Player.Stored_Hero != Hero(D.Va), Is In Alternate Form(Event Player) != True),
+			Current Array Element), 99999);
+		Wait(0.100, Ignore Condition);
+		Abort If(Event Player.Stored_Hero != Hero(D.Va));
+		Event Player.Ultimate_Cost = Global.Ultimate_Cost[Index Of Array Value(All Heroes, Hero(D.Va))];
+		Event Player.Ultimate_Points = Event Player.Stored_Mech_Points;
+		Skip If(!Is Duplicating(Event Player), 1);
+		Event Player.Ultimate_Cost /= 5;
+	}
+}
+
+rule("Charge : Update")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Ultimate Charge Percent(Event Player) != Event Player.Ultimate_Points / (Event Player.Ultimate_Cost / 100);
+	}
+
+	actions
+	{
+		Set Ultimate Charge(Event Player, Event Player.Ultimate_Points / (Event Player.Ultimate_Cost / 100));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Charge : Damage")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Attacker.Ultimate_Points < Attacker.Ultimate_Cost;
+		Is Using Ultimate(Attacker) != True;
+		Team Of(Attacker) != Team Of(Victim);
+		Event Ability != Button(Ultimate);
+	}
+
+	actions
+	{
+		Abort If(Victim.Stored_Health - Max Health(Victim) * Normalized Health(Victim) <= 0);
+		Attacker.Ultimate_Points += Min((Victim.Stored_Health - Max Health(Victim) * Normalized Health(Victim)) * (Array Contains(
+			Victim.Passives, Custom String("Tank")) ? 0.700 : 1), Attacker.Ultimate_Cost - Attacker.Ultimate_Points);
+		Victim.Valid_Healing += Event Damage;
+	}
+}
+
+rule("Charge : Healing (Others)")
+{
+	event
+	{
+		Player Dealt Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Healer.Ultimate_Points < Healer.Ultimate_Cost;
+		Is Using Ultimate(Healer) != True;
+		Event Ability != Null;
+		Event Ability != Button(Ultimate);
+		Healee != Healer;
+		Event Was Health Pack != True;
+		Healee.Valid_Healing > 0;
+	}
+
+	actions
+	{
+		Healer.Ultimate_Points += Min(Min(Event Healing * (Array Contains(Healee.Passives, Custom String("Tank")) ? 0.700 : 1),
+			Healee.Valid_Healing), Healer.Ultimate_Cost - Healer.Ultimate_Points);
+	}
+}
+
+rule("Charge : Healing (Self)")
+{
+	event
+	{
+		Player Dealt Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Healer.Ultimate_Points < Healer.Ultimate_Cost;
+		Is Using Ultimate(Healer) != True;
+		Event Ability != Null;
+		Event Ability != Button(Ultimate);
+		Healee == Healer;
+		Event Was Health Pack != True;
+		Healee.Valid_Healing > 0;
+	}
+
+	actions
+	{
+		Abort If(Player Hero Stat(Event Player, Hero Of(Event Player), Self Healing) == Event Player.Stored_Self_Healing_Stat);
+		Healer.Ultimate_Points += Min(Min((Player Hero Stat(Event Player, Hero Of(Event Player), Self Healing)
+			- Event Player.Stored_Self_Healing_Stat) * (Array Contains(Healee.Passives, Custom String("Tank")) ? 0.700 : 1),
+			Healee.Valid_Healing), Healer.Ultimate_Cost - Healer.Ultimate_Points);
+		Event Player.Stored_Self_Healing_Stat = Player Hero Stat(Event Player, Hero Of(Event Player), Self Healing);
+	}
+}
+
+rule("Subtract : Vaild Healing")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Healee.Valid_Healing -= Min(Event Healing, Event Player.Valid_Healing);
+	}
+}
+
+rule("Reset : Vaild Healing")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Valid_Healing = 0;
+	}
+}
+
+rule("Store Health")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+		Event Player.Stored_Health != Health(Event Player);
+	}
+
+	actions
+	{
+		Wait(0.010, Ignore Condition);
+		Event Player.Stored_Health = Max Health(Event Player) * Normalized Health(Event Player);
+	}
+}
