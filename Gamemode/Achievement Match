@@ -1,0 +1,2302 @@
+settings
+{
+	main
+	{
+		Description: "Deathmatch Means Kills To Score Points.\nAchievement Match Means You Need\nAchievements To Score Points, Very Basic.\n\nJunk-ie Has A Dash Because The Game\nWill Censor It, If It Doesn't."
+		Mode Name: "Achievement Match! - 6K87M"
+	}
+
+	lobby
+	{
+		Map Rotation: After A Game
+		Match Voice Chat: Enabled
+		Return To Lobby: Never
+	}
+
+	modes
+	{
+		disabled Assault
+		{
+			Game Mode Start: Immediately
+			Limit Roles: 1 Tank 2 Offense 2 Support
+			Tank Role Passive Health Bonus: Always Enabled
+		}
+
+		disabled Control
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		Deathmatch
+		{
+			Game Length In Minutes: 15
+			Score To Win: 5000
+			Self Initiated Respawn: Off
+		}
+
+		disabled Escort
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		disabled Flashpoint
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		disabled Hybrid
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+
+		disabled Push
+		{
+			Limit Roles: 1 Tank 2 Offense 2 Support
+		}
+	}
+}
+
+variables
+{
+	global:
+		0: Achievement_Hero_Order
+		1: Achievement_Names
+		2: Progress_Needed
+		3: Progress_Type
+		4: Reset_Type
+
+	player:
+		0: Hero
+		1: Achievements_Completed
+		2: Progess_Achievements
+		3: Progress_Counter
+		4: Progress_Needed
+		5: Progress_Type
+		6: Reset_Type
+		7: Achievement1_Timers
+		8: Achievement2_Timers
+		9: Timer_Index1
+		10: Timer_Index2
+		11: Using_Ult
+		12: Solo_Kills
+		13: Healing
+		14: Damage_Blocked
+		15: Is_Sunstruck
+		16: Frozen_By
+		17: Hacked_By
+		18: Served
+		19: Mine_In_Air
+		20: Bastion_Form_Kills
+		21: Rein_Combo
+		22: Zarya_Power_Level
+		23: Orb_Used
+		24: JQ_Combo
+		25: Health
+		26: Crits
+		27: Unqiue_Enemy
+		28: Discord_Target
+		29: Discord_Cooldown
+		30: Discord_Players
+		31: Discord_Index
+		32: Cage_Fight_Pos
+		33: Is_Caged_By
+}
+
+rule("Debug Give Ultimate Charge")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Melee)) == True;
+		Is Button Held(Event Player, Button(Crouch)) == True;
+	}
+
+	actions
+	{
+		Set Ultimate Charge(Event Player, 100);
+		Set Ability Cooldown(Event Player, Button(Ability 1), 0);
+		Set Ability Charge(Event Player, Button(Ability 1), 3);
+	}
+}
+
+rule("Skip Assembling Heros")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(3);
+	}
+}
+
+rule("Global Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Scoring;
+		Global.Achievement_Names = Array(Custom String("Die Die Die... Die"), Custom String("Waste Not, Want Not"), Custom String(
+			"Slice and Dice"), Custom String("Their Own Worst Enemy"), Custom String("It's High Noon"), Custom String("Gotcha"),
+			Custom String("Death From Above"), Custom String("Clearing The Area"), Custom String("Target Rich Environment"), Custom String(
+			"Rocket Man"), Custom String("Special Delivery"), Custom String("Total Recall"), Custom String("Incoming!"), Custom String(
+			"Triple Threat"), Custom String("The Dragon Is Stated"), Custom String("Simple Geometry"), Custom String("Roadkill"),
+			Custom String("Mine Like A Steel Trap"), Custom String("Cold Snap"), Custom String("Ice Blocked"), Custom String("Raid Wipe"),
+			Custom String("Armor Up!"), Custom String("Smooth As Slik"), Custom String("Did That Sting?"), Custom String("Game Over"),
+			Custom String("Shot Down"), Custom String("Storm, Earth And Fire"), Custom String("I Am Your Shield"), Custom String(
+			"Hog Wild"), Custom String("Giving You The Hook"), Custom String("Anger Management"), Custom String("Mine Sweeper"),
+			Custom String("The Power Of Attraction"), Custom String("Power Overwhelming"), Custom String("Supersonic"), Custom String(
+			"The Floor Is Lava"), Custom String("Huge Rez"), Custom String("Group Health Plan"), Custom String("Huge Success"),
+			Custom String("The Car Wash"), Custom String("The Iris Enbraces You"), Custom String("Rapid Discord"), Custom String(
+			"Enabler"), Custom String("Naptime"), Custom String("Power Outage"), Custom String("Hack The Planet"), Custom String(
+			"Terrable Terrable Damage"), Custom String("Tip Of The Spear"), Custom String("Cratered"), Custom String("Power Punch"),
+			Custom String("Antipode"), Custom String("Simple Trigometry"), Custom String("Excuse Me"), Custom String("Grounded"),
+			Custom String("Strike"), Custom String("Adaptation"), Custom String("Served Up"), Custom String("Short Fuse"), Custom String(
+			"Window of Opportunity"), Custom String("Stand By Me"), Custom String("Event Horizon"), Custom String(
+			"Conservation of Energy"), Custom String("Adaptability"), Custom String("Focused"), Custom String("Yokai"), Custom String(
+			"Purified"), Custom String("Taking Charge"), Custom String("On The Move"), Custom String("Adrenaline Junk-ie"), Custom String(
+			"Coup De Gracie"), Custom String("Any Means"), Custom String("Incomparable Pain"), Custom String("Giving Tree"), Custom String(
+			"Life Weaving"), Custom String("Solar Flare"), Custom String("Perfect Placement"), Custom String("Three's A Crowd"),
+			Custom String("Heartthrob"));
+		Global.Achievement_Hero_Order = Array(Hero(Reaper), Hero(Genji), Hero(Cassidy), Hero(Pharah), Hero(Soldier: 76), Hero(Tracer),
+			Hero(Bastion), Hero(Hanzo), Hero(Junkrat), Hero(Mei), Hero(Torbjörn), Hero(Widowmaker), Hero(D.Va), Hero(Reinhardt), Hero(
+			Roadhog), Hero(Winston), Hero(Zarya), Hero(Lúcio), Hero(Mercy), Hero(Symmetra), Hero(Zenyatta), Hero(Ana), Hero(Sombra), Hero(
+			Orisa), Hero(Doomfist), Hero(Moira), Hero(Brigitte), Hero(Wrecking Ball), Hero(Ashe), Hero(Baptiste), Hero(Sigma), Hero(Echo),
+			Hero(Kiriko), Hero(Sojourn), Hero(Junker Queen), Hero(Ramattra), Hero(Lifeweaver), Hero(Illari), Hero(Mauga));
+		Global.Progress_Needed = Array(4, 3, 4, 2, 4, 2, 4, 1, 4, 2, 4, 400, 3, 3, 4, 3, 4, 1, 4, 1000, 4, 500, 1, 4, 4, 1250, 3, 7500, 2,
+			1, 5, 10, 4, 60, 900, 3, 5, 4, 15, 3, 1250, 4, 4, 1, 5, 15, 3, 1, 4, 3, 6, 2, 1, 1, 4, 1250, 1, 1, 2000, 4, 3, 350, 2, 2, 2, 5,
+			4, 1, 7, 1, 3, 300, 1200, 3, 3, 8000, 3, 900);
+		Global.Progress_Type = Array(Custom String("Ultimate Kill"), Custom String("Solo Kill"), Custom String("Ultimate Kill"),
+			Custom String("Ability2 Kill"), Custom String("Ultimate Kill"), Custom String("Ability2 Kill"), Custom String("Kill"),
+			Custom String("Ability2 Kill"), Custom String("Ultimate Kill"), Custom String("Secondary Kill"), Custom String("Special"),
+			Custom String("Special"), Custom String("Ultimate Kill"), Custom String("Special"), Custom String("Ultimate Kill"),
+			Custom String("Ability2 Kill"), Custom String("Ultimate Kill"), Custom String("Special"), Custom String("Special"),
+			Custom String("Block Damage"), Custom String("Ultimate Kill"), Custom String("Special"), Custom String("Special"),
+			Custom String("Ability2 Kill"), Custom String("Ultimate Kill"), Custom String("Special"), Custom String("Special"),
+			Custom String("Block Damage"), Custom String("Ultimate Kill"), Custom String("Interupt Ultimate"), Custom String("Special"),
+			Custom String("Special"), Custom String("Special"), Custom String("Special"), Custom String("Block Damage"), Custom String(
+			"Special"), Custom String("Special"), Custom String("Special"), Custom String("Special"), Custom String("Special"),
+			Custom String("Ultimate Healing"), Custom String("Special"), Custom String("Ultimate Kill"), Custom String(
+			"Interupt Ultimate"), Custom String("Special"), Custom String("Special"), Custom String("Ultimate Kill"), Custom String(
+			"Secondary Kill"), Custom String("Special"), Custom String("Special"), Custom String("Special"), Custom String("Special"),
+			Custom String("Sepcial"), Custom String("Special"), Custom String("Special"), Custom String("Overhealth"), Custom String(
+			"Special"), Custom String("Special"), Custom String("Special"), Custom String("Special"), Custom String("Special"),
+			Custom String("Overhealth"), Custom String("Special"), Custom String("Ability2 Kill"), Custom String("Ultimate Healing"),
+			Custom String("Special"), Custom String("Special"), Custom String("Special"), Custom String("Special"), Custom String(
+			"Special"), Custom String("Special"), Custom String("Block Damage"), Custom String("Ultimate Healing"), Custom String(
+			"Special"), Custom String("Special"), Custom String("Healing"), Custom String("Ultimate Kill"), Custom String("Special"));
+		Global.Reset_Type = Array(Custom String("Ultimate End"), Custom String("Reload"), Custom String("Ultimate End"), Custom String(
+			"Ability2 End"), Custom String("Ultimate End"), Custom String("Ability2 End"), Custom String("Touching Ground"), Custom String(
+			"Never"), Custom String("Ultimate End"), Custom String("Secondary End"), Custom String("Never"), Custom String("Death"),
+			Custom String("Ultimate End"), Custom String("Death"), Custom String("Timer8"), Custom String("Ability2 End"), Custom String(
+			"Ultimate End"), Custom String("Never"), Custom String("Updates"), Custom String("Ability2 End"), Custom String("Timer8"),
+			Custom String("Death"), Custom String("Never"), Custom String("Never"), Custom String("Ultimate End"), Custom String(
+			"Secondary End"), Custom String("Special"), Custom String("Death"), Custom String("Timer8"), Custom String("Never"),
+			Custom String("Ultimate End"), Custom String("Death"), Custom String("Ultimate End"), Custom String("Never"), Custom String(
+			"Ultimate End"), Custom String("Death"), Custom String("Death"), Custom String("Death"), Custom String("Never"), Custom String(
+			"Updates"), Custom String("Ultimate End"), Custom String("Timer6"), Custom String("Ultimate End"), Custom String("Never"),
+			Custom String("Updates"), Custom String("Death"), Custom String("Ultimate End"), Custom String("Never"), Custom String(
+			"Ultimate End"), Custom String("Instant"), Custom String("Updates"), Custom String("Death"), Custom String("Never"),
+			Custom String("Never"), Custom String("Special"), Custom String("Death"), Custom String("Special"), Custom String("Never"),
+			Custom String("Ultimate End"), Custom String("Ability2 End"), Custom String("Ultimate End"), Custom String("Ability2 End"),
+			Custom String("Death"), Custom String("Ability2 End"), Custom String("Death"), Custom String("Ability2 End"), Custom String(
+			"Ultimate End"), Custom String("Never"), Custom String("Updates"), Custom String("Never"), Custom String("Ultimate End"),
+			Custom String("Ability1 End"), Custom String("Ultimate End"), Custom String("Death"), Custom String("Timer8"), Custom String(
+			"Never"), Custom String("Ultimate End"), Custom String("Ability2 End"));
+		Create HUD Text(Local Player, Null, Custom String("{0}: {1}", First Of(Local Player.Progess_Achievements), !Array Contains(
+			Local Player.Achievements_Completed, First Of(Local Player.Progess_Achievements)) ? Custom String("{0}/{1}", Round To Integer(
+			First Of(Local Player.Progress_Counter), Down), First Of(Local Player.Progress_Needed)) : Icon String(Checkmark)), Null, Left,
+			0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Local Player, Null, Custom String("{0}: {1}", Last Of(Local Player.Progess_Achievements), !Array Contains(
+			Local Player.Achievements_Completed, Last Of(Local Player.Progess_Achievements)) ? Custom String("{0}/{1}", Round To Integer(
+			Last Of(Local Player.Progress_Counter), Down), Last Of(Local Player.Progress_Needed)) : Icon String(Checkmark)), Null, Left, 1,
+			Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Local Player, Null, Custom String("\nHold {0} For 3s\nTo Select New Hero", Input Binding String(Button(Interact))),
+			Null, Left, 2, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+	}
+}
+
+rule("Player Setup")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Achievements_Completed = Empty Array;
+		Event Player.Achievement1_Timers = Empty Array;
+		Event Player.Achievement2_Timers = Empty Array;
+	}
+}
+
+rule("Update Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Event Player.Hero;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Heal Over Time(Event Player.Healing);
+		Event Player.Hero = Hero Of(Event Player);
+		Event Player.Progess_Achievements = Array(Global.Achievement_Names[Index Of Array Value(Global.Achievement_Hero_Order, Hero Of(
+			Event Player)) * 2], Global.Achievement_Names[Index Of Array Value(Global.Achievement_Hero_Order, Hero Of(Event Player))
+			* 2 + 1]);
+		Event Player.Progress_Needed = Array(Global.Progress_Needed[Index Of Array Value(Global.Achievement_Hero_Order, Hero Of(
+			Event Player)) * 2], Global.Progress_Needed[Index Of Array Value(Global.Achievement_Hero_Order, Hero Of(Event Player))
+			* 2 + 1]);
+		Event Player.Progress_Type = Array(Global.Progress_Type[Index Of Array Value(Global.Achievement_Hero_Order, Hero Of(Event Player))
+			* 2], Global.Progress_Type[Index Of Array Value(Global.Achievement_Hero_Order, Hero Of(Event Player)) * 2 + 1]);
+		Event Player.Reset_Type = Array(Global.Reset_Type[Index Of Array Value(Global.Achievement_Hero_Order, Hero Of(Event Player)) * 2],
+			Global.Reset_Type[Index Of Array Value(Global.Achievement_Hero_Order, Hero Of(Event Player)) * 2 + 1]);
+		Event Player.Solo_Kills = Player Stat(Event Player, Solo Kills);
+		Event Player.Damage_Blocked = Player Stat(Event Player, Damage Blocked);
+		Event Player.Progress_Counter = Array(Null, Null);
+		Event Player.Achievement1_Timers = Empty Array;
+		Event Player.Achievement2_Timers = Empty Array;
+		Event Player.Bastion_Form_Kills = Array(Null, Null, Null);
+		Event Player.Unqiue_Enemy = Empty Array;
+		Event Player.Orb_Used = Array(200, 300);
+		Event Player.Is_Sunstruck = Array(False, 0, Null);
+		Event Player.Discord_Target = Null;
+		Event Player.Discord_Cooldown = Empty Array;
+		Event Player.Discord_Players = Empty Array;
+	}
+}
+
+rule("Select New Hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("3"));
+		Wait(1, Abort When False);
+		Small Message(Event Player, Custom String("2"));
+		Wait(1, Abort When False);
+		Small Message(Event Player, Custom String("1"));
+		Wait(1, Abort When False);
+		Set Player Allowed Heroes(Event Player, Remove From Array(All Heroes, Hero Of(Event Player)));
+		Reset Player Hero Availability(Event Player);
+	}
+}
+
+rule("Complete Achievement 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		First Of(Event Player.Progress_Counter) >= First Of(Event Player.Progress_Needed);
+		Array Contains(Event Player.Achievements_Completed, First Of(Event Player.Progess_Achievements)) != True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Achievements_Completed, Append To Array, First Of(Event Player.Progess_Achievements));
+		Small Message(Event Player, Custom String("{0}, Completed", First Of(Event Player.Progess_Achievements)));
+		Modify Player Score(Event Player, 1);
+	}
+}
+
+rule("Complete Achievement 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Last Of(Event Player.Progress_Counter) >= Last Of(Event Player.Progress_Needed);
+		Array Contains(Event Player.Achievements_Completed, Last Of(Event Player.Progess_Achievements)) != True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Achievements_Completed, Append To Array, Last Of(Event Player.Progess_Achievements));
+		Small Message(Event Player, Custom String("{0}, Completed", Last Of(Event Player.Progess_Achievements)));
+		Modify Player Score(Event Player, 1);
+	}
+}
+
+rule("Achievement 1 - Timer Reset")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Count Of(Event Player.Achievement1_Timers) > 0;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, Timer_Index1, Count Of(Event Player.Achievement1_Timers) - 1, -1, -1);
+			If(Event Player.Achievement1_Timers[Event Player.Timer_Index1] <= 0);
+				Modify Player Variable(Event Player, Achievement1_Timers, Remove From Array By Index, Event Player.Timer_Index1);
+				Event Player.Progress_Counter[0] -= 1;
+			Else;
+				Event Player.Achievement1_Timers[Event Player.Timer_Index1] -= 1;
+			End;
+		End;
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Achievement 2 - Timer Reset")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Count Of(Event Player.Achievement2_Timers) > 0;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, Timer_Index2, Count Of(Event Player.Achievement2_Timers) - 1, -1, -1);
+			If(Event Player.Achievement2_Timers[Event Player.Timer_Index2] <= 0);
+				Modify Player Variable(Event Player, Achievement2_Timers, Remove From Array By Index, Event Player.Timer_Index2);
+				Event Player.Progress_Counter[1] -= 1;
+			Else;
+				Event Player.Achievement2_Timers[Event Player.Timer_Index2] -= 1;
+			End;
+		End;
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Is Using Ultimate")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Using_Ult = True;
+		Skip If(Hero Of(Event Player) != Hero(Illari), 1);
+		Event Player.Progress_Counter[0] = 0;
+		Wait Until(!Is Using Ultimate(Event Player), 99999);
+		Wait(0.100, Ignore Condition);
+		Event Player.Using_Ult = False;
+		If(Is True For Any(Array(Hero(Moira), Hero(Winston), Hero(Zarya)), Hero Of(Event Player) == Current Array Element));
+			Event Player.Unqiue_Enemy = Empty Array;
+			Event Player.Progress_Counter[0] = 0;
+		Else If(Hero Of(Event Player) == Hero(Lúcio));
+			Event Player.Health = 0;
+			Stop Chasing Player Variable(Event Player, Health);
+			Event Player.Progress_Counter[0] = 0;
+		Else If(Is True For Any(Array(Hero(Sojourn), Hero(Ramattra), Hero(Illari), Hero(Sigma)), Hero Of(Event Player)
+				== Current Array Element));
+			Wait(Hero Of(Event Player) == Hero(Illari) ? 8 : 0, Restart When True);
+			Event Player.Progress_Counter[0] = 0;
+		End;
+		Loop If Condition Is True;
+	}
+}
+
+rule("Detect Cause Of Frozen")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Status(Event Player, Frozen) == True;
+		Hero Of(Attacker) == Hero(Mei);
+		Event Ability == Button(Ultimate);
+	}
+
+	actions
+	{
+		Event Player.Frozen_By = Attacker;
+		Wait Until(!Has Status(Event Player, Frozen), 99999);
+		Event Player.Frozen_By = Null;
+	}
+}
+
+rule("Track Zarya Power Level")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zarya;
+	}
+
+	conditions
+	{
+		Event Player.Damage_Blocked != Player Stat(Event Player, Damage Blocked);
+	}
+
+	actions
+	{
+		Stop Chasing Player Variable(Event Player, Zarya_Power_Level);
+		Event Player.Zarya_Power_Level += (Player Stat(Event Player, Damage Blocked) - Event Player.Damage_Blocked) / 5;
+		Modify Player Variable(Event Player, Zarya_Power_Level, Min, 100);
+		Event Player.Damage_Blocked = Player Stat(Event Player, Damage Blocked);
+		Wait(2, Restart When True);
+		Chase Player Variable At Rate(Event Player, Zarya_Power_Level, 0, 2, Destination and Rate);
+	}
+}
+
+rule("Is Sunstruck")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Illari);
+		Event Ability == Button(Ultimate);
+		Event Damage <= 80;
+	}
+
+	actions
+	{
+		Event Player.Is_Sunstruck = Array(True, 0, Attacker);
+		Wait Until(Is Dead(Event Player), 7);
+		Wait(0.100, Ignore Condition);
+		Event Player.Is_Sunstruck = Array(False, 0, Null);
+	}
+}
+
+rule("Interupt Ultimate - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.Using_Ult == True;
+		Array Contains(Attacker.Progress_Type, Custom String("Interupt Ultimate")) == Event Player;
+		Event Ability == Button(Ability 1);
+	}
+
+	actions
+	{
+		Wait(0.016, Ignore Condition);
+		Abort If(Is Using Ultimate(Event Player));
+		Skip If(First Of(Event Player.Progress_Type) != Custom String("Interupt Ultimate"), 1);
+		Attacker.Progress_Counter[0] += 1;
+		Skip If(Last Of(Attacker.Progress_Type) != Custom String("Interupt Ultimate"), 1);
+		Attacker.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Ultimate Kill - Progress/Reset")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Attacker.Progress_Type, Custom String("Ultimate Kill")) == Event Player;
+		(Hero Of(Attacker) != Hero(Roadhog) || Event Was Environment) == True;
+		(Hero Of(Attacker) == Hero(Ana) ? Is Using Ultimate(Attacker) : Event Ability == Button(Ultimate)) == True;
+	}
+
+	actions
+	{
+		Skip If(First Of(Attacker.Progress_Type) != Custom String("Ultimate Kill"), 3);
+		Attacker.Progress_Counter[0] += 1;
+		Skip If(String Contains(First Of(Attacker.Reset_Type), Custom String("Timer")) != True, 1);
+		Modify Player Variable(Attacker, Achievement1_Timers, Append To Array, Array(6, 8)[Index Of Array Value(Array(Custom String("6"),
+			Custom String("8")), String Slice(First Of(Attacker.Reset_Type), 5, 5))]);
+		Skip If(Last Of(Attacker.Progress_Type) != Custom String("Ultimate Kill"), 1);
+		Attacker.Progress_Counter[1] += 1;
+		Wait Until(!Is Using Ultimate(Attacker), 99999);
+		Wait(0.100, Ignore Condition);
+		Skip If(First Of(Attacker.Reset_Type) != Custom String("Ultimate End") || First Of(Attacker.Progress_Type) != Custom String(
+			"Ultimate Kill"), 1);
+		Attacker.Progress_Counter[0] -= 1;
+		Skip If(Last Of(Attacker.Reset_Type) != Custom String("Ultimate End") || Last Of(Attacker.Progress_Type) != Custom String(
+			"Ultimate Kill"), 1);
+		Attacker.Progress_Counter[1] -= 1;
+	}
+}
+
+rule("Secondary Kill - Progress")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Attacker.Progress_Type, Custom String("Secondary Kill")) == Event Player;
+		(Hero Of(Attacker) != Hero(Orisa) || Event Was Environment) == True;
+		Event Ability == Button(Secondary Fire);
+	}
+
+	actions
+	{
+		Skip If(First Of(Event Player.Progress_Type) != Custom String("Secondary Kill"), 1);
+		Attacker.Progress_Counter[0] += 1;
+		Skip If(Last Of(Attacker.Progress_Type) != Custom String("Secondary Kill"), 1);
+		Attacker.Progress_Counter[1] += 1;
+		Wait Until(!Is Firing Secondary(Attacker), 99999);
+		Wait(0.100, Ignore Condition);
+		Skip If(First Of(Attacker.Reset_Type) != Custom String("Secondary End") || First Of(Attacker.Progress_Type) != Custom String(
+			"Secondary Kill"), 1);
+		Attacker.Progress_Counter[0] -= 1;
+		Skip If(Last Of(Attacker.Reset_Type) != Custom String("Secondary End") || Last Of(Attacker.Progress_Type) != Custom String(
+			"Secondary Kill"), 1);
+		Attacker.Progress_Counter[1] -= 1;
+	}
+}
+
+rule("Ability2 Kill - Progress")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Attacker.Progress_Type, Custom String("Ability2 Kill")) == Event Player;
+		(Hero Of(Attacker) != Hero(Pharah) || Event Was Environment) == True;
+		(Hero Of(Attacker) == Hero(Genji) ? Is Using Ability 2(Attacker) : Event Ability == Button(Ability 2)) == True;
+	}
+
+	actions
+	{
+		Skip If(First Of(Event Player.Progress_Type) != Custom String("Ability2 Kill"), 1);
+		Attacker.Progress_Counter[0] += 1;
+		Skip If(Last Of(Attacker.Progress_Type) != Custom String("Ability2 Kill"), 1);
+		Attacker.Progress_Counter[1] += 1;
+		Wait Until(!Is Using Ability 2(Attacker), 99999);
+		Wait(0.100, Ignore Condition);
+		Skip If(First Of(Attacker.Reset_Type) != Custom String("Ability2 End") || First Of(Attacker.Progress_Type) != Custom String(
+			"Ability2 Kill"), 1);
+		Attacker.Progress_Counter[0] -= 1;
+		Skip If(Last Of(Attacker.Reset_Type) != Custom String("Ability2 End") || Last Of(Attacker.Progress_Type) != Custom String(
+			"Ability2 Kill"), 1);
+		Attacker.Progress_Counter[1] -= 1;
+	}
+}
+
+rule("Death - Reset")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.Orb_Used = Array(200, 300);
+		Event Player.Bastion_Form_Kills = Array(Null, Null, Null);
+		Skip If(First Of(Event Player.Reset_Type) != Custom String("Death"), 1);
+		Event Player.Progress_Counter[0] = 0;
+		Skip If(Last Of(Event Player.Reset_Type) != Custom String("Death"), 1);
+		Event Player.Progress_Counter[1] = 0;
+	}
+}
+
+rule("Waste Not, Want Not - Progress")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Event Player.Solo_Kills != Player Stat(Event Player, Solo Kills);
+	}
+
+	actions
+	{
+		Event Player.Solo_Kills = Player Stat(Event Player, Solo Kills);
+		Event Player.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Waste Not, Want Not - Reset")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		(Is Using Ultimate(Event Player) || Is Using Ability 1(Event Player) || Is Reloading(Event Player)) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] = 0;
+	}
+}
+
+rule("Death From Above - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Pharah;
+	}
+
+	conditions
+	{
+		Is In Air(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Death From Above - Reset")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	conditions
+	{
+		Is On Ground(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] = 0;
+	}
+}
+
+rule("Special Delivery - Progress")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Tracer;
+	}
+
+	conditions
+	{
+		Event Damage <= 5;
+		Event Ability == Button(Ultimate);
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Total Recall - Progress")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Tracer;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Health = Health(Event Player);
+		Wait Until(!Is Using Ability 2(Event Player), 99999);
+		Event Player.Progress_Counter[1] += Health(Event Player) - Event Player.Health;
+	}
+}
+
+rule("Triple Threat - Progress (Recon)")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Event Player.Bastion_Form_Kills[0] < 2;
+		Is In Alternate Form(Event Player) != True;
+		Event Ability != Button(Ultimate);
+	}
+
+	actions
+	{
+		If(Event Player.Bastion_Form_Kills[0] < 2);
+			Event Player.Bastion_Form_Kills[0] += 1;
+		End;
+		Skip If(Event Player.Bastion_Form_Kills[0] < 2, 2);
+		Event Player.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Triple Threat - Progress (Assault)")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Event Player.Bastion_Form_Kills[1] < 2;
+		Is In Alternate Form(Event Player) == True;
+		Event Ability != Button(Ultimate);
+	}
+
+	actions
+	{
+		If(Event Player.Bastion_Form_Kills[1] < 2);
+			Event Player.Bastion_Form_Kills[1] += 1;
+		End;
+		Skip If(Event Player.Bastion_Form_Kills[1] < 2, 2);
+		Event Player.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Triple Threat - Progress (Artillery)")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Event Player.Bastion_Form_Kills[2] < 2;
+		Event Ability == Button(Ultimate);
+	}
+
+	actions
+	{
+		If(Event Player.Bastion_Form_Kills[2] < 2);
+			Event Player.Bastion_Form_Kills[2] += 1;
+		End;
+		Skip If(Event Player.Bastion_Form_Kills[2] < 2, 2);
+		Event Player.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Mine Like A Steel Trap (Mine)")
+{
+	event
+	{
+		Player Received Knockback;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Junkrat);
+		Event Ability == Button(Ability 1);
+	}
+
+	actions
+	{
+		Event Player.Mine_In_Air = Attacker;
+		Wait Until(Is In Air(Event Player), 1);
+		Wait Until(!Is In Air(Event Player), 8);
+		Wait(0.100, Ignore Condition);
+		Event Player.Mine_In_Air = Null;
+	}
+}
+
+rule("Mine Like A Steel Trap (Trap)")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Junkrat);
+		Event Ability == Button(Ability 2);
+		Event Player.Mine_In_Air == Attacker;
+	}
+
+	actions
+	{
+		Attacker.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Ice Blocked - Progress")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Event Player.Damage_Blocked != Player Stat(Event Player, Damage Blocked);
+	}
+
+	actions
+	{
+		Skip If(!Is Using Ability 2(Event Player), 1);
+		Event Player.Progress_Counter[1] += Player Stat(Event Player, Damage Blocked) - Event Player.Damage_Blocked;
+		Event Player.Damage_Blocked = Player Stat(Event Player, Damage Blocked);
+	}
+}
+
+rule("Ice Blocked - Reset")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) != True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] = 0;
+	}
+}
+
+rule("Cold Snap - Update")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Array Contains(Event Player.Achievements_Completed, First Of(Event Player.Progess_Achievements)) != True;
+		Count Of(Filtered Array(All Players(Opposite Team Of(Team Of(Event Player))), Current Array Element.Frozen_By == Event Player))
+			!= First Of(Event Player.Progress_Counter);
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] = Count Of(Filtered Array(All Players(Opposite Team Of(Team Of(Event Player))),
+			Current Array Element.Frozen_By == Event Player));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Armor Up! Refresh HP")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Torbjörn;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Health = 75;
+	}
+}
+
+rule("Armor Up! - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Torbjörn;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+		Event Player.Health > 0;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] += Min(Event Damage, Event Player.Health);
+		Event Player.Health -= Event Damage;
+	}
+}
+
+rule("Smooth as Slik - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Widowmaker;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+		Event Was Critical Hit == True;
+		Is In Air(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("I Am Your Shield - Progress")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Event Player.Damage_Blocked != Player Stat(Event Player, Damage Blocked);
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] += Player Stat(Event Player, Damage Blocked) - Event Player.Damage_Blocked;
+		Event Player.Damage_Blocked = Player Stat(Event Player, Damage Blocked);
+	}
+}
+
+rule("Storm, Earth and Fire (Earth Shatter)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Event Ability == Button(Ultimate);
+	}
+
+	actions
+	{
+		Event Player.Rein_Combo[0] = True;
+		Event Player.Progress_Counter[0] = 1;
+		Wait(8, Ignore Condition);
+		Event Player.Progress_Counter[0] = 0;
+		Event Player.Rein_Combo[0] = False;
+		Event Player.Rein_Combo[1] = False;
+		Event Player.Rein_Combo[2] = False;
+	}
+}
+
+rule("Storm, Earth and Fire (Firestrike)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Event Ability == Button(Ability 2);
+		Event Player.Rein_Combo[0] == True;
+		Event Player.Rein_Combo[1] != True;
+	}
+
+	actions
+	{
+		Event Player.Rein_Combo[1] = True;
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Storm, Earth and Fire (Charge)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Event Ability == Button(Ability 1);
+		Event Player.Rein_Combo[0] == True;
+		Event Player.Rein_Combo[2] != True;
+		Event Damage > 80;
+	}
+
+	actions
+	{
+		Event Player.Rein_Combo[2] = True;
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Anger Management - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Winston);
+		Event Ability == Button(Ultimate);
+		Array Contains(Attacker.Unqiue_Enemy, Event Player) != True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Attacker, Unqiue_Enemy, Append To Array, Event Player);
+		Attacker.Progress_Counter[0] += 1;
+	}
+}
+
+rule("The Power of Attraction - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Zarya);
+		Event Ability == Button(Ultimate);
+		Array Contains(Attacker.Unqiue_Enemy, Event Player) != True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Attacker, Unqiue_Enemy, Append To Array, Event Player);
+		Attacker.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Power Overwhelming - Progress")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zarya;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Event Player.Zarya_Power_Level >= 70;
+		Array Contains(Event Player.Achievements_Completed, Last Of(Event Player.Progess_Achievements)) != True;
+	}
+
+	actions
+	{
+		Wait(1, Abort When False);
+		Event Player.Progress_Counter[1] += 1;
+		Loop If Condition Is True;
+	}
+}
+
+rule("The Floor Is Lava - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is On Wall(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Supersonic HP")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Health = 750;
+		Chase Player Variable At Rate(Event Player, Health, 0, 125, Destination and Rate);
+	}
+}
+
+rule("Supersonic - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Event Player.Health > 0;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += Min(Event Damage, Event Player.Health);
+		Event Player.Health -= Event Damage;
+	}
+}
+
+rule("Hack The Planet/Power Outage - Progress (Hack)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Status(Event Player, Hacked) == True;
+	}
+
+	actions
+	{
+		Wait(0.016, Ignore Condition);
+		Abort If(Entity Exists(Event Player.Hacked_By));
+		Event Player.Hacked_By = First Of(Filtered Array(Players On Hero(Hero(Sombra), All Teams), Is Firing Secondary(
+			Current Array Element) && Distance Between(Event Player, Current Array Element) <= 15 && Is In Line of Sight(Eye Position(
+			Event Player), Current Array Element, All Barriers Block LOS)));
+		Event Player.Hacked_By.Progress_Counter[0] += 1;
+		Event Player.Hacked_By.Progress_Counter[1] += 1;
+		Wait Until(!Has Status(Event Player, Hacked), 99999);
+		Event Player.Hacked_By.Progress_Counter[0] -= 1;
+		Event Player.Hacked_By = Null;
+	}
+}
+
+rule("Hack The Planet/Power Outage - Progress (EMP)")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Sombra);
+		Event Ability == Button(Ultimate);
+		Entity Exists(Event Player.Hacked_By) != True;
+	}
+
+	actions
+	{
+		Event Player.Hacked_By = Attacker;
+		Event Player.Hacked_By.Progress_Counter[0] += 1;
+		Event Player.Hacked_By.Progress_Counter[1] += 1;
+		Wait Until(!Has Status(Event Player, Hacked), 99999);
+		Event Player.Hacked_By.Progress_Counter[0] -= 1;
+		Event Player.Hacked_By = Null;
+	}
+}
+
+rule("Power Punch - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Doomfist);
+		Event Ability == Button(Secondary Fire);
+		Event Damage > 30;
+		Event Damage <= 45;
+	}
+
+	actions
+	{
+		Attacker.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Antipode - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Moira);
+		Event Ability == Button(Ultimate);
+	}
+
+	actions
+	{
+		Skip If(Array Contains(Attacker.Unqiue_Enemy, Event Player), 2);
+		Modify Player Variable(Attacker, Unqiue_Enemy, Append To Array, Event Player);
+		Attacker.Progress_Counter[0] += 1;
+		Wait(1, Restart When True);
+		Modify Player Variable(Attacker, Unqiue_Enemy, Remove From Array By Value, Event Player);
+		Attacker.Progress_Counter[0] -= 1;
+	}
+}
+
+rule("Simple Trigonometry - Progress (Damage Orb)")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Moira);
+		Event Ability == Button(Ability 2);
+		Event Player.Orb_Used[0] > 0;
+	}
+
+	actions
+	{
+		Attacker.Orb_Used[0] -= Event Damage;
+		Modify Player Variable At Index(Attacker, Orb_Used, 0, Max, 0);
+		Event Player.Progress_Counter[1] = Count Of(Filtered Array(Event Player.Orb_Used, Current Array Element == 0));
+	}
+}
+
+rule("Simple Trigonometry - Progress (Healing Orb)")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Healer) == Hero(Moira);
+		Event Ability == Button(Ability 2);
+		Event Player.Orb_Used[1] > 0;
+	}
+
+	actions
+	{
+		Healer.Orb_Used[1] -= Event Healing;
+		Modify Player Variable At Index(Healer, Orb_Used, 1, Max, 0);
+		Event Player.Progress_Counter[1] = Count Of(Filtered Array(Event Player.Orb_Used, Current Array Element == 0));
+	}
+}
+
+rule("Simple Trigonometry - Reset (Orb)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Moira;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == Button(Ability 2);
+	}
+
+	actions
+	{
+		Wait Until(!Is Using Ability 2(Event Player), 99999);
+		If(Is Button Held(Event Player, Button(Primary Fire)) && Event Player.Orb_Used[0] != 0);
+			Event Player.Orb_Used[1] = 300;
+		Else If(Is Button Held(Event Player, Button(Secondary Fire)) && Event Player.Orb_Used[1] != 0);
+			Event Player.Orb_Used[0] = 200;
+		End;
+	}
+}
+
+rule("Grounded - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Event Ability == Button(Ability 1);
+		Event Was Environment != True;
+		Is In Air(Victim) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Excuse Me - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Event Ability == Button(Primary Fire);
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Adaptation HP")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Health = Max Health(Event Player) - 550;
+	}
+}
+
+rule("Adaptation - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+		Event Player.Health > 0;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] += Min(Event Damage, Event Player.Health);
+		Event Player.Health -= Event Damage;
+	}
+}
+
+rule("Strike - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Wrecking Ball);
+		Event Ability == Button(Secondary Fire);
+	}
+
+	actions
+	{
+		Skip If(Array Contains(Attacker.Unqiue_Enemy, Event Player), 2);
+		Modify Player Variable(Attacker, Unqiue_Enemy, Append To Array, Event Player);
+		Attacker.Progress_Counter[0] += 1;
+		Wait(2, Restart When True);
+		Modify Player Variable(Attacker, Unqiue_Enemy, Remove From Array By Value, Event Player);
+		Attacker.Progress_Counter[0] -= 1;
+	}
+}
+
+rule("B.O.B Served")
+{
+	event
+	{
+		Player Received Knockback;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Ashe);
+		Event Ability == Button(Ultimate);
+	}
+
+	actions
+	{
+		Wait Until(!Is On Ground(Event Player), 1);
+		Event Player.Served = Attacker;
+		Wait Until(Is On Ground(Event Player), 5);
+		Event Player.Served = Null;
+	}
+}
+
+rule("Served Up - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Ashe;
+	}
+
+	conditions
+	{
+		Victim.Served == Event Player;
+		Event Ability != Button(Ultimate);
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Short Fuse - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Ashe;
+	}
+
+	conditions
+	{
+		Event Ability == Button(Ability 2);
+		Distance Between(Event Player, Victim) >= 30;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Conservation of Energy - Progress")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait Until(!Is Using Ability 1(Event Player), 99999);
+		Event Player.Progress_Counter[1] += Max Health(Event Player) - 400;
+		Wait Until(Is Using Ability 1(Event Player), 5);
+		Event Player.Progress_Counter[1] = 0;
+		Loop If Condition Is True;
+	}
+}
+
+rule("Adaptability - Progress")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Echo;
+	}
+
+	conditions
+	{
+		Is Duplicating(Event Player) == True;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Yokai - Progress (Crits)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Kiriko;
+	}
+
+	conditions
+	{
+		Event Was Critical Hit == True;
+	}
+
+	actions
+	{
+		Event Player.Crits += 1;
+		Modify Player Variable(Event Player, Crits, Min, 5);
+		Event Player.Progress_Counter[0] = 0;
+		Skip If(Event Player.Crits < 5, 1);
+		Event Player.Progress_Counter[0] += 1;
+		Skip If(Event Player.Healing < 1500, 1);
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Yokai - Progress (Healing)")
+{
+	event
+	{
+		Player Dealt Healing;
+		All;
+		Kiriko;
+	}
+
+	actions
+	{
+		Event Player.Healing += Event Healing;
+		Modify Player Variable(Event Player, Healing, Min, 1500);
+		Event Player.Progress_Counter[0] = 0;
+		Skip If(Event Player.Crits < 5, 1);
+		Event Player.Progress_Counter[0] += 1;
+		Skip If(Event Player.Healing < 1500, 1);
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("On The Move - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Sojourn;
+	}
+
+	conditions
+	{
+		Is Using Ability 1(Event Player) == True;
+		Event Ability == Button(Secondary Fire);
+		Event Was Critical Hit == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Taking Charge - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Sojourn;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Coup Da Gracie (Jagged Blade)")
+{
+	event
+	{
+		Player Received Knockback;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Junker Queen);
+		Event Ability == Button(Secondary Fire);
+	}
+
+	actions
+	{
+		Event Player.JQ_Combo = Attacker;
+		Wait Until(Is In Air(Event Player), 1);
+		Wait Until(!Is In Air(Event Player), 8);
+		Wait(1, Ignore Condition);
+		Event Player.JQ_Combo = Null;
+	}
+}
+
+rule("Coup Da Gracie (Axe)")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Junker Queen);
+		Event Ability == Button(Ability 2);
+		Event Player.JQ_Combo == Attacker;
+	}
+
+	actions
+	{
+		Attacker.Progress_Counter[1] += 1;
+	}
+}
+
+rule("Adrenaline Junk-ie - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Junker Queen);
+		Is True For Any(Array(Button(Ability 2), Button(Secondary Fire), Button(Ultimate), Button(Melee)),
+			Event Ability == Current Array Element) == True;
+	}
+
+	actions
+	{
+		Skip If(Array Contains(Attacker.Unqiue_Enemy, Event Player), 2);
+		Modify Player Variable(Attacker, Unqiue_Enemy, Append To Array, Event Player);
+		Attacker.Progress_Counter[0] += 1;
+		Wait(1, Restart When True);
+		Modify Player Variable(Attacker, Unqiue_Enemy, Remove From Array By Value, Event Player);
+		Attacker.Progress_Counter[0] -= 1;
+	}
+}
+
+rule("Any Means - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Ramattra;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Giving Tree - Progress")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Healer) == Hero(Lifeweaver);
+		Event Ability == Button(Ultimate);
+	}
+
+	actions
+	{
+		Healer.Progress_Counter[0] += Event Healing;
+	}
+}
+
+rule("Solar Flare - Progress")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		First Of(Event Player.Is_Sunstruck) == True;
+	}
+
+	actions
+	{
+		Event Player.Is_Sunstruck[1] += Event Damage;
+		Wait(0.016, Ignore Condition);
+		Abort If(Is Alive(Event Player) && Event Player.Is_Sunstruck[1] >= 90);
+		Wait(0.800, Ignore Condition);
+		Last Of(Event Player.Is_Sunstruck).Progress_Counter[0] += 1;
+		Wait(5, Ignore Condition);
+		Event Player.Is_Sunstruck = Array(False, 0, Null);
+	}
+}
+
+rule("Perfect Placement - Progress")
+{
+	event
+	{
+		Player Dealt Healing;
+		All;
+		Illari;
+	}
+
+	conditions
+	{
+		Event Ability != Button(Secondary Fire);
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] += Event Healing;
+	}
+}
+
+rule("Fix Illari (Perfect Placement)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Illari;
+	}
+
+	conditions
+	{
+		Normalized Health(Event Player) < 1;
+	}
+
+	actions
+	{
+		Wait(1.900, Abort When False);
+		Damage(Event Player, Null, 0);
+		Set Player Health(Event Player, Health(Event Player) + 0);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Replace Illari Support Passive")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Illari;
+	}
+
+	conditions
+	{
+		Event Damage > 1;
+	}
+
+	actions
+	{
+		Stop Heal Over Time(Event Player.Healing);
+		Wait(2, Restart When True);
+		Start Heal Over Time(Event Player, Null, 9999, 15);
+		Event Player.Healing = Last Heal Over Time ID;
+	}
+}
+
+rule("Attach Discord Orb")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Skip If(!Entity Exists(Event Player.Discord_Target), 2);
+		Modify Player Variable(Event Player, Discord_Players, Append To Array, Event Player.Discord_Target);
+		Modify Player Variable(Event Player, Discord_Cooldown, Append To Array, 7);
+		Event Player.Discord_Target = First Of(Sorted Array(Filtered Array(Remove From Array(All Living Players(All Teams),
+			Append To Array(Event Player.Discord_Players, Event Player)), Distance Between(Event Player, Current Array Element)
+			<= 40 && Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element), All Barriers Block LOS)
+			&& Is In View Angle(Event Player, Eye Position(Current Array Element), 60)), Distance Between(Position Of(
+			Current Array Element), Position Of(Event Player) + Direction Towards(Position Of(Event Player), Position Of(
+			Current Array Element)) * Distance Between(Event Player, Current Array Element))));
+	}
+}
+
+rule("Lost Discord Orb")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) != True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, Discord_Players, Append To Array, Event Player.Discord_Target);
+		Modify Player Variable(Event Player, Discord_Cooldown, Append To Array, 7);
+		Wait(Is Dead(Event Player.Discord_Target) ? 0.500 : 0, Ignore Condition);
+		Event Player.Discord_Target = Null;
+	}
+}
+
+rule("Discord Orb Cooldown")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Count Of(Event Player.Discord_Cooldown) > 0;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, Discord_Index, Count Of(Event Player.Discord_Cooldown) - 1, -1, -1);
+			If(Event Player.Discord_Cooldown[Event Player.Discord_Index] <= 0);
+				Modify Player Variable(Event Player, Discord_Players, Remove From Array By Index, Event Player.Discord_Index);
+				Modify Player Variable(Event Player, Discord_Cooldown, Remove From Array By Index, Event Player.Discord_Index);
+			Else;
+				Event Player.Discord_Cooldown[Event Player.Discord_Index] -= 1;
+			End;
+		End;
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Rapid Discord - Progress/Reset")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Zenyatta);
+		Attacker.Discord_Target == Event Player;
+	}
+
+	actions
+	{
+		Attacker.Progress_Counter[1] += 1;
+		Wait(6, Ignore Condition);
+		Attacker.Progress_Counter[1] -= 1;
+	}
+}
+
+rule("Cratered - Progress/Reset")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) == Hero(Doomfist);
+		Event Ability == Button(Ultimate);
+		Event Was Environment != True;
+	}
+
+	actions
+	{
+		Attacker.Progress_Counter[0] += 1;
+		Wait(1, Ignore Condition);
+		Attacker.Progress_Counter[0] -= 1;
+	}
+}
+
+rule("Event Horizon - Progress")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Cage Fight Pos")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mauga;
+	}
+
+	conditions
+	{
+		Update Every Frame(Is Using Ultimate(Event Player)) == True;
+	}
+
+	actions
+	{
+		Event Player.Cage_Fight_Pos = World Vector Of(Vector(0, 0.100, 0), Event Player, Rotation And Translation);
+		Chase Player Variable At Rate(Event Player, Cage_Fight_Pos, Ray Cast Hit Position(Event Player.Cage_Fight_Pos,
+			Event Player.Cage_Fight_Pos - Vector(0, 1, 0), Null, Event Player, False) + Vector(0, 0.010, 0), 6, Destination and Rate);
+		Wait Until(!Is Using Ultimate(Event Player), 99999);
+		Stop Chasing Player Variable(Event Player, Cage_Fight_Pos);
+		Event Player.Progress_Counter[0] = 0;
+	}
+}
+
+rule("Has Been Caged")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Is_Caged_By) != True;
+		Has Status(Event Player, Phased Out) != True;
+		Is True For Any(Players On Hero(Hero(Mauga), All Teams), Is Using Ultimate(Current Array Element) && Is In Line of Sight(
+			Eye Position(Event Player), Current Array Element.Cage_Fight_Pos, Barriers Do Not Block LOS) && Distance Between(Vector(
+			X Component Of(Position Of(Event Player)), Y Component Of(Current Array Element.Cage_Fight_Pos), Z Component Of(Position Of(
+			Event Player))), Current Array Element.Cage_Fight_Pos) < 9 && Distance Between(Vector(X Component Of(
+			Current Array Element.Cage_Fight_Pos), Y Component Of(Position Of(Event Player)), Z Component Of(
+			Current Array Element.Cage_Fight_Pos)), Current Array Element.Cage_Fight_Pos) < 8) == True;
+	}
+
+	actions
+	{
+		Event Player.Is_Caged_By = First Of(Filtered Array(Players On Hero(Hero(Mauga), All Teams), Is Using Ultimate(
+			Current Array Element) && Is In Line of Sight(Eye Position(Event Player), Current Array Element.Cage_Fight_Pos,
+			Barriers Do Not Block LOS) && Distance Between(Vector(X Component Of(Position Of(Event Player)), Y Component Of(
+			Current Array Element.Cage_Fight_Pos), Z Component Of(Position Of(Event Player))), Current Array Element.Cage_Fight_Pos)
+			< 9 && Distance Between(Vector(X Component Of(Current Array Element.Cage_Fight_Pos), Y Component Of(Position Of(Event Player)),
+			Z Component Of(Current Array Element.Cage_Fight_Pos)), Current Array Element.Cage_Fight_Pos) < 8) == True);
+	}
+}
+
+rule("No Longer Caged")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Entity Exists(Event Player.Is_Caged_By) == True;
+		Is True For Any(Array(!Is Using Ultimate(Event Player.Is_Caged_By), Distance Between(Vector(X Component Of(Position Of(
+			Event Player)), Y Component Of(Event Player.Is_Caged_By.Cage_Fight_Pos), Z Component Of(Position Of(Event Player))),
+			Event Player.Is_Caged_By.Cage_Fight_Pos) > 10, Distance Between(Vector(X Component Of(Event Player.Is_Caged_By.Cage_Fight_Pos),
+			Y Component Of(Position Of(Event Player)), Z Component Of(Event Player.Is_Caged_By.Cage_Fight_Pos)),
+			Event Player.Is_Caged_By.Cage_Fight_Pos) > 10), Current Array Element) == True;
+	}
+
+	actions
+	{
+		Event Player.Is_Caged_By = Null;
+	}
+}
+
+rule("Three's A Crowd - Progress")
+{
+	event
+	{
+		Player Earned Elimination;
+		All;
+		Mauga;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+		Victim.Is_Caged_By == Event Player;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[0] += 1;
+	}
+}
+
+rule("Heartthrob - Progress (Damage)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Mauga;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] += Min(Event Damage, Event Player.Progress_Needed[1] - Event Player.Progress_Counter[1]);
+	}
+}
+
+rule("Heartthrob - Progress (Healing)")
+{
+	event
+	{
+		Player Dealt Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] += Min(Event Healing, Event Player.Progress_Needed[1] - Event Player.Progress_Counter[1]);
+	}
+}
+
+rule("Heartthrob - Reset")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mauga;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) != True;
+	}
+
+	actions
+	{
+		Event Player.Progress_Counter[1] = 0;
+	}
+}
