@@ -1,0 +1,12 @@
+{
+    "passive": "Eject!",
+    "primary fire": "Fusion Cannons",
+    "secondary fire": "Defense Matrix",
+    "ability1": "Boosters",
+    "ability2": "Micro Missiles",
+    "ultimate": "Self-Destruct",
+    "alternativeform": {
+        "primary fire": "Light Gun",
+        "ultimate": "Call Mech"
+    }
+}

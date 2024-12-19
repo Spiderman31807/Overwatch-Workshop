@@ -1,0 +1,11 @@
+{
+    "passive": "Inspire",
+    "primary fire": "Rocket Flail",
+    "secondary fire": "Barrier Shield",
+    "ability1": "Whip Shot",
+    "ability2": "Repair Pack",
+    "ultimate": "Rally",
+    "alternativeform": {
+        "primary fire": "Shield Bash"
+    }
+}
