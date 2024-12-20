@@ -6,6 +6,7 @@
     "ultimate": "Configuration: Artillery",
     "extras": [
         "Configuration: Assault",
+        "Configuration: Tank",
         "Self Repair"
     ]
 }
