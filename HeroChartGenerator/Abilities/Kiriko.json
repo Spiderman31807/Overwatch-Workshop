@@ -1,7 +1,7 @@
 {
-    "passive": "Wall Climb (Kiriko)",
-    "primary fire": "Healing Ofuda",
-    "secondary fire": "Kunai",
+    "passive": "Wall Climb",
+    "primary": "Healing Ofuda",
+    "secondary": "Kunai",
     "ability1": "Swift Step",
     "ability2": "Protection Suzu",
     "ultimate": "Kitsune Rush"
