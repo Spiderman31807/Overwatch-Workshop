@@ -1,7 +1,6 @@
 {
     "passive": "Energy",
-    "primary fire": "Particle Cannon",
-    "secondary fire": "Particle Cannon Alt Fire",
+    "primary": "Particle Cannon",
     "ability1": "Particle Barrier",
     "ability2": "Projected Barrier",
     "ultimate": "Graviton Surge"
