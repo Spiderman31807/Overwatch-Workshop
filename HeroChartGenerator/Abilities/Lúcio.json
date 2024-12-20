@@ -1,7 +1,7 @@
 {
     "passive": "Wall Ride",
-    "primary fire": "Sonic Amplifier",
-    "secondary fire": "Soundwave",
+    "primary": "Sonic Amplifier",
+    "secondary": "Soundwave",
     "ability1": "Crossfade",
     "ability2": "Amp It Up",
     "ultimate": "Sound Barrier",
