@@ -1,8 +1,11 @@
 {
-    "passive": "The Best Defense...",
-    "primary fire": "Hand Cannon",
-    "secondary fire": "Rocket Punch",
+    "passive": "The Best Defense",
+    "primary": "Hand Cannon",
+    "secondary": "Rocket Punch",
     "ability1": "Seismic Slam",
     "ability2": "Power Block",
-    "ultimate": "Meteor Strike"
+    "ultimate": "Meteor Strike",
+    "extras": [
+        "Wall Slam"
+    ]
 }
