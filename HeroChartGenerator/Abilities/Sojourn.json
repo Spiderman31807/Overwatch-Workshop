@@ -1,6 +1,6 @@
 {
-    "primary fire": "Railgun",
-    "secondary fire": "Railgun Alt Fire",
+    "primary": "Railgun",
+    "secondary": "Railgun Alt Fire",
     "ability1": "Power Slide",
     "ability2": "Disruptor Shot",
     "ultimate": "Overclock"
