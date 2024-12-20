@@ -1,6 +1,6 @@
 {
-    "primary fire": "Endothermic Blaster",
-    "secondary fire": "Icicle",
+    "primary": "Endothermic Blaster",
+    "secondary": "Icicle",
     "ability1": "Cryo Freeze",
     "ability2": "Ice Wall",
     "ultimate": "Blizzard"
