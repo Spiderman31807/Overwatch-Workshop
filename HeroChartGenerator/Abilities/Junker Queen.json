@@ -4,5 +4,9 @@
     "secondary fire": "Jagged Blade",
     "ability1": "Commanding Shout",
     "ability2": "Carnage",
-    "ultimate": "Rampage"
+    "ultimate": "Rampage",
+    "extras": [
+        "Axe Recall",
+        "Barbed Axe"
+    ]
 }
