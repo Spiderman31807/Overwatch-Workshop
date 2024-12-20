@@ -1,7 +1,11 @@
 {
     "primary fire": "Photon Projector",
-    "secondary fire": "Photon Projector Alt Fire",
     "ability1": "Sentry Turret",
     "ability2": "Teleporter",
-    "ultimate": "Photon Barrier"
+    "ultimate": "Photon Barrier",
+    "extras": [
+        "Photon Barrier (Original)",
+        "Photon Shield",
+        "Shield Generator"
+    ]
 }
