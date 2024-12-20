@@ -1,10 +1,10 @@
 {
     "passive": "Ironclad",
-    "primary fire": "Configuration: Recon",
-    "secondary fire": "A-36 Tactical Grenade",
+    "primary": "Configuration: Recon",
+    "secondary": "A-36 Tactical Grenade",
     "ability1": "Reconfigure",
     "ultimate": "Configuration: Artillery",
-    "alternativeform": {
-        "primary fire": "Configuration: Assault"
-    }
+    "extras": [
+        "Configuration: Assault"
+    ]
 }
