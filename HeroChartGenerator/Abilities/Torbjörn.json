@@ -1,6 +1,6 @@
 {
-    "primary fire": "Rivet Gun",
-    "secondary fire": "Rivet Gun Alt Fire",
+    "primary": "Rivet Gun",
+    "secondary": "Rivet Gun Alt Fire",
     "ability1": "Deploy Turret",
     "ability2": "Overload",
     "ultimate": "Molten Core",
