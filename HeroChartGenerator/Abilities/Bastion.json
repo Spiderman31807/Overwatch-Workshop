@@ -5,6 +5,7 @@
     "ability1": "Reconfigure",
     "ultimate": "Configuration: Artillery",
     "extras": [
-        "Configuration: Assault"
+        "Configuration: Assault",
+        "Self Repair"
     ]
 }
