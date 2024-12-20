@@ -1,7 +1,10 @@
 {
-    "primary fire": "Peacekeeper",
-    "secondary fire": "Peacekeeper Alt Fire",
+    "primary": "Peacekeeper",
+    "secondary": "Peacekeeper Alt Fire",
     "ability1": "Combat Roll",
     "ability2": "Flashbang",
-    "ultimate": "Deadeye"
+    "ultimate": "Deadeye",
+    "extras": [
+        "Magnetic Grenade"
+    ]
 }
