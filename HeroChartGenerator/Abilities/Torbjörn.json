@@ -1,8 +1,12 @@
 {
     "primary fire": "Rivet Gun",
     "secondary fire": "Rivet Gun Alt Fire",
-    "secondary weapon": "Forge Hammer",
     "ability1": "Deploy Turret",
     "ability2": "Overload",
-    "ultimate": "Molten Core"
+    "ultimate": "Molten Core",
+    "extras": [
+        "Forge Hammer",
+        "Armor Pack",
+        "Build Turret"
+    ]
 }
