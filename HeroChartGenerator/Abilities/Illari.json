@@ -1,6 +1,6 @@
 {
-    "primary fire": "Solar Rifle",
-    "secondary fire": "Solar Rifle Alt Fire",
+    "primary": "Solar Rifle",
+    "secondary": "Solar Rifle Alt Fire",
     "ability1": "Outburst",
     "ability2": "Healing Pylon",
     "ultimate": "Captive Sun"
