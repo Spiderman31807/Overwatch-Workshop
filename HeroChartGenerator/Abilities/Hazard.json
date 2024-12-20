@@ -1,7 +1,7 @@
 {
     "passive": "Vault",
-    "primary fire": "Bonespur",
-    "secondary fire": "Spike Guard",
+    "primary": "Bonespur",
+    "secondary": "Spike Guard",
     "ability1": "Violent Leap",
     "ability2": "Jagged Wall",
     "ultimate": "Downpour"
