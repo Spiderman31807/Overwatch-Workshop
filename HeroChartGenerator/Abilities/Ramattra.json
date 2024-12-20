@@ -1,11 +1,11 @@
 {
-    "primary fire": "Void Accelerator",
-    "secondary fire": "Void Barrier",
+    "primary fire": "Void Accelerator (Omnic Form)",
+    "secondary fire": "Void Barrier (Omnic Form)",
     "ability1": "Nemesis Form",
     "ability2": "Ravenous Vortex",
     "ultimate": "Annihilation",
-    "alternativeform": {
-        "primary fire": "Pummel",
-        "secondary fire": "Block"
-    }
+    "extras": [
+        "Block (Nemesis Form)",
+        "Pummel (Nemesis Form)"
+    ]
 }
