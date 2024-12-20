@@ -4,5 +4,8 @@
     "secondary fire": "Soundwave",
     "ability1": "Crossfade",
     "ability2": "Amp It Up",
-    "ultimate": "Sound Barrier"
+    "ultimate": "Sound Barrier",
+    "extras": [
+        "Healing Boost"
+    ]
 }
