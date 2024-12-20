@@ -1,6 +1,6 @@
 {
-    "primary fire": "Mediblaster",
-    "secondary fire": "Pulsar Torpedoes",
+    "primary": "Mediblaster",
+    "secondary": "Pulsar Torpedoes",
     "ability1": "Glide Boost",
     "ability2": "Hyper Ring",
     "ultimate": "Orbital Ray",
