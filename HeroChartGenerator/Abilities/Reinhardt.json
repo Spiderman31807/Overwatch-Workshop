@@ -1,6 +1,6 @@
 {
-    "primary fire": "Rocket Hammer",
-    "secondary fire": "Barrier Field",
+    "primary": "Rocket Hammer",
+    "secondary": "Barrier Field",
     "ability1": "Charge",
     "ability2": "Fire Strike",
     "ultimate": "Earthshatter"
