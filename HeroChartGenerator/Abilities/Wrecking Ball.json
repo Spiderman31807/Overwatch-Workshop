@@ -1,6 +1,6 @@
 {
-    "primary fire": "Quad Cannons",
-    "secondary fire": "Grappling Claw",
+    "primary": "Quad Cannons",
+    "secondary": "Grappling Claw",
     "ability1": "Roll",
     "ability2": "Adaptive Shield",
     "ultimate": "Minefield",
