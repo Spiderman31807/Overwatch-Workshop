@@ -1,7 +1,7 @@
 {
     "passive": "Glide",
-    "primary fire": "Tri-Shot",
-    "secondary fire": "Sticky Bombs",
+    "primary": "Tri-Shot",
+    "secondary": "Sticky Bombs",
     "ability1": "Flight",
     "ability2": "Focusing Beam",
     "ultimate": "Duplicate"
