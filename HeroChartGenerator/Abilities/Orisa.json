@@ -3,5 +3,9 @@
     "secondary fire": "Energy Javelin",
     "ability1": "Fortify",
     "ability2": "Javelin Spin",
-    "ultimate": "Terra Surge"
+    "ultimate": "Terra Surge",
+    "extras": [
+        "Fusion Driver",
+        "Halt"
+    ]
 }
