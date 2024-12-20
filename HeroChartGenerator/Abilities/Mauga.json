@@ -1,7 +1,7 @@
 {
     "passive": "Berserker",
-    "primary fire": "Incendiary Chaingun",
-    "secondary fire": "Volatile Chaingun",
+    "primary": "Incendiary Chaingun",
+    "secondary": "Volatile Chaingun",
     "ability1": "Overrun",
     "ability2": "Cardiac Overdrive",
     "ultimate": "Cage Fight"
