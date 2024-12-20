@@ -1,6 +1,5 @@
 {
-    "primary fire": "Tesla Cannon",
-    "secondary fire": "Tesla Cannon Alt Fire",
+    "primary": "Tesla Cannon",
     "ability1": "Barrier Projector",
     "ability2": "Jump Pack",
     "ultimate": "Primal Rage"
