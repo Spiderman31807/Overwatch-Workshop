@@ -1,6 +1,5 @@
 {
-    "primary fire": "Orb of Destruction",
-    "secondary fire": "Orb of Destruction Alt Fire",
+    "primary": "Orb of Destruction",
     "ability1": "Orb of Harmony",
     "ability2": "Orb of Discord",
     "ultimate": "Transcendence",
