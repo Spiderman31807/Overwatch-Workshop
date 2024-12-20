@@ -1,9 +1,11 @@
 {
     "passive": "Opportunist",
-    "passive2": "Stealth",
     "primary fire": "Machine Pistol",
     "secondary fire": "Hack",
     "ability1": "Virus",
     "ability2": "Translocator",
-    "ultimate": "EMP"
+    "ultimate": "EMP",
+    "extras": [
+        "Stealth"
+    ]
 }
