@@ -1,7 +1,7 @@
 {
     "passive": "Opportunist",
-    "primary fire": "Machine Pistol",
-    "secondary fire": "Hack",
+    "primary": "Machine Pistol",
+    "secondary": "Hack",
     "ability1": "Virus",
     "ability2": "Translocator",
     "ultimate": "EMP",
