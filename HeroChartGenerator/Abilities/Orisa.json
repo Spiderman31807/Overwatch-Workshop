@@ -1,11 +1,12 @@
 {
-    "primary fire": "Augmented Fusion Driver",
-    "secondary fire": "Energy Javelin",
+    "primary": "Augmented Fusion Driver",
+    "secondary": "Energy Javelin",
     "ability1": "Fortify",
     "ability2": "Javelin Spin",
     "ultimate": "Terra Surge",
     "extras": [
         "Fusion Driver",
+        "Supercharger",
         "Halt"
     ]
 }
