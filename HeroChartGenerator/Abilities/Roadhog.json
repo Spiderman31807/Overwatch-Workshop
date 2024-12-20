@@ -1,6 +1,6 @@
 {
-    "primary fire": "Scrap Gun",
-    "secondary fire": "Take a Breather",
+    "primary": "Scrap Gun",
+    "secondary": "Take a Breather",
     "ability1": "Chain Hook",
     "ability2": "Pig Pen",
     "ultimate": "Whole Hog"
